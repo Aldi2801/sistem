@@ -1,0 +1,50 @@
+{% extends 'include/include.html' %} {% block content %}
+
+<div class="page-titles">
+  <div class="row">
+    <div class="col-lg-8 col-md-6 col-12 align-self-center">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0 d-flex align-items-center">
+          <li class="breadcrumb-item">
+            <a href="index.html" class="link"
+              ><i class="ri-home-3-line fs-5"></i
+            ></a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">Info Desa / Sejarah</li>
+        </ol>
+      </nav>
+      <h1 class="mb-0 fw-bold">Sejarah</h1>
+    </div>
+    <div
+      class="col-lg-4 col-md-6 d-none d-md-flex align-items-center justify-content-end"
+    >
+      <a
+        href="../admin/edit_sejarah"
+        class="btn btn-info d-flex align-items-center ms-2"
+      >
+      <i data-feather="edit"  style="width: 18px; height: 18px; margin-right: 10px"></i>
+        Edit
+      </a>
+    </div>
+  </div>
+</div>
+<div class="container-fluid">
+  <!-- ============================================================= -->
+  <!-- Start Page Content -->
+  <!-- ============================================================= -->
+  <!-- user card -->
+  <div style="margin: 0px">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Sejarah:</h4>
+
+        {{info_list[0]['sejarah']|safe}}
+      </div>
+    </div>
+  </div>
+  <!-- ============================================================= -->
+  <!-- End PAge Content -->
+  <!-- ============================================================= -->
+</div>
+
+{% endblock %}

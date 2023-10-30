@@ -1,0 +1,347 @@
+{% extends 'include/include.html' %} {% block content %}
+<head>
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="../../static/assets/libs/quill/dist/quill.snow.css"
+  />
+</head>
+
+<div class="page-titles">
+  <div class="row">
+    <div class="col-lg-8 col-md-6 col-12 align-self-center">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0 d-flex align-items-center">
+          <li class="breadcrumb-item">
+            <a href="index.html" class="link"
+              ><i class="ri-home-3-line fs-5"></i
+            ></a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">Berita</li>
+        </ol>
+      </nav>
+      <h1 class="mb-0 fw-bold">Berita</h1>
+    </div>
+
+    <div
+      class="col-lg-4 col-md-6 d-none d-md-flex align-items-center justify-content-end"
+    >
+      <a
+        class="btn btn-info d-flex align-items-center ms-2"
+        data-bs-toggle="modal"
+        data-bs-target="#bs-example-modal-xlg"
+      >
+        <i class="ri-add-line me-1"></i>
+        Tambah Berita
+      </a>
+    </div>
+    <!-- Modal tambah-->
+    <div
+      class="modal fade"
+      id="bs-example-modal-xlg"
+      tabindex="-1"
+      aria-labelledby="bs-example-modal-lg"
+      aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header d-flex align-items-center">
+            <h4 class="modal-title" id="myLargeModalLabel">
+              Tambah Berita
+            </h4>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <h4>Judul Berita</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="judulberitabaru" class="form-control" />
+              </div>
+            </form>
+            <h4>Input Gambar</h4>
+            <form>
+              <div class="input-group mb-3">
+                <div class="custom-file">
+                  <input class="form-control" type="file" id="formFilebaru" />
+                </div>
+              </div>
+            </form>
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-12">
+                  <div class="card">
+                    <div class="border-bottom title-part-padding">
+                      <h4 class="mb-0">Deskripsi Berita</h4>
+                    </div>
+                    <div class="card-body">
+                      <!-- Create the editor container -->
+                      <div id="editor">
+                        <p id="val" value="Deskripsi Berita"></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+           
+              <a
+                id="tambah"
+                href="javascript:void(0)"
+                class="btn btn-info d-fFlex align-items-center ms-2"
+              >
+                Submit
+              </a>
+              <button
+                type="button"
+                class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+      <!-- Modal tambah -->
+    </div>
+  </div>
+  <br>
+  <div class="container-fluid" >
+    <div class="row">
+      <div class="col-12">
+        <!-- Row -->
+        <div class="row">
+          <!-- Column -->
+          {% for i in info_list :%}
+          <div class="col-lg-4">
+            <div class="card">
+              <img
+                class="card-img-top img-responsive"
+                src="../../static/image/{{i.gambar}}"
+                alt="Card image cap"
+              />
+              <div class="card-body">
+                <div class="d-flex no-block align-items-center mb-3">
+                  <span class="d-flex align-items-center"
+                    ><i data-feather="calendar" class="feather-sm me-1"></i
+                    >{{i.tanggal}}</span
+                  >
+                </div>
+                <h3 class="font-weight-medium">{{i.judul}}</h3>
+                <p class="mb-0 mt-2 text-muted">{{i.deskripsi|safe}}</p>
+                <div class="text-end">
+                  <button
+                    class="btn btn-primary btn-rounded waves-effect waves-light mt-3"
+                    data-bs-toggle="modal"
+                    data-bs-target="#bs-example-modal-lg-{{i.id}}"
+                  >
+                    Edit
+                  </button>
+                  
+                  <button class="btn btn-danger btn-rounded waves-effect waves-light mt-3" onclick="hapusBerita('{{i.id}}')">
+                    Hapus
+                  </button>
+                </div>
+                <!---->
+            </button>
+            <!-- Modal Edit-->
+          
+            <div
+            class="modal fade"
+            id="bs-example-modal-lg-{{i.id}}"
+            tabindex="-1"
+            aria-labelledby="bs-example-modal-lg"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog modal-xl">
+              <div class="modal-content">
+                <div class="modal-header d-flex align-items-center">
+                  <h4 class="modal-title" id="myLargeModalLabel1">
+                    Edit Berita
+                  </h4>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div class="modal-body">
+                  <h4>Judul Berita</h4>
+                  <form>
+                    <div class="form-group">
+                      <input type="text" class="form-control" id="editjudulberitabaru" value="{{i.judul}}" />
+                    </div>
+                  </form>
+                  <h4>Input Gambar Baru</h4>
+                  <form>
+                    <div class="input-group mb-3">
+                      <div class="custom-file">
+                        <input class="form-control" type="file" hint="{{i.gambar}}" id="editformFilebaru" />
+                      </div>
+                    </div>
+                  </form>
+                  <div class="container-fluid">
+                    <div class="row">
+                      <div class="col-12">
+                        <div class="card">
+                          <div class="border-bottom title-part-padding">
+                            <h4 class="mb-0">Deskripsi Berita</h4>
+                          </div>
+                            <!-- Create the editor container -->
+                            <div id="editor-{{i.id}}">
+                              {{i.deskripsifull|safe}}
+                              <p  value="Deskripsi Berita"></p>
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  
+                  <button
+                  type="submit"
+                      onclick="edit('{{i.id}}')"
+                      class="btn btn-info d-flex align-items-center ms-2"
+                    >
+                      Submit
+                </button>
+                    <button
+                      type="button"
+                      class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start"
+                      data-bs-dismiss="modal"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+                <!-- /.modal-content -->
+              </div>
+              <!-- /.modal-dialog -->
+            </div>
+            <!-- Modal tambah -->
+        
+                <!---->
+              </div>
+            </div>
+          </div>
+          <!-- Column -->
+<script>
+  $(document).ready(function () {
+   new Quill("#editor-{{i.id}}", {
+    theme: "snow",
+  });
+});
+</script>
+          {% endfor %}
+        </div>
+        <!-- Row -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Initialize Quill editor -->
+
+  <!-- All Jquery -->
+  <!-- ============================================================= -->
+
+  <script>
+    $(document).ready(function () {
+      var tambah = new Quill("#editor", {
+        theme: "snow",
+      });
+      $( "#tambah" ).on( "click", function() {
+        var value = tambah.getText();
+        var jdl = $('#judulberitabaru').val()
+        var formFilebaru = $('#formFilebaru')
+        console.log(String(value))
+
+          let formData = new FormData();
+          formData.append('judul',jdl)
+          jQuery.each(jQuery('#formFilebaru')[0].files, function(i, file) {
+            formData.append('gambar', file);
+        });
+        formData.append('deskripsi',String(value))
+        
+          console.log(formData)
+          $.ajax({
+            url: "/admin/tambah_berita",
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            method: 'POST',
+            type: 'POST', 
+          }).done(function (data) {
+            console.log(data);
+            
+            window.location.href = "/admin/berita";
+          });
+          event.preventDefault();
+      } );
+    
+   
+    
+    });
+</script>
+<script>
+  function edit(id){
+    var quilli = new Quill("#editor-"+id, {
+      theme: "snow",
+    });
+    var editvalue = quilli.getText();
+    var editjdl = $('#editjudulberitabaru').val()
+    var editformFilebaru = $('#editjudulberitabaru').val()
+    let formData = new FormData();
+    formData.append('id',id);
+    formData.append('judul',editjdl);
+    jQuery.each(jQuery('#formFilebaru')[0].files, function(i, file) {
+      formData.append('gambar', file);
+  });
+  formData.append('deskripsi',String(editvalue))
+      $.ajax({
+        url: "/admin/edit_berita",
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        method: 'POST',
+        type: 'POST', 
+      }).done(function (data) {
+        console.log(data);
+        window.location.href = "/admin/berita";
+      });
+  } 
+  function hapusBerita(id) {
+    $.ajax({
+      url: '/hapus_berita',
+      method: 'POST',
+      data: { id: id },
+      dataType: 'json',
+    }).done(function(response) {
+      console.log(response);
+      // Handle the response or perform any necessary actions
+      
+      // Optional: Reload the page after successful deletion
+      window.location.href = "/admin/berita";
+    }).fail(function(error) {
+      console.error(error);
+      // Handle the error case
+    });
+  }
+</script>
+
+<script>
+
+
+</script>
+  {% endblock %}
+</div>

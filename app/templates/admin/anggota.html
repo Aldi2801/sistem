@@ -1,0 +1,456 @@
+{% extends 'include/include.html' %} {% block content %}
+<head>
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="../../static/assets/libs/quill/dist/quill.snow.css"
+  />
+</head>
+
+<div class="page-titles">
+  <div class="row">
+    <div class="col-lg-8 col-md-6 col-12 align-self-center">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0 d-flex align-items-center">
+          <li class="breadcrumb-item">
+            <a href="index.html" class="link"
+              ><i class="ri-home-3-line fs-5"></i
+            ></a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">Anggota Pemerintahan</li>
+        </ol>
+      </nav>
+      <h1 class="mb-0 fw-bold">Anggota</h1>
+    </div>
+
+    <div
+      class="col-lg-4 col-md-6 d-none d-md-flex align-items-center justify-content-end"
+    >
+      <a
+        class="btn btn-info d-flex align-items-center ms-2"
+        data-bs-toggle="modal"
+        data-bs-target="#bs-example-modal-xlg"
+      >
+        <i class="ri-add-line me-1"></i>
+        Tambah Anggota
+      </a>
+    </div>
+    <!-- Modal tambah-->
+    <div
+      class="modal fade"
+      id="bs-example-modal-xlg"
+      tabindex="-1"
+      aria-labelledby="bs-example-modal-lg"
+      aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header d-flex align-items-center">
+            <h4 class="modal-title" id="myLargeModalLabel">
+              Tambah Anggota
+            </h4>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <h4>Nama Anggota</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="Namalengkapbaru" class="form-control" />
+              </div>
+            </form>
+            <h4>Input Gambar</h4>
+            <form>
+              <div class="input-group mb-3">
+                <div class="custom-file">
+                  <input class="form-control" type="file" id="formFilebaru" />
+                </div>
+              </div>
+            </form>
+            <h4>Jabatan</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="jabatanbaru" class="form-control" />
+              </div>
+            </form>
+            <h4>NIAP</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="niapbaru" class="form-control" />
+              </div>
+            </form>
+            <h4>Tempat, Tanggal Lahir</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="ttlbaru" class="form-control" />
+              </div>
+            </form>
+            <h4>Agama</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="agamabaru" class="form-control" />
+              </div>
+            </form>
+            <h4>Pangkat / Golongan</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="golonganbaru" class="form-control" />
+              </div>
+            </form>
+            <h4>Pendidikan Terakhir</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="pendidkanbaru" class="form-control" />
+              </div>
+            </form>
+            <h4>Nomor SK</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="nomorskbaru" class="form-control" />
+              </div>
+            </form>
+            <h4>Tanggal SK</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="tanggalskbaru" class="form-control" />
+              </div>
+            </form>
+            <h4>Masa Jabatan</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="masajabatanbaru" class="form-control" />
+              </div>
+            </form>
+            <h4>Status</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="statusbaru" class="form-control" />
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+           
+              <button
+                id="tambah"
+                href="javascript:void(0)"
+                class="btn btn-info d-fFlex align-items-center ms-2"
+              >
+                Submit
+              </button>
+              <button
+                type="button"
+                class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+      <!-- Modal tambah -->
+    </div>
+  </div>
+  <br>
+  <div class="container-fluid" >
+    <div class="row">
+      <div class="col-12">
+        <!-- Row -->
+        <div class="row">
+          <!-- Column -->
+          {% for i in info_list :%}
+          <div class="col-lg-4">
+            <div class="card">
+              <img
+                class="card-img-top img-responsive"
+                src="../../static/image/{{i.gambar}}"
+                alt="Card image cap"
+              />
+              <div class="card-body">
+                <div class="d-flex no-block align-items-center mb-3">
+                  <span class="d-flex align-items-center"
+                    ><i data-feather="calendar" class="feather-sm me-1"></i
+                    >{{i.status}}</span
+                  >
+                </div>
+                <h3 class="font-weight-medium">{{i.nama_lengkap}}</h3>
+                <p class="mb-0 mt-2 text-muted">{{i.jabatan}}</p>
+                <div class="text-end">
+                  <button
+                    class="btn btn-primary btn-rounded waves-effect waves-light mt-3"
+                    data-bs-toggle="modal"
+                    data-bs-target="#bs-example-modal-lg-{{i.id}}"
+                  >
+                    Edit
+                  </button>
+                  
+                  <button class="btn btn-danger btn-rounded waves-effect waves-light mt-3" onclick="hapusBerita('{{i.id}}')">
+                    Hapus
+                  </button>
+                </div>
+                <!---->
+            </button>
+            <!-- Modal Edit-->
+          
+            <div
+            class="modal fade"
+            id="bs-example-modal-lg-{{i.id}}"
+            tabindex="-1"
+            aria-labelledby="bs-example-modal-lg"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog modal-xl">
+              <div class="modal-content">
+                <div class="modal-header d-flex align-items-center">
+                  <h4 class="modal-title" id="myLargeModalLabel1">
+                    Edit Anggota
+                  </h4>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div class="modal-body">
+                  <h4>Nama lengkap</h4>
+                  <form>
+                    <div class="form-group">
+                      <input type="text" class="form-control" id="editnamalengkapbaru" value="{{i.nama_lengkap}}" />
+                    </div>
+                  </form>
+                  <h4>Input Gambar Baru</h4>
+                  <form>
+                    <div class="input-group mb-3">
+                      <div class="custom-file">
+                        <input class="form-control" type="file" hint="{{i.gambar}}" id="editformFilebaru" />
+                      </div>
+                    </div>
+                  </form>
+                  <h4>Jabatan</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="editjabatanbaru" class="form-control" value="{{i.jabatan}}" />
+              </div>
+            </form>
+            <h4>NIAP</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="editniapbaru" class="form-control" />
+              </div>
+            </form>
+            <h4>Tempat, Tanggal Lahir</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="editttlbaru" class="form-control" value="{{i.ttl}}" />
+              </div>
+            </form>
+            <h4>Agama</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="editagamabaru" class="form-control" value="{{i.agama}}" />
+              </div>
+            </form>
+            <h4>Pangkat / Golongan</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="editgologanbaru" class="form-control" value="{{i.gologan}}" />
+              </div>
+            </form>
+            <h4>Pendidikan Terakhir</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="editpendidikanbaru" class="form-control" value="{{i.pendidikan_terakhir}}" />
+              </div>
+            </form>
+            <h4>Nomor SK</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="editnomorskbaru" class="form-control" value="{{i.nomorsk}}"/>
+              </div>
+            </form>
+            <h4>Tanggal SK</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="edittanggalskbaru" class="form-control" value="{{i.tanggalsk}}" />
+              </div>
+            </form>
+            <h4>Masa Jabatan</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="editmasajabatanbaru" class="form-control" value="{{i.masa_jabatan}}"/>
+              </div>
+            </form>
+            <h4>Status</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="editstatusbaru" class="form-control" value="{{i.status}}"/>
+              </div>
+            </form>
+                </div>
+                <div class="modal-footer">
+                  
+                  <button
+                  type="submit"
+                      onclick="edit('{{i.id}}')"
+                      class="btn btn-info d-flex align-items-center ms-2"
+                    >
+                      Submit
+                </button>
+                    <button
+                      type="button"
+                      class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start"
+                      data-bs-dismiss="modal"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+                <!-- /.modal-content -->
+              </div>
+              <!-- /.modal-dialog -->
+            </div>
+            <!-- Modal tambah -->
+        
+                <!---->
+              </div>
+            </div>
+          </div>
+          <!-- Column -->
+
+          {% endfor %}
+        </div>
+        <!-- Row -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Initialize Quill editor -->
+
+  <!-- All Jquery -->
+  <!-- ============================================================= -->
+
+  <script>
+    let formData = new FormData();
+    $(document).ready(function () {
+    
+      $( "#tambah" ).on( "click", function() {
+        var nama = $('#Namalengkapbaru').val()
+        var formFilebaru = $('#formFilebaru')
+        var jabatan = $('#jabatanbaru').val()
+        var niap = $('#niapbaru').val()
+        var ttl = $('#ttlbaru').val()
+        var agama = $('#agamabaru').val()
+        var golongan = $('#golonganbaru').val()
+        var pendidikan = $('#pendidkanbaru').val()
+        var nomorsk = $('#nomorskbaru').val()
+        var tanggalsk = $('#tanggalskbaru').val()
+        var masajabatan = $('#masajabatanbaru').val()
+        var status = $('#statusbaru').val()
+        
+
+          formData.append('nama_lengkap',nama)
+          jQuery.each(jQuery('#formFilebaru')[0].files, function(i, file) {
+            formData.append('gambar', file);
+        });
+        
+          formData.append('jabatan',jabatan)
+          formData.append('niap',niap)
+          formData.append('ttl',ttl)
+          formData.append('agama',agama)
+          formData.append('golongan',golongan)
+          formData.append('pendidikan_terakhir',pendidikan)
+          formData.append('nomorsk',nomorsk)
+          formData.append('tanggalsk',tanggalsk)
+          formData.append('masa_jabatan',masajabatan)
+          formData.append('status',status)
+        
+          console.log(formData)
+          $.ajax({
+            url: "/admin/tambah_anggota",
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            method: 'POST',
+            type: 'POST', 
+          }).done(function (data) {
+            console.log(data);
+            
+            window.location.href = "/admin/anggota";
+          });
+          event.preventDefault();
+      } );
+    
+   
+    
+});
+  function edit(id){
+    
+    var editnama = $('#editnamalengkapbaru').val()
+    var editformFilebaru = $('#editformFilebaru').val()
+    var editjabatan = $('#editjabatanbaru').val()
+    var editniap = $('#editniapbaru').val()
+    var editttl = $('#editttlbaru').val()
+    var editagama = $('#editagamabaru').val()
+    var editgolongan = $('#editgologanbaru').val()
+    var editpendidikan = $('#editpendidikanbaru').val()
+    var editnomorsk = $('#editnomorskbaru').val()
+    var edittanggalsk = $('#edittanggalskbaru').val()
+    var editmasajabatan = $('#editmasajabatanbaru').val()
+    var editstatus = $('#editstatusbaru').val()
+    formData.append('id',id);
+    formData.append('nama_lengkap',editnama)
+    jQuery.each(jQuery('#formFilebaru')[0].files, function(i, file) {
+      formData.append('gambar', file);
+  });
+    formData.append('jabatan',editjabatan)
+    formData.append('niap',editniap)
+    formData.append('ttl',editttl)
+    formData.append('agama',editagama)
+    formData.append('golongan',editgolongan)
+    formData.append('pendidikan_terakhir',editpendidikan)
+    formData.append('nomorsk',editnomorsk)
+    formData.append('tanggalsk',edittanggalsk)
+    formData.append('masa_jabatan',editmasajabatan)
+    formData.append('status',editstatus)
+      $.ajax({
+        url: "/admin/edit_anggota",
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        method: 'POST',
+        type: 'POST', 
+      }).done(function (data) {
+        console.log(data);
+        
+      });
+  } 
+  function hapusBerita(id) {
+    $.ajax({
+      url: '/hapus_berita',
+      method: 'POST',
+      data: { id: id },
+      dataType: 'json',
+    }).done(function(response) {
+      console.log(response);
+      // Handle the response or perform any necessary actions
+      
+      // Optional: Reload the page after successful deletion
+      window.location.href = "/admin/berita";
+    }).fail(function(error) {
+      console.error(error);
+      // Handle the error case
+    });
+  }
+  
+</script>
+
+  {% endblock %}
+</div>

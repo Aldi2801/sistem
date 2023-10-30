@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="keywords"
+      content="wrappixel, admin dashboard, html css dashboard, web dashboard, bootstrap 5 admin, bootstrap 5, css3 dashboard, bootstrap 5 dashboard, FlexileDash bootstrap dashboard admin bootstrap 5 dashboard, frontend, responsive bootstrap 5 admin template, material design, FlexileDash bootstrap 5 dashboard template"
+    />
+    <meta
+      name="description"
+      content="FlexileDash is powerful and clean admin dashboard template"
+    />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Admin Desa Pangkah</title>
+    <!-- Favicon icon -->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../../static/assets/images/favicon.png"
+    />
+    <!-- Side Bar -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="../../static/assets/extra-libs/css-chart/css-chart.css"
+    />
+    <!-- Ck Editor -->
+    <link
+    rel="stylesheet"
+    type="text/css"
+    href="../../static/assets/libs/quill/dist/quill.snow.css"
+  />
+  <!-- Table -->
+  <link
+  href="../../static/assets/extra-libs/datatables.net-bs4/css/dataTables.bootstrap4.css"
+  rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link
+      rel="stylesheet"
+      href="../../static/assets/libs/apexcharts/dist/apexcharts.css"
+    />
+    <link href="../../static/dist/css/style.min.css" rel="stylesheet" />
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="../../static/assets/libs/jquery/dist/jquery.min.js"></script>
+  </head>
+
+  <body>
+    <!-- ============================================================= -->
+    <!-- Preloader - style you can find in spinners.css -->
+    <!-- ============================================================= -->
+    
+    <!-- ============================================================= -->
+    <!-- Main wrapper - style you can find in pages.scss -->
+    <!-- ============================================================= -->
+    <div id="main-wrapper">
+      <!-- ============================================================= -->
+      <!-- Topbar header - style you can find in pages.scss -->
+      <!-- ============================================================= -->
+      <header class="topbar">
+        <nav class="navbar top-navbar navbar-expand-md navbar-dark">
+          <div class="navbar-header">
+            <!-- This is for the sidebar toggle which is visible on mobile only -->
+            <a
+              class="nav-toggler waves-effect waves-light d-block d-md-none"
+              href="javascript:void(0)"
+              ><i class="ri-close-line ri-menu-2-line fs-6"></i
+            ></a>
+            <!-- ============================================================== -->
+            <!-- Logo -->
+            <!-- ============================================================== -->
+
+            <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
+            <!-- Dark Logo icon -->
+
+            <!-- Light Logo icon -->
+            <img
+              src="../../static/image/Shield_of_Tegal_Regency.svg"
+              alt="homepage"
+              class="light-logo"
+              style="height: 20%; width: 20%; margin-left: 50px"
+            />
+
+            <!-- ============================================================== -->
+            <!-- End Logo -->
+            <!-- ============================================================== -->
+            <!-- ============================================================== -->
+            <!-- Toggle which is visible on mobile only -->
+            <!-- ============================================================== -->
+            <a
+              class="topbartoggler d-block d-md-none waves-effect waves-light"
+              href="javascript:void(0)"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+              ><i class="ri-more-line fs-6"></i
+            ></a>
+          </div>
+          <!-- ============================================================== -->
+          <!-- End Logo -->
+          <!-- ============================================================== -->
+          <div class="navbar-collapse collapse" id="navbarSupportedContent">
+            <!-- ============================================================== -->
+            <!-- toggle and nav items -->
+            <!-- ============================================================== -->
+            <ul class="navbar-nav me-auto">
+              <!-- This is  -->
+              <li class="nav-item">
+                <a
+                  class="nav-link sidebartoggler d-none d-md-block"
+                  href="javascript:void(0)"
+                  ><i data-feather="menu"></i
+                ></a>
+              </li>
+              <!-- search -->
+            </ul>
+            <!-- ============================================================== -->
+            <!-- Right side toggle and nav items -->
+            <!-- ============================================================== -->
+            <ul class="navbar-nav">
+              <!-- ============================================================== -->
+              <!-- Messages -->
+              <!-- ============================================================== -->
+
+              <!-- ============================================================== -->
+              <!-- End Messages -->
+              <!-- ============================================================== -->
+              <!-- ============================================================== -->
+              <!-- Comment -->
+              <!-- ============================================================== -->
+
+              <!-- ============================================================== -->
+              <!-- End Comment -->
+              <!-- ============================================================== -->
+
+              <!-- ============================================================== -->
+              <!-- Profile -->
+              <!-- ============================================================== -->
+              <li class="nav-item dropdown profile-dropdown">
+                <a
+                  class="nav-link dropdown-toggle d-flex align-items-center"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  <img
+                    src="../../static/assets/images/users/user.jpg"
+                    alt="user"
+                    width="30"
+                    class="profile-pic rounded-circle"
+                  />
+                  <div class="d-none d-md-flex">
+                    <span class="ms-2"
+                      >Hi, <span class="text-dark fw-bold">Admin</span></span
+                    >
+                    <span>
+                      <i data-feather="chevron-down" class="feather-sm"></i>
+                    </span>
+                  </div>
+                </a>
+                <div
+                  class="dropdown-menu dropdown-menu-end mailbox dropdown-menu-animate-up"
+                  style="width: 50%"
+                >
+                  <ul class="list-style-none">
+                    <li class="p-30 pt-0">
+                      <!-- Message -->
+
+                      <div class="mt-4">
+                        <a
+                          class="btn btn-info text-white"
+                          href="javascript:void(0);"
+                        >
+                          Logout
+                        </a>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </header>
+      <!-- ============================================================= -->
+      <!-- End Topbar header -->
+      <!-- ============================================================= -->
+      <!-- ============================================================= -->
+      <!-- Left Sidebar - style you can find in sidebar.scss  -->
+      <!-- ============================================================= -->
+      {% include "include/sidebar2.html" %}
+      <!-- ============================================================= -->
+      <!-- End Left Sidebar - style you can find in sidebar.scss  -->
+      <!-- ============================================================= -->
+      <!-- ============================================================= -->
+      <!-- Page wrapper  -->
+      <!-- ============================================================= -->
+      <div class="page-wrapper">
+        <!-- ============================================================== -->
+        <!-- Bread crumb and right sidebar toggle -->
+        <!-- ============================================================== -->
+
+        <!-- ============================================================== -->
+        <!-- End Bread crumb and right sidebar toggle -->
+        <!-- ============================================================== -->
+        <!-- ============================================================= -->
+        <!-- Container fluid  -->
+        <!-- ============================================================= -->
+
+        {% block content %}{% endblock content %}
+        <!-- ============================================================= -->
+        <!-- End Container fluid  -->
+        <!-- ============================================================= -->
+        <!-- ============================================================= -->
+        <!-- footer -->
+        <!-- ============================================================= -->
+        <footer class="footer text-center">
+          2021© All Rights Reserved by Wrappixel
+        </footer>
+        <!-- ============================================================= -->
+        <!-- End footer -->
+        <!-- ============================================================= -->
+      </div>
+      <!-- ============================================================= -->
+      <!-- End Page wrapper  -->
+      <!-- ============================================================= -->
+    </div>
+    <!-- ============================================================= -->
+    <!-- End Wrapper -->
+    <!-- ============================================================= -->
+    <!-- ============================================================= -->
+    <!-- customizer Panel -->
+    <!-- ============================================================= -->
+
+    <!-- ============================================================= -->
+    <!-- All Jquery -->
+    <!-- ============================================================= -->
+    <!-- Bootstrap tether Core JavaScript -->
+    <script src="../../static/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- apps -->
+    <script src="../../static/dist/js/app.min.js"></script>
+    <script src="../../static/dist/js/app.init.stylish.js"></script>
+    <script src="../../static/dist/js/app-style-switcher.js"></script>
+    <!-- slimscrollbar scrollbar JavaScript -->
+    <script src="../../static/assets/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
+    <script src="../../static/assets/extra-libs/sparkline/sparkline.js"></script>
+    <!--Wave Effects -->
+    <script src="../../static/dist/js/waves.js"></script>
+    <!--Menu sidebar -->
+    <script src="../../static/dist/js/sidebarmenu.js"></script>
+    <!--Custom JavaScript -->
+    <script src="../../static/dist/js/feather.min.js"></script>
+    <script src="../../static/dist/js/custom.min.js"></script>
+    <!-- This Page JS -->
+    <script src="../../static/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+    <script src="../../static/dist/js/pages/widget/card-custom.js"></script>
+    <!-- Quill editor -->
+    <script src="../../static/assets/libs/quill/dist/quill.min.js"></script>
+    <!-- Table -->
+    <script src="../../static/assets/extra-libs/datatables.net/js/jquery.dataTables.min.js"></script>
+  </body>
+</html>

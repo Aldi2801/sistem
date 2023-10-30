@@ -1,0 +1,260 @@
+{% extends 'include/include.html' %} {% block content %}
+<div class="page-titles">
+  <div class="row">
+    <div class="col-lg-8 col-md-6 col-12 align-self-center">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0 d-flex align-items-center">
+          <li class="breadcrumb-item">
+            <a href="index.html" class="link"
+              ><i class="ri-home-3-line fs-5"></i
+            ></a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            Dana Desa
+          </li>
+        </ol>
+      </nav>
+      <h1 class="mb-0 fw-bold">Dana Desa</h1>
+    </div>
+    <div
+      class="col-lg-4 col-md-6 d-none d-md-flex align-items-center justify-content-end"
+    >
+      <a
+        href="javascript:void(0)"
+        class="btn btn-info d-flex align-items-center ms-2"
+        data-bs-toggle="modal"
+        data-bs-target="#bs-example-modal-xl"
+      >
+        <i class="ri-add-line me-1"></i>
+        Add New
+      </a>
+    </div>
+  </div>
+</div>
+<!-- ============================================================== -->
+<!-- End Bread crumb and right sidebar toggle -->
+<!-- ============================================================== -->
+<!-- ============================================================= -->
+<!-- Container fluid  -->
+<!-- ============================================================= -->
+<div class="container-fluid">
+  <!-- ============================================================= -->
+  <!-- Start Page Content -->
+  <!-- ============================================================= -->
+  <!-- File export -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="border-bottom title-part-padding">
+          <h4>File export</h4>
+          <h6 class="card-subtitle mb-0">
+            Exporting data from a table can often be a key part of a complex
+            application. The Buttons extension for DataTables provides three
+            plug-ins that provide overlapping functionality for data export. You
+            can refer full documentation from here
+            <a href="https://datatables.net/">Datatables</a>
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table
+              id="file_export"
+              class="table table-striped table-bordered display text-nowrap"
+            >
+              <thead>
+                <tr>
+                  <th>Tahun</th>
+                  <th>Anggaran</th>
+                  <th>Realisasi</th>
+                  <th>Lebih/Kurang</th>
+                  <th>Detail</th>
+                </tr>
+              </thead>
+              {% for i in info_list :%}
+              <tbody>
+                <tr>
+                  <td>{{i.tahun}}</td>
+                  <td>RP. {{ '{:,.0f}'.format(i['total_anggaran']|int) }}</td>
+                  <td>RP. {{ '{:,.0f}'.format(i['realisasi']|int) }}</td>
+                  <td>RP. {{ '{:,.0f}'.format(i['lebih']|int) }}</td>
+                  <td>
+                    <a
+                      href="javascript:void(0)"
+                      class="
+                      d-inline-flex
+                      align-items-center
+                      justify-content-center
+                      btn btn-info btn-circle btn-lg"
+                      data-bs-toggle="modal"
+                      data-bs-target="#bs-example-modal-xlg-{{i.id}}"
+                    >
+                      <i class="bi-file-earmark-bar-graph"></i>
+                    </a>
+                  </td>
+                  
+                </tr>
+              </tbody>
+    <div
+      class="modal fade"
+      id="bs-example-modal-xlg-{{i.id}}"
+      tabindex="-1"
+      aria-labelledby="bs-example-modal-lg"
+      aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header d-flex align-items-center">
+            <h4 class="modal-title" id="myLargeModalLabel">
+              Detail Dana Desa
+            </h4>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <img
+                class="card-img-top img-responsive"
+                src="../../static/image/{{i.gambar}}"
+                alt="Card image cap"
+              />
+          <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+      <!-- Modal tambah -->
+    </div>
+              <tbody>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div
+      class="modal fade"
+      id="bs-example-modal-xl"
+      tabindex="-1"
+      aria-labelledby="bs-example-modal-lg"
+      aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header d-flex align-items-center">
+            <h4 class="modal-title" id="myLargeModalLabel">
+              Tambah Dana Desa
+            </h4>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <h4>Tahun Dana</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="tahun" class="form-control" />
+              </div>
+            </form>
+            <h4>Input Gambar</h4>
+            <form>
+              <div class="input-group mb-3">
+                <div class="custom-file">
+                  <input class="form-control" type="file" id="formFilebaru" />
+                </div>
+              </div>
+            </form>
+            <h4>Tambah Anggaran</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="total_anggaran" class="form-control" />
+              </div>
+            </form>
+            <h4>Relisasi</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="relisasi" class="form-control" />
+              </div>
+            </form>
+            <h4>Lebih/Kurang</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="lebih" class="form-control" />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <div
+              class="col-lg-4 col-md-6 d-none d-md-flex align-items-center justify-content-end"
+            >
+              <a
+                id="tambah"
+                href="javascript:void(0)"
+                class="btn btn-info d-flex align-items-center ms-2"
+              >
+                Submit
+              </a>
+            </div>
+              <button
+                type="button"
+                class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+      <!-- Modal tambah -->
+    </div>
+    <script>
+      $( "#tambah" ).on( "click", function() {
+        var thn = $('#tahun').val();
+        var formFilebaru = $('#formFilebaru')[0].files[0];
+        var ang = $('#total_anggaran').val();
+        var rea = $('#realisasi').val();
+        var leb = $('#lebih').val();
+    
+        let formData = new FormData();
+        formData.append('tahun', thn);
+        formData.append('gambar', formFilebaru);
+        formData.append('total_anggaran', ang);
+        formData.append('realisasi', rea);
+        formData.append('lebih', leb);
+    
+        console.log(formData);
+        $.ajax({
+          url: "/admin/tambah_dana",
+          data: formData,
+          cache: false,
+          contentType: false,
+          processData: false,
+          method: 'POST',
+          success: function(data) {
+            console.log(data);
+            // Redirect to "admindana" after successful AJAX request
+            window.location.href = "/admin/dana";
+          }
+        });
+        event.preventDefault();
+      });
+    </script>
+{% endblock %}

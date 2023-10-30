@@ -1,0 +1,154 @@
+{% extends 'include/base.html' %}
+{% block content %}
+
+<div class="page-titles">
+  <div class="row">
+    <div class="col-lg-8 col-md-6 col-12 align-self-center">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0 d-flex align-items-center">
+          <li class="breadcrumb-item">
+            <a href="/" class="link"><i class="ri-home-3-line fs-5"></i></a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">PEMERINTAHAN DESA</li>
+        </ol>
+      </nav>
+      <h1 class="mb-0 fw-bold">PEMERINTAHAN DESA</h1>
+    </div>
+  </div>
+</div>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <!-- Row -->
+
+      <!-- Row -->
+    </div>
+  </div>
+</div>
+<div class="container-fluid">
+  <!-- ============================================================= -->
+  <!-- Start Page Content -->
+  <!-- ============================================================= -->
+  <!-- user card -->
+
+  <div class="row">
+    <div class="col-lg-8">
+      {% for i in info_list :%}
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex no-block white-space align-items-center ">
+            <img class="card-img img-responsive" src="../static/image/{{i.gambar}}" alt="Card image cap"
+              src="../../static/image/{{i.gambar}}" style="max-width: 200px;" />
+            
+            <div class="align-items-center " style="margin-left: 20px;  height: 100%; width: 100%;">
+              <table style="width: 100%;">
+                <tr>
+                  <th style="width: 50%;"></th>
+                  <th style="width: 5%;"></th>
+                  <th style="width: 45%;"></th>
+                </tr>
+                <tr>
+                  <td>NAMA</td>
+                  <td> : </td>
+                  <td>{{ i.nama_lengkap }}</td>
+                </tr>
+                <tr>
+                  <td>JABATAN</td>
+                  <td> : </td>
+                  <td>{{ i.jabatan }}</td>
+                </tr>
+                <tr>
+                  <td>NIAP</td>
+                  <td> : </td>
+                  <td>{{ i.niap }}</td>
+                </tr>
+                <tr>
+                  <td>TEMPAT, TANGGAL LAHIR</td>
+                  <td> : </td>
+                  <td>{{ i.ttl }}</td>
+                </tr>
+                <tr>
+                  <td>AGAMA</td>
+                  <td> : </td>
+                  <td>{{ i.agama }}</td>
+                </tr>
+                <tr>
+                  <td>PANGKAT / GOLONGAN</td>
+                  <td> : </td>
+                  <td>{{ i.golongan }}</td>
+                </tr>
+                <tr>
+                  <td>PENDIDIKAN TERAKHIR</td>
+                  <td> : </td>
+                  <td>{{ i.pendidikan_terakhir }}</td>
+                </tr>
+                <tr>
+                  <td>NOMOR SK</td>
+                  <td> : </td>
+                  <td>{{ i.nomorsk }}</td>
+                </tr>
+                <tr>
+                  <td>TANGGAL SK</td>
+                  <td> : </td>
+                  <td>{{ i.tanggalsk }}</td>
+                </tr>
+                <tr>
+                  <td>MASA JABATAN</td>
+                  <td> : </td>
+                  <td>{{ i.masa_jabatan }}</td>
+                </tr>
+                <tr>
+                  <td>STATUS</td>
+                  <td> : </td>
+                  <td>{{ i.status }}</td>
+                </tr>
+
+
+              </table>
+            </div>
+          </div>
+
+          <!---->
+        </div>
+      </div>
+      {% endfor %}
+
+    </div>
+
+    <div class="col-lg-4 mt-4 mt-md-0">
+      <div class="card">
+        <div class="card-body">
+          <center>
+            <img src="../static/image/logo.png" style="width: 150px; height: 100px;" alt="logo admin"><br><br>
+          </center>
+          <h4>Sistem Informasi desa pangkah</h4>
+          <p><strong>Desa pangkah</strong> berada di kecamatan Pangkah Kab. Tegal, dengan sebagian
+            besar penduduknya sebagai Perindustrian/jasa menjadikan desa pangkah memiliki potensi
+            wisata .</p><br>
+          <p>Dengan luas wilayah 62.98 m<sup>2</sup> ini populasinya dianggap cukup karena dari total
+            penduduk sebesar 2950, terbagi para laki-laki di pangkah sebanyak 1474 orang dan 1476
+            sisanya wanita.</p><br>
+          <br><br><br><br><br><br><br><br><br><br><br><br>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <h4 class="text-uppercase">Kontak Bantuan</h4>
+          <hr>
+          <h4 class="d-flex align-item-center">
+            <i class="ri-smartphone-line"></i> 081227589209
+          </h4>
+          <small>Please contact with us if you have any questions. We are
+            avalible 24h.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- End PAge Content -->
+<!-- ============================================================= -->
+</div>
+
+{% endblock %}

@@ -1,0 +1,356 @@
+{% extends 'include/include.html' %} {% block content %}
+<div class="page-titles">
+    <div class="row">
+      <div class="col-lg-8 col-md-6 col-12 align-self-center">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0 d-flex align-items-center">
+            <li class="breadcrumb-item">
+              <a href="index.html" class="link"
+                ><i class="ri-home-3-line fs-5"></i
+              ></a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Info Desa / Monografi</li>
+          </ol>
+        </nav>
+        <h1 class="mb-0 fw-bold">Monografi</h1>
+      </div>
+      <div
+        class="col-lg-4 col-md-6 d-none d-md-flex align-items-center justify-content-end"
+      >
+        <a
+          href="javascript:void(0)"
+          class="btn btn-info d-flex align-items-center ms-2"
+        >
+        <i data-feather="edit" style="width: 18px; height: 18px; margin-right: 10px"></i>
+          Edit
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    <!-- ============================================================= -->
+    <!-- Start Page Content -->
+    <!-- ============================================================= -->
+    <!-- Row -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body border-bottom">
+            <h4 class="card-title">Monografi Desa</h4>
+            <div class="col-sm-3">
+              <div class="mb-3">
+                <select
+                  class="form-select"
+                  id="tahun"
+                  name="educationDate"
+                >
+                  <option>Tahun</option>
+                  {% for i in info_list :%}
+                  <option value="{{i.tahun}}">{{i.tahun}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <form class="form-horizontal" action="/admin/monoedit" method="post">
+            <div class="card-body">
+              <input
+              type="hidden"
+              class="form-control"
+              name="hidden"
+              value=""
+            />
+              <h4 class="card-title">Kependudukan</h4>
+              <div class="mb-3 row">
+                <label
+                  for="cono"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Jumlah Penduduk</label
+                >
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="jpenduduk"
+                    value=" {{info_list[0]['jpenduduk']}}"
+                  />
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="cono"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Jumlah KK</label
+                >
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="jkk"
+                    value="{{info_list[0]['jkk']}}"
+                  />
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="cono1"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Laki-Laki</label
+                >
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="laki"
+                    value="{{info_list[0]['laki']}}"
+                  />
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="cono1"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Perempuan</label
+                >
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="perempuan"
+                    value="{{info_list[0]['perempuan']}}"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">Kesejahteraan Sosial</h4>
+              <div class="mb-3 row">
+                <label
+                  for="com1"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Jumlah KK Prasejahtera</label
+                >
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="jkkprese"
+                    value="{{info_list[0]['jkkprese']}}"
+                  />
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="com1"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Jumlah KK Sejahtera</label
+                >
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="jkkseja"
+                    value="{{info_list[0]['jkkseja']}}"
+                  />
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="com1"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Jumlah KK Kaya</label
+                >
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="jkkkaya"
+                    value="{{info_list[0]['jkkkaya']}}"
+                  />
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="com1"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Jumlah KK Sedang</label
+                >
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="jkksedang"
+                    value="{{info_list[0]['jkksedang']}}"
+                  />
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="com1"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Jumlah KK Miskin</label
+                >
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="jkkmiskin"
+                    value="{{info_list[0]['jkkmiskin']}}"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">Agama</h4>
+                <div class="mb-3 row">
+                  <label
+                    for="com1"
+                    class="col-sm-3 text-end control-label col-form-label"
+                    >Islam</label
+                  >
+                  <div class="col-sm-9">
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="islam"
+                      value="{{info_list[0]['islam']}}"
+                    />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label
+                    for="com1"
+                    class="col-sm-3 text-end control-label col-form-label"
+                    >Kristen</label
+                  >
+                  <div class="col-sm-9">
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="kristen"
+                      value="{{info_list[0]['kristen']}}"
+                    />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label
+                    for="com1"
+                    class="col-sm-3 text-end control-label col-form-label"
+                    >Protestan</label
+                  >
+                  <div class="col-sm-9">
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="protestan"
+                      value="{{info_list[0]['protestan']}}"
+                    />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label
+                    for="com1"
+                    class="col-sm-3 text-end control-label col-form-label"
+                    >Katolik</label
+                  >
+                  <div class="col-sm-9">
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="katolik"
+                      value="{{info_list[0]['katolik']}}"
+                    />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label
+                    for="com1"
+                    class="col-sm-3 text-end control-label col-form-label"
+                    >Hindu</label
+                  >
+                  <div class="col-sm-9">
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="hindu"
+                      value="{{info_list[0]['hindu']}}"
+                    />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                    <label
+                      for="com1"
+                      class="col-sm-3 text-end control-label col-form-label"
+                      >Budha</label
+                    >
+                    <div class="col-sm-9">
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="budha"
+                        value="{{info_list[0]['budha']}}"
+                      />
+                    </div>
+                  </div>
+              </div>
+            <div class="p-3 border-top">
+              <div class="text-end">
+                <button
+                  type="submit"
+                  class="
+                    btn btn-info
+                    rounded-pill
+                    px-4
+                    waves-effect waves-light
+                  "
+                >
+                  Save
+                </button>
+                <button
+                  type="submit"
+                  class="
+                    btn btn-dark
+                    rounded-pill
+                    px-4
+                    waves-effect waves-light
+                  "
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+<script>
+  $('#tahun').on('change', function() {
+    var info_list = JSON.parse('{{info_list|tojson}}');
+    console.log(info_list)
+    for(i in info_list){
+      console.log(info_list[i].tahun)
+      if (info_list[i].tahun==this.value){
+        $id=$('[name=id').val(info_list[i].id)
+        $tahun=$('[name=tahun]').val(info_list[i].tahun)
+        $jpenduduk=$('[name=jpenduduk]').val(info_list[i].jpenduduk)
+        $jkk=$('[name=jkk]').val(info_list[i].jkk)
+        $laki=$('[name=laki]').val(info_list[i].laki)
+        $perempuan=$('[name=perempuan]').val(info_list[i].perempuan)
+        $jkkprese=$('[name=jkkprese]').val(info_list[i].jkkprese)
+        $jkkseja=$('[name=jkkseja]').val(info_list[i].jkkseja)
+        $jkkkaya=$('[name=jkkkaya]').val(info_list[i].jkkkaya)
+        $jkksedang=$('[name=jkksedang]').val(info_list[i].jkksedang)
+        $jkkmiskin=$('[name=jkkmiskin]').val(info_list[i].jkkmiskin)
+        $islam=$('[name=islam]').val(info_list[i].islam)
+        $kristen=$('[name=kristen]').val(info_list[i].kristen)
+        $protestan=$('[name=protestan]').val(info_list[i].protestan)
+        $katolik=$('[name=katolik]').val(info_list[i].katolik)
+        $hindu=$('[name=hindu]').val(info_list[i].hindu)
+        $budha=$('[name=budha]').val(info_list[i].budha)
+      }
+    } 
+    
+  });
+</script>
+    {% endblock %}

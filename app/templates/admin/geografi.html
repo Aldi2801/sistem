@@ -1,0 +1,235 @@
+{% extends 'include/include.html' %} {% block content %}
+<div class="page-titles">
+    <div class="row">
+      <div class="col-lg-8 col-md-6 col-12 align-self-center">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0 d-flex align-items-center">
+            <li class="breadcrumb-item">
+              <a href="index.html" class="link"
+                ><i class="ri-home-3-line fs-5"></i
+              ></a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Info Desa/Geografi</li>
+          </ol>
+        </nav>
+        <h1 class="mb-0 fw-bold">Geografi</h1>
+      </div>
+      <div
+        class="col-lg-4 col-md-6 d-none d-md-flex align-items-center justify-content-end"
+      >
+        <a
+          href="javascript:void(0)"
+          class="btn btn-info d-flex align-items-center ms-2"
+        >
+        <i data-feather="edit" style="width: 18px; height: 18px; margin-right: 10px"></i>
+          Edit
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    <!-- ============================================================= -->
+    <!-- Start Page Content -->
+    <!-- ============================================================= -->
+    <!-- Row -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body border-bottom">
+            <h4 class="card-title">Kondisi Geografi</h4>
+            <h6 class="card-subtitle mb-0">
+              This is the basic horizontal form with labels on left and
+              form controls on right in one line. To use add class
+              <mark><code>form-horizontal</code></mark> to the form tag
+              and give class <mark><code>row</code></mark> with mb-3.
+            </h6>
+          </div>
+          <form class="form-horizontal" action="/admin/wilayah" method="post">
+            <div class="card-body">
+              <h4 class="card-title">Berbatasan Wilayah</h4>
+              <div class="mb-3 row">
+                <label
+                  for="com1"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Berbatasan Utara</label
+                >
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="utara"
+                    value="{{info_list2[0]['utara']}}"
+                  ></input>
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="com1"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Berbatasan Selatan</label
+                >
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="selatan"
+                    value="{{info_list2[0]['selatan']}}"
+                  />
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="com1"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Berbatasan Timur</label
+                >
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="timur"
+                    value="{{info_list2[0]['timur']}}"
+                  />
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="com1"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Berbatasan barat</label
+                >
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="barat"
+                    value="{{info_list2[0]['barat']}}"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="p-3 border-top">
+              <div class="text-end">
+                <button
+                  type="submit"
+                  class="
+                    btn btn-info
+                    rounded-pill
+                    px-4
+                    waves-effect waves-light
+                  "
+                  
+                >
+                  Save
+                </button>
+                <button
+                  type="submit"
+                  class="
+                    btn btn-dark
+                    rounded-pill
+                    px-4
+                    waves-effect waves-light
+                  "
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </form>
+          <form class="form-horizontal" action="/admin/tanah" method="post" >
+            <div class="card-body">
+              <h4 class="card-title">Luas Desa</h4>
+              <div class="mb-3 row">
+                <label
+                  for="fname"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Luas</label
+                >
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="luas"
+                    value=" {{info_list[0]['luas']}} Ha"
+                  />
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="lname"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Sawah Teririgasi</label
+                >
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="sawahteri"
+                    value="{{info_list[0]['sawahteri']}} Ha"
+                  />
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="text"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Sawah Tandah Hujan</label
+                >
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="sawahhu"
+                    value="{{info_list[0]['sawahhu']}} Ha"
+                  />
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="cono1"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Pemukiman</label
+                >
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="pemukiman"
+                    value="{{info_list[0]['pemukiman']}} Ha"
+                  />
+                </div>
+              </div>
+              <div class="p-3 border-top">
+                <div class="text-end">
+                  <button
+                    type="submit"
+                    class="
+                      btn btn-info
+                      rounded-pill
+                      px-4
+                      waves-effect waves-light
+                    "
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="submit"
+                    class="
+                      btn btn-dark
+                      rounded-pill
+                      px-4
+                      waves-effect waves-light
+                    "
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </from>
+        </div>
+      </div>
+    </div>
+
+    {% endblock %}

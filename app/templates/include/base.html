@@ -1,0 +1,282 @@
+<html dir="ltr" lang="en">
+
+<head>
+    {% block head %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <title>sistemdesa</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="../static/img/warjok.jpg">
+    <link href="../static/dist/css/style.min.css" rel="stylesheet">
+    <style type="text/css">
+        .text-yellow {
+            color: #FFFF00 !important;
+        }
+    </style>
+    <style type="text/css" id="operaUserStyle"></style>
+    <style type="text/css">
+        .jqstooltip {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            visibility: hidden;
+            background: rgb(0, 0, 0) transparent;
+            background-color: rgba(0, 0, 0, 0.6);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);
+            -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
+            color: white;
+            font: 10px arial, san serif;
+            text-align: left;
+            white-space: nowrap;
+            padding: 5px;
+            border: 1px solid white;
+            z-index: 10000;
+        }
+
+        .jqsfield {
+            color: white;
+            font: 10px arial, san serif;
+            text-align: left;
+        }
+    </style>
+    {% endblock %}
+</head>
+
+<body style="background-color: #e6f4ff;">
+
+
+    <!-- ============================================================= -->
+    <!-- Topbar header - style you can find in pages.scss -->
+    <!-- ============================================================= -->
+    <header class="topbar" data-navbarbg="skin6">
+        <nav class="navbar top-navbar navbar-expand-md navbar-light">
+            <img src="../static/image/logo.png" alt="logo-icon" style="width: 50px; height: 30px;">
+            <!-- ============================================================== -->
+            <!-- End Logo -->
+            <!-- ============================================================== -->
+            <div class="navbar-collapse collapse" id="navbarSupportedContent">
+                <!-- ============================================================== -->
+                <!-- toggle and nav items -->
+                <!-- ============================================================== -->
+
+                <!-- ============================================================== -->
+                <!-- Right side toggle and nav items -->
+                <!-- ============================================================== -->
+
+                <ul class="navbar-nav  navbar-right">
+                    <li class="nav-item">
+                        <a href="/"
+                        class="dropdown-item btn text-secondary font-weight-medium dropdown-toggle">
+                         Beranda
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <div class="btn-group" role="group">
+                            <button id="btnGroupVerticalDrop2" type="button"
+                                class="dropdown-item btn text-secondary font-weight-medium dropdown-toggle"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Profil Desa ▼
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                <a class="dropdown-item" href="/sejarah">SEJARAH & MONOGRAFI DESA</a>
+                                <a class="dropdown-item" href="#">VIDEO PROFIL DESA</a>
+                            </div>
+                        </div>
+                        <!-- ============================================================== -->
+                        <!-- Messages -->
+                        <!-- ============================================================== -->
+                    <li class="nav-item">
+                        <div class="btn-group" role="group">
+                            <button id="btnGroupDrop1" type="button"
+                                class="dropdown-item btn text-secondary font-weight-medium dropdown-toggle"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Pemerintahan ▼
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                <a class="dropdown-item" href="/visi_misi">VISI DAN MISI</a>
+                                <a class="dropdown-item" href="/pemerintahan_desa">PEMERINTAH DESA</a>
+                                <a class="dropdown-item" href="#">BADAN PERMUSYAWARATAN DESA</a>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="nav-item">
+                        <div class="btn-group" role="group">
+                            <button id="btnGroupDrop1" type="button"
+                                class="dropdown-item btn text-secondary font-weight-medium dropdown-toggle"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Dana Desa ▼
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                <a class="dropdown-item" href="/dana/2021">TAHUN ANGGARAN 2021</a>
+                                <a class="dropdown-item" href="/dana/2022">TAHUN ANGGARAN 2022</a>
+                                
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <div class="btn-group" role="group">
+                            <a href="https://www.google.com/maps/place/Pangkah,+Tegal+Regency,+Central+Java/@-6.981731,109.15958,15z/data=!4m6!3m5!1s0x2e6fbf7326f79acf:0xb8e2ae524ec7f3c8!8m2!3d-6.9803518!4d109.1627343!16s%2Fg%2F122t1938?entry=ttu" id="btnGroupDrop1" type="button"
+                                class="dropdown-item btn text-secondary font-weight-medium dropdown-toggle">
+                                Peta Desa
+                        </a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <div class="btn-group" role="group">
+                            <button id="btnGroupDrop1" type="button"
+                                class="dropdown-item btn text-secondary font-weight-medium dropdown-toggle"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Data Desa ▼
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                <a class="dropdown-item" href="#">DATA WILAYAH ADMINISTRATIF</a>
+                                <a class="dropdown-item" href="#">DATA PEKERJAAN</a>
+                                <a class="dropdown-item" href="#">DATA AGAMA</a>
+                                <a class="dropdown-item" href="#">DATA JENIS KELAMIN</a>
+                                <a class="dropdown-item" href="#">DATA WARGA NEGARA</a>
+                                <a class="dropdown-item" href="#">DATA CALON PEMILIH</a>
+                                <a class="dropdown-item" href="#">KELAS SOSIAL KELUARGA</a>
+                                <a class="dropdown-item" href="#">DATA PENDIDIKAN DALAM KK</a>
+                                <a class="dropdown-item" href="#">DATA PENDIDIKAN DITEMPUH</a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <div class="btn-group" role="group">
+                            <button id="btnGroupDrop1" type="button"
+                                class="dropdown-item btn text-secondary font-weight-medium dropdown-toggle"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Galeri Foto
+                            </button>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <div class="btn-group" role="group">
+                            <button id="btnGroupDrop1" type="button"
+                                class="dropdown-item btn text-secondary font-weight-medium dropdown-toggle"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Agenda
+                            </button>
+
+                        </div>
+                    </li>
+                    <!-- ============================================================== -->
+                    <!-- End Messages -->
+                    <!-- ============================================================== -->
+                    <!-- ============================================================== -->
+                    <!-- Comment -->
+                    <!-- ============================================================== -->
+
+                    <!-- ============================================================== -->
+                    <!-- End Comment -->
+                    <!-- ============================================================== -->
+
+                    <!-- ============================================================== -->
+                    <!-- Profile -->
+                    <!-- ============================================================== -->
+
+                </ul>
+            </div>
+        </nav>
+    </header>
+    
+    {% block content %}
+    {% endblock content %}
+
+    <div class="container-fluid row">
+        <h1 class="mb-0 fw-bold">Peta Wilayah Desa</h1>
+        <div class="col-lg-12">
+        </div>
+    </div>
+    <iframe style="margin-top:32px;"
+        src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15840.934627434102!2d109.15958!3d-6.981731!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e6fbf7326f79acf%3A0xb8e2ae524ec7f3c8!2sPangkah%2C%20Tegal%20Regency%2C%20Central%20Java!5e0!3m2!1sen!2sid!4v1697634290283!5m2!1sen!2sid"
+        width="100%" height="400px" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+
+    <footer class="footer ">
+        <div class="footer">
+            <div class="footer-top">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="footer-left">
+                            <div class="footer-title">Tentang Desa Pangkah</div>
+                            <p style="text-align:justify">Desa Pangkah merupakan desa yang memberi pelayanan publik
+                                secara cepat dan efisien. Dengan mengedepankan pelayanan dan pengolahan data berbasis
+                                IT, Desa Pangkah diharapkan dapat berkembang menjadi yang lebih maju dalam berbagai
+                                aspek baik itu SDM, Kesehatan, Kesejahteraan dan Ekonomi. Dengan Portal Desa Digital
+                                semua pelayanan menjadi lebih baik.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="footer-center">
+                            <div class="logo-footer">
+                                <a href="#" target="_blank"><img src="../static/image/logo.png" alt="Logo Desa"
+                                        width="100"></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="footer-right">
+                            <div class="footer-title">Kontak Desa Pangkah</div>
+                            <ul style="list-style: none;">
+                                <li style="text-align: left; "><i class="fa fa-map-marker"></i> &nbsp;Jalan Raya Bogares Lor-Balamoa-Slawi, Km 2,5
+                                    Kecamatan Pangkah Kabupaten Tegal Jawa Tengah Kodepos
+                                    52471 </li>
+                                <li style="text-align: left; "> <i class="fa fa-phone"></i> &nbsp;Telepon : </li>
+                                <li style="text-align: left; "><i class="fa fa-envelope"></i>
+                                    Email : pemdesboglor@gmail.com</li>
+                                <li style="text-align: left; "><i class="fa fa-globe"></i> &nbsp;https://bogareslor.id</li>
+                            </ul>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="social-footer">
+                    <a href="https://www.facebook.com/danu.nimbuzz" target="_blank"
+                        class="scl-btn scl-crcl shadow fa fa-facebook"></a>
+                    <a href="https://api.whatsapp.com/send?phone=62816599941" target="_blank"
+                        class="scl-btn scl-crcl shadow fa fa-whatsapp"></a>
+                </div>
+            </div>
+        </div>
+        2023© All Rights Reserved
+    </footer>
+    <script src="../static/assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="../static/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../static/dist/js/app.min.js"></script>
+    <script src="../static/dist/js/app.init.stylish.js"></script>
+    <script src="../static/dist/js/app-style-switcher.js"></script>
+    <script src="../static/assets/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
+    <script src="../static/assets/extra-libs/sparkline/sparkline.js"></script>
+    <script src="../static/dist/js/waves.js"></script>
+    <script src="../static/dist/js/sidebarmenu.js"></script>
+    <script src="../static/dist/js/feather.min.js"></script>
+    <script src="../static/dist/js/custom.min.js"></script>
+    <script>
+        var paket = "";
+        $("input").on("click", function () {
+            console.log($("input:checked").val() + " is checked!");
+            var paket = $("input:checked").val();
+        });
+        function send() {
+            var email = $("#email").val();
+            var pswd = $("#pswd").val();
+            var reqhero = $("#reqhero").val();
+            var catatan = $("#catatan").val();
+            var userid = $("#userid").val();
+            var loginmethod = $("#loginvia").val();
+            var paket = $("input:checked").val();
+            console.log(email, pswd, reqhero, catatan, userid, loginmethod, paket)
+            var url = "https://wa.me/6281227589209?text=email:%20" + email + "%0D%0Apassword:%20" + pswd + "%0D%0ARequest%20Hero:%20" + reqhero + "%0D%0ACatatan:%20" + catatan + "%0D%0AUser%20ID%20dan%20Nick%20Name:%20" + userid + "%0D%0ALogin%20Via:%20" + loginmethod + "%0D%0APaket:%20" + paket
+            window.open(url, '_blank');
+        }
+    </script>
+
+
+</body>
+
+</html>

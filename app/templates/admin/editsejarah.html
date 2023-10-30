@@ -1,0 +1,107 @@
+{% extends 'include/include.html' %} {% block content %}
+<head><link
+    rel="stylesheet"
+    type="text/css"
+    href="../../static/assets/libs/quill/dist/quill.snow.css"
+  /></head>
+<div class="page-titles">
+    <div class="row">
+      <div class="col-lg-8 col-md-6 col-12 align-self-center">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0 d-flex align-items-center">
+            <li class="breadcrumb-item">
+              <a href="index.html" class="link"
+                ><i class="ri-home-3-line fs-5"></i
+              ></a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+              Quill Editor
+            </li>
+          </ol>
+        </nav>
+        <h1 class="mb-0 fw-bold">Quill Editor</h1>
+      </div>
+      <div
+        class="
+          col-lg-4 col-md-6
+          d-none d-md-flex
+          align-items-center
+          justify-content-end
+        "
+      >
+      <a
+      id="submit"
+      href="javascript:void(0)"
+      class="btn btn-info d-flex align-items-center ms-2"
+    >
+      Submit
+    </a>
+      
+    </div>
+  </div>
+  <!-- ============================================================== -->
+  <!-- End Bread crumb and right sidebar toggle -->
+  <!-- ============================================================== -->
+  <!-- ============================================================= -->
+  <!-- Container fluid  -->
+  <!-- ============================================================= -->
+  <div class="container-fluid">
+    <!-- ============================================================= -->
+    <!-- Start Page Content -->
+    <!-- ============================================================= -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="border-bottom title-part-padding">
+            <h4 class="mb-0">Quill Editor</h4>
+          </div>
+          <div class="card-body">
+            <!-- Create the editor container -->
+            <div id="editor" style="height: 300px">
+              <p id="val">{{info[1]}}</p>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ============================================================= -->
+    <!-- End PAge Content -->
+    <!-- ============================================================= -->
+  </div>
+  
+  <!-- Initialize Quill editor -->
+  
+    <!-- All Jquery -->
+    <!-- ============================================================= -->
+    
+  <script>
+    $(document).ready(function () {
+        var quill = new Quill("#editor", {
+            theme: "snow",
+          });
+        $( "#submit" ).on( "click", function() {
+            var value = quill.root.innerHTML
+            //var content = quill.getContents()
+            //var contenthtml = content
+            //console.log(quill.getContents())
+            console.log(String(value))
+            var formData = {
+                sejarah: String(value)
+              };
+              console.log(formData)
+              $.ajax({
+                type: "POST",
+                url: "/admin/edit_sejarah",
+                data: formData,
+                dataType: "json",
+                encode: true,
+              }).done(function (data) {
+                console.log(data);
+              });
+              event.preventDefault();
+          } );
+      });
+  </script>
+  
+  {% endblock %}

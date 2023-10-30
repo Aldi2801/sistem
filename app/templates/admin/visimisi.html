@@ -1,0 +1,172 @@
+{% extends 'include/include.html' %} {% block content %}
+<head>
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="../../static/assets/libs/quill/dist/quill.snow.css"
+  />
+</head>
+
+<div class="page-titles">
+  <div class="row">
+    <div class="col-lg-8 col-md-6 col-12 align-self-center">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0 d-flex align-items-center">
+          <li class="breadcrumb-item">
+            <a href="index.html" class="link"
+              ><i class="ri-home-3-line fs-5"></i
+            ></a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">Visi Dan Misi</li>
+        </ol>
+      </nav>
+      <h1 class="mb-0 fw-bold">Visi Dan Misi</h1>
+    </div>
+
+    <div
+      class="col-lg-4 col-md-6 d-none d-md-flex align-items-center justify-content-end"
+    >
+      
+    </div>
+  </div>
+<form class="form-horizontal" style="padding-top: 20px">
+    <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="border-bottom title-part-padding">
+              <h4 class="mb-0">Visi Desa</h4>
+            </div>
+            <div class="card-body">
+              <!-- Create the editor container -->
+              <div id= "editor" style="height: 300px">
+                <p name="visi" id="val">{{info_list[0]['visi']|safe}}</p>
+              </div>
+            </div>
+            <div class="p-3 border-top">
+              <div class="text-end">
+                <button
+                id="submit"
+                  type="submit"
+                  class="
+                    btn btn-info
+                    rounded-pill
+                    px-4
+                    waves-effect waves-light
+                  "
+                  
+                >
+                  Save
+                </button>
+                <button
+                  type="submith"
+                  class="
+                    btn btn-dark
+                    rounded-pill
+                    px-4
+                    waves-effect waves-light
+                  "
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="border-bottom title-part-padding">
+            <h4 class="mb-0">Misi Desa</h4>
+          </div>
+          <div class="card-body">
+            <!-- Create the editor container -->
+            <div  id= "edit" style="height: 300px">
+              <p name="visi" id="val">{{info_list[0]['misi']|safe}}</p>
+            </div>
+          </div>
+          <div class="p-3 border-top">
+            <div class="text-end">
+              <button
+              id="submit2"
+                type="submit"
+                class="
+                  btn btn-info
+                  rounded-pill
+                  px-4
+                  waves-effect waves-light
+                "
+                
+              >
+                Save
+              </button>
+              <button
+                type="submit2"
+                class="
+                  btn btn-dark
+                  rounded-pill
+                  px-4
+                  waves-effect waves-light
+                "
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</from>
+</div>
+<script>
+    $(document).ready(function () {
+        var quill = new Quill("#editor", {
+            theme: "snow",
+          });
+          $( "#submit" ).on( "click", function() {
+            var value = quill.root.innerHTML
+            console.log(String(value))
+            var formData = {
+                visi: String(value)
+              };
+              console.log(formData)
+              $.ajax({
+                type: "POST",
+                url: "/admin/visiedit",
+                data: formData,
+                dataType: "json",
+                encode: true,
+              }).done(function (data) {
+                console.log(data);
+              });
+              event.preventDefault();
+          } );
+        var quilll = new Quill("#edit", {
+            theme: "snow",
+          });
+          $( "#submit2" ).on( "click", function() {
+            var value = quilll.root.innerHTML
+            console.log(String(value))
+            var formData = {
+                misi: String(value)
+              };
+              console.log(formData)
+              $.ajax({
+                type: "POST",
+                url: "/admin/misiedit",
+                data: formData,
+                dataType: "json",
+                encode: true,
+              }).done(function (data) {
+                console.log(data);
+              });
+              event.preventDefault();
+          } );
+      });
+        
+</script>
+<script>
+    
+</script>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'include/base.html' %} 
+{% block content %}
+
+<div class="page-titles">
+    <div class="row">
+      <div class="col-lg-8 col-md-6 col-12 align-self-center">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0 d-flex align-items-center">
+            <li class="breadcrumb-item">
+              <a href="/" class="link"
+                ><i class="ri-home-3-line fs-5"></i
+              ></a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">VISI & MISI DESA PANGKAH</li>
+          </ol>
+        </nav>
+        <h1 class="mb-0 fw-bold">VISI & MISI DESA PANGKAH</h1>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <!-- ============================================================= -->
+    <!-- Start Page Content -->
+    <!-- ============================================================= -->
+    <!-- user card -->
+    
+    <div class="row">
+      <div class="col-lg-8">
+    <div style="margin: 0px">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Visi dan Misi:</h4>
+  
+          {{info_list[0]['visi']|safe}}
+          {{info_list[0]['misi']|safe}}
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="col-lg-4 mt-4 mt-md-0">
+      <div class="card">
+          <div class="card-body">
+              <center>
+                  <img src="../static/image/logo.png" style="width: 150px; height: 100px;"
+                      alt="logo admin"><br><br>
+              </center>
+              <h4>Sistem Informasi desa pangkah</h4>
+              <p><strong>Desa pangkah</strong> berada di kecamatan Pangkah Kab. Tegal, dengan sebagian
+                  besar penduduknya sebagai Perindustrian/jasa menjadikan desa pangkah memiliki potensi
+                  wisata .</p><br>
+              <p>Dengan luas wilayah 62.98 m<sup>2</sup> ini populasinya dianggap cukup karena dari total
+                  penduduk sebesar 2950, terbagi para laki-laki di pangkah sebanyak 1474 orang dan 1476
+                  sisanya wanita.</p><br>
+              <br><br><br><br><br><br><br><br><br><br><br><br>
+          </div>
+      </div>
+      <div class="card">
+          <div class="card-body">
+              <h4 class="text-uppercase">Kontak Bantuan</h4>
+              <hr>
+              <h4 class="d-flex align-item-center">
+                  <i class="ri-smartphone-line"></i> 081227589209
+              </h4>
+              <small>Please contact with us if you have any questions. We are
+                  avalible 24h.</small>
+          </div>
+      </div>
+      </div>
+      </div>
+  </div>
+    
+    <!-- ============================================================= -->
+    <!-- End PAge Content -->
+    <!-- ============================================================= -->
+  </div>
+  
+{% endblock %}
