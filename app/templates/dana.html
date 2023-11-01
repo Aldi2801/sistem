@@ -22,15 +22,17 @@
             <div class="card">
                     <div class="card-body">
                         {% if info_list %}
-                        <table style="width: 100%; " class="table table-striped">
+                        <table id="file_export" class="table table-striped table-bordered display text-nowrap">
+                            <thead>
                             <tr>
-                              <th style="width: 5%;">no</th>
-                              <th style="width: 45%;">uraian</th>
-                              <th style="width: 15%;">anggaran</th>
-                              <th style="width: 15%;">realisasi</th>
-                              <th style="width: 15%;">lebih/(kurang)</th>
-                              <th style="width: 5%;">tahun</th>
+                              <th >No</th>
+                              <th >Uraian</th>
+                              <th >Anggaran</th>
+                              <th >Realisasi</th>
+                              <th >Lebih/(Kurang)</th>
+                              <th >Tahun</th>
                             </tr>
+                        </thead>
                             {% for i in info_list :%}
                             <tr>
                                 <td>{{i.no}}</td>
@@ -49,9 +51,80 @@
     {% endif %}
                         <!---->
                     </div>
+                    
             </div>
-
+            <h1 class="mb-0 fw-bold">Realisasi Belanja</h1>
+            <div class="card">
+                    <div class="card-body">
+                        {% if info_list2 %}
+                        <table id="file_export" class="table table-striped table-bordered display text-nowrap">
+                            <thead>
+                            <tr>
+                              <th >No</th>
+                              <th >Uraian</th>
+                              <th >Anggaran</th>
+                              <th >Realisasi</th>
+                              <th >Lebih/(Kurang)</th>
+                              <th >Tahun</th>
+                            </tr>
+                        </thead>
+                            {% for i in info_list2 :%}
+                            <tr>
+                                <td>{{i.no}}</td>
+                                <td>{{i.uraian}}</td>
+                                <td>{{i.anggaran}}</td>
+                                <td>{{i.realisasi}}</td>
+                                <td>{{i.lebih_kurang}}</td>
+                                <td>{{i.tahun}}</td>
+                            </tr>
+                            {% endfor %}
+            
+            
+                          </table>
+                          {% else %}
+    <p>No data available.</p>
+    {% endif %}
+                        <!---->
+                    </div>
+                    
+            </div>
+            <h1 class="mb-0 fw-bold">Realisasi Pembiayaan</h1>
+            <div class="card">
+                    <div class="card-body">
+                        {% if info_list3 %}
+                        <table id="file_export" class="table table-striped table-bordered display text-nowrap">
+                            <thead>
+                            <tr>
+                              <th >No</th>
+                              <th >Uraian</th>
+                              <th >Anggaran</th>
+                              <th >Realisasi</th>
+                              <th >Lebih/(Kurang)</th>
+                              <th >Tahun</th>
+                            </tr>
+                        </thead>
+                            {% for i in info_list3 :%}
+                            <tr>
+                                <td>{{i.no}}</td>
+                                <td>{{i.uraian}}</td>
+                                <td>{{i.anggaran}}</td>
+                                <td>{{i.realisasi}}</td>
+                                <td>{{i.lebih_kurang}}</td>
+                                <td>{{i.tahun}}</td>
+                            </tr>
+                            {% endfor %}
+            
+            
+                          </table>
+                          {% else %}
+    <p>No data available.</p>
+    {% endif %}
+                        <!---->
+                    </div>
+                    
+            </div>
         </div>
+        
         <div class="col-lg-4 mt-4 mt-md-0">
             <div class="card">
                 <div class="card-body">

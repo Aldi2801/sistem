@@ -1,6 +1,7 @@
 from . import app,mysql
 from flask import render_template, request, jsonify, redirect, url_for,session
 import os
+import pandas as pd
 import textwrap
 from PIL import Image
 from io import BytesIO
@@ -135,7 +136,43 @@ def dana_desa(thn):
            
         }
         info_list.append(list_data)
-    return render_template("dana.html", info_list = info_list, tahun = thn)
+        
+    con.execute("SELECT * FROM realisasi_belanja where tahun = %s order by id",(thn,))
+    dana = con.fetchall()
+    info_list2 = []
+    
+    for sistem in dana:
+        print(str(sistem[1]))
+        list_data = {
+            'id': str(sistem[0]),
+            'no': str(sistem[1]),
+            'uraian': str(sistem[2]),
+            'anggaran': str(sistem[3]),
+            'realisasi': str(sistem[4]),
+            'lebih_kurang': str(sistem[5]),
+            'tahun': str(sistem[6])
+           
+        }
+        info_list2.append(list_data)
+        
+    con.execute("SELECT * FROM realisasi_pembiayaan where tahun = %s order by id",(thn,))
+    dana = con.fetchall()
+    info_list3 = []
+    
+    for sistem in dana:
+        print(str(sistem[1]))
+        list_data = {
+            'id': str(sistem[0]),
+            'no': str(sistem[1]),
+            'uraian': str(sistem[2]),
+            'anggaran': str(sistem[3]),
+            'realisasi': str(sistem[4]),
+            'lebih_kurang': str(sistem[5]),
+            'tahun': str(sistem[6])
+           
+        }
+        info_list3.append(list_data)
+    return render_template("dana.html", info_list = info_list,info_list2 = info_list2,info_list3 = info_list3,   tahun = thn)
 
 #halaman admin
 @app.route('/admin')
@@ -298,46 +335,96 @@ def format_currency(value):
 @app.route('/admin/dana')
 def admindana():
     con = mysql.connection.cursor()
-    con.execute("SELECT * FROM dana ")
+    con.execute("SELECT * FROM realisasi_pendapatan order by id")
     dana = con.fetchall()
     info_list = []
+    
     for sistem in dana:
         list_data = {
             'id': str(sistem[0]),
-            'tahun': str(sistem[1]),
-            'gambar': str(sistem[2]),
-            'total_anggaran': str(sistem[3]),
+            'no': str(sistem[1]),
+            'uraian': str(sistem[2]),
+            'anggaran': str(sistem[3]),
             'realisasi': str(sistem[4]),
-            'lebih': str(sistem[5])
+            'lebih_kurang': str(sistem[5]),
+            'tahun': str(sistem[6])
+           
         }
-        
         info_list.append(list_data)
-    return render_template("admin/dana.html", info_list = info_list)
+        
+    con.execute("SELECT * FROM realisasi_belanja  order by id")
+    dana = con.fetchall()
+    info_list2 = []
+    
+    for sistem in dana:
+        list_data = {
+            'id': str(sistem[0]),
+            'no': str(sistem[1]),
+            'uraian': str(sistem[2]),
+            'anggaran': str(sistem[3]),
+            'realisasi': str(sistem[4]),
+            'lebih_kurang': str(sistem[5]),
+            'tahun': str(sistem[6])
+           
+        }
+        info_list2.append(list_data)
+        
+    con.execute("SELECT * FROM realisasi_pembiayaan  order by id")
+    dana = con.fetchall()
+    info_list3 = []
+    
+    for sistem in dana:
+        list_data = {
+            'id': str(sistem[0]),
+            'no': str(sistem[1]),
+            'uraian': str(sistem[2]),
+            'anggaran': str(sistem[3]),
+            'realisasi': str(sistem[4]),
+            'lebih_kurang': str(sistem[5]),
+            'tahun': str(sistem[6])
+           
+        }
+        info_list3.append(list_data)
+    con.execute("SELECT * FROM realisasi_pendapatan group by tahun ")
+    data_thn = con.fetchall()
+    thn = []
+    
+    for sistem in data_thn:
+        list_data = {
+            'tahun': str(sistem[6])
+        }
+        thn.append(list_data)
+    return render_template("admin/dana.html", info_list = info_list,info_list2 = info_list2,info_list3 = info_list3, tahun = thn)
+
 
 @app.route('/admin/tambah_dana', methods=['POST'])
 def tambah_dana():
     con = mysql.connection.cursor()
-    tahun = request.form['tahun']
-    file = request.files['gambar']
-    if file:
-            img = Image.open(file)
-            img = img.convert('RGB')
-            # Resize gambar
-
-            # Simpan gambar yang diresize ke BytesIO
-            img_io = BytesIO()
-            img.save(img_io, 'JPEG', quality=70)
-            img_io.seek(0)
-            filename = file.filename
-            destination = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            img.save(destination)  # Ganti dengan lokasi penyimpanan yang diinginkan
-            
-            # Gunakan img_io atau file yang telah diresize sesuai kebutuhan Anda
-    total_anggaran = request.form['total_anggaran']
-    realisasi = request.form['realisasi']
-    lebih = request.form['lebih']
-    con.execute("INSERT INTO dana (tahun, gambar , total_anggaran, realisasi, lebih) VALUES (%s,%s,%s,%s,%s)",(tahun,filename,total_anggaran, realisasi, lebih))
-    mysql.connection.commit()
+    filependapatan = request.files['excellpendapatan']
+    filebelanja  = request.files['excellbelanja']
+    filepembiayaan = request.files['excellpembiayaan']
+    if filependapatan:
+        df = pd.read_excel(filependapatan)
+        # Insert data from the DataFrame into MySQL
+        for index, row in df.iterrows():
+            sql = "INSERT INTO realisasi_pendapatan (no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun) VALUES (%s, %s, %s,%s,%s,%s)"
+            con.execute(sql, (row['no'],row['uraian'],row['anggaran'],row['realisasi'],row['lebih/(kurang)'],row['tahun']))
+            mysql.connection.commit()
+    if filebelanja:
+        df = pd.read_excel(filebelanja)
+        # Insert data from the DataFrame into MySQL
+        for index, row in df.iterrows():
+            sql = "INSERT INTO realisasi_belanja (no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun) VALUES (%s, %s, %s,%s,%s,%s)"
+            con.execute(sql, (row['no'],row['uraian'],row['anggaran'],row['realisasi'],row['lebih/(kurang)'],row['tahun']))
+            mysql.connection.commit()
+    if filepembiayaan:
+        df = pd.read_excel(filepembiayaan)
+        # Insert data from the DataFrame into MySQL
+        for index, row in df.iterrows():
+            sql = "INSERT INTO realisasi_pembiayaan (no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun) VALUES (%s, %s, %s,%s,%s,%s)"
+            con.execute(sql, (row['no'],row['uraian'],row['anggaran'],row['realisasi'],row['lebih/(kurang)'],row['tahun']))
+            mysql.connection.commit()
+               
     return redirect(url_for("admindana"))
 
 #geografi
