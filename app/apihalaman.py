@@ -404,25 +404,30 @@ def tambah_dana():
     filebelanja  = request.files['excellbelanja']
     filepembiayaan = request.files['excellpembiayaan']
     if filependapatan:
-        df = pd.read_excel(filependapatan)
+        df = pd.read_csv(filependapatan)
         # Insert data from the DataFrame into MySQL
         for index, row in df.iterrows():
+            print(row[0].split(";"))
+            data = row[0].split(";")
             sql = "INSERT INTO realisasi_pendapatan (no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun) VALUES (%s, %s, %s,%s,%s,%s)"
-            con.execute(sql, (row['no'],row['uraian'],row['anggaran'],row['realisasi'],row['lebih/(kurang)'],row['tahun']))
-            mysql.connection.commit()
+            con.execute(sql, (data[0],data[1],data[2],data[3],data[4],data[5]))
     if filebelanja:
-        df = pd.read_excel(filebelanja)
+        df = pd.read_csv(filebelanja)
         # Insert data from the DataFrame into MySQL
         for index, row in df.iterrows():
+            print(row[0].split(";"))
+            data = row[0].split(";")
             sql = "INSERT INTO realisasi_belanja (no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun) VALUES (%s, %s, %s,%s,%s,%s)"
-            con.execute(sql, (row['no'],row['uraian'],row['anggaran'],row['realisasi'],row['lebih/(kurang)'],row['tahun']))
+            con.execute(sql, (data[0],data[1],data[2],data[3],data[4],data[5]))
             mysql.connection.commit()
     if filepembiayaan:
-        df = pd.read_excel(filepembiayaan)
+        df = pd.read_csv(filepembiayaan)
         # Insert data from the DataFrame into MySQL
         for index, row in df.iterrows():
+            print(row[0].split(";"))
+            data = row[0].split(";")
             sql = "INSERT INTO realisasi_pembiayaan (no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun) VALUES (%s, %s, %s,%s,%s,%s)"
-            con.execute(sql, (row['no'],row['uraian'],row['anggaran'],row['realisasi'],row['lebih/(kurang)'],row['tahun']))
+            con.execute(sql, (data[0],data[1],data[2],data[3],data[4],data[5]))
             mysql.connection.commit()
                
     return redirect(url_for("admindana"))

@@ -1,7 +1,7 @@
 from flask import Flask,request,session
 from flask_mysqldb import MySQL 
-from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required
 import bcrypt
+
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 

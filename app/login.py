@@ -1,7 +1,7 @@
 from . import app,mysql
 from flask import render_template, request, jsonify,session,redirect,url_for
 import os
-from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required
+
 from bcrypt import hashpw, gensalt, checkpw
 import jwt 
 from flask_jwt_extended import JWTManager,jwt_required, get_jwt_identity,create_access_token
