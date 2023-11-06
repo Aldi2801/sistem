@@ -230,11 +230,21 @@ def adminvisimisi():
         info_list.append(list_data)
     return render_template("admin/visimisi.html", info_list = info_list)
 
-@app.route('/admin/visimisiedit', methods=['POST'])
-def adminvisimisiedit():
+@app.route('/admin/visiedit', methods=['POST'])
+def adminvisiedit():
     con = mysql.connection.cursor()
     visi = request.form['visi']
-    con.execute("UPDATE sejarah_desa SET visi= %s WHERE id = 1",(str(visi)))
+    visi = str(visi)
+    con.execute("UPDATE sejarah_desa SET visi= %s WHERE id = 1",(visi,))
+    mysql.connection.commit()
+    return redirect(url_for("adminvisimisi"))
+
+@app.route('/admin/misiedit', methods=['POST'])
+def adminmisiedit():
+    con = mysql.connection.cursor()
+    misi = request.form['misi']
+    misi = str(misi)
+    con.execute("UPDATE sejarah_desa SET misi= %s WHERE id = 1",(misi,))
     mysql.connection.commit()
     return redirect(url_for("adminvisimisi"))
     
