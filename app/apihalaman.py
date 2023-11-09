@@ -340,7 +340,7 @@ def hapus_berita():
 @app.template_filter('format_currency')
 def format_currency(value):
     locale.setlocale(locale.LC_ALL, 'id_ID.UTF-8')
-    return locale.currency(value, grouping=True, symbol='RP')
+    return locale.currency(value, grouping=True, symbol='')
 
 @app.route('/admin/dana')
 def admindana():
@@ -348,63 +348,62 @@ def admindana():
     con.execute("SELECT * FROM realisasi_pendapatan order by id")
     dana = con.fetchall()
     info_list = []
-    
+
     for sistem in dana:
         list_data = {
             'id': str(sistem[0]),
             'no': str(sistem[1]),
             'uraian': str(sistem[2]),
-            'anggaran': str(sistem[3]),
-            'realisasi': str(sistem[4]),
-            'lebih_kurang': str(sistem[5]),
+            'anggaran': format_currency(int(sistem[3])),  # Menggunakan format_currency untuk mengubah anggaran
+            'realisasi': format_currency(int(sistem[4])),  # Menggunakan format_currency untuk mengubah realisasi
+            'lebih_kurang': format_currency(int(sistem[5])),  # Menggunakan format_currency untuk mengubah lebih_kurang
             'tahun': str(sistem[6])
-           
         }
         info_list.append(list_data)
         
     con.execute("SELECT * FROM realisasi_belanja  order by id")
     dana = con.fetchall()
     info_list2 = []
-    
+
     for sistem in dana:
         list_data = {
             'id': str(sistem[0]),
             'no': str(sistem[1]),
             'uraian': str(sistem[2]),
-            'anggaran': str(sistem[3]),
-            'realisasi': str(sistem[4]),
-            'lebih_kurang': str(sistem[5]),
+            'anggaran': format_currency(int(sistem[3])),  # Menggunakan format_currency untuk mengubah anggaran
+            'realisasi': format_currency(int(sistem[4])),  # Menggunakan format_currency untuk mengubah realisasi
+            'lebih_kurang': format_currency(int(sistem[5])),  # Menggunakan format_currency untuk mengubah lebih_kurang
             'tahun': str(sistem[6])
-           
         }
         info_list2.append(list_data)
         
     con.execute("SELECT * FROM realisasi_pembiayaan  order by id")
     dana = con.fetchall()
     info_list3 = []
-    
+
     for sistem in dana:
         list_data = {
             'id': str(sistem[0]),
             'no': str(sistem[1]),
             'uraian': str(sistem[2]),
-            'anggaran': str(sistem[3]),
-            'realisasi': str(sistem[4]),
-            'lebih_kurang': str(sistem[5]),
+            'anggaran': format_currency(int(sistem[3])),  # Menggunakan format_currency untuk mengubah anggaran
+            'realisasi': format_currency(int(sistem[4])),  # Menggunakan format_currency untuk mengubah realisasi
+            'lebih_kurang': format_currency(int(sistem[5])),  # Menggunakan format_currency untuk mengubah lebih_kurang
             'tahun': str(sistem[6])
-           
         }
         info_list3.append(list_data)
+        
     con.execute("SELECT * FROM realisasi_pendapatan group by tahun ")
     data_thn = con.fetchall()
     thn = []
-    
+
     for sistem in data_thn:
         list_data = {
             'tahun': str(sistem[6])
         }
         thn.append(list_data)
-    return render_template("admin/dana.html", info_list = info_list,info_list2 = info_list2,info_list3 = info_list3, tahun = thn)
+        
+    return render_template("admin/dana.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn)
 
 
 @app.route('/admin/tambah_dana', methods=['POST'])
@@ -414,27 +413,27 @@ def tambah_dana():
     filebelanja  = request.files['excellbelanja']
     filepembiayaan = request.files['excellpembiayaan']
     if filependapatan:
-        df = pd.read_csv(filependapatan)
+        df = ""
+        df = pd.read_excel(filependapatan)
         # Insert data from the DataFrame into MySQL
         for index, row in df.iterrows():
-            print(row[0].split(";"))
-            data = row[0].split(";")
             sql = "INSERT INTO realisasi_pendapatan (no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun) VALUES (%s, %s, %s,%s,%s,%s)"
-            con.execute(sql, (data[0],data[1],data[2],data[3],data[4],data[5]))
+            con.execute(sql, (row[0],row[1],row[2],row[3],row[4],row[5]))
     if filebelanja:
-        df = pd.read_csv(filebelanja)
+        df =""
+        df = pd.read_excel(filebelanja)
         # Insert data from the DataFrame into MySQL
         for index, row in df.iterrows():
-            print(row[0].split(";"))
-            data = row[0].split(";")
             sql = "INSERT INTO realisasi_belanja (no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun) VALUES (%s, %s, %s,%s,%s,%s)"
-            con.execute(sql, (data[0],data[1],data[2],data[3],data[4],data[5]))
+            con.execute(sql, (row[0],row[1],row[2],row[3],row[4],row[5]))
             mysql.connection.commit()
     if filepembiayaan:
+        df = ""
         df = pd.read_csv(filepembiayaan)
         # Insert data from the DataFrame into MySQL
+        data = ""
         for index, row in df.iterrows():
-            print(row[0].split(";"))
+            
             data = row[0].split(";")
             sql = "INSERT INTO realisasi_pembiayaan (no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun) VALUES (%s, %s, %s,%s,%s,%s)"
             con.execute(sql, (data[0],data[1],data[2],data[3],data[4],data[5]))
@@ -694,3 +693,117 @@ def edit_anggota():
         con.execute("UPDATE anggota SET nama_lengkap = %s, jabatan = %s, niap = %s, ttl = %s, agama = %s, golongan = %s, pendidikan_terakhir = %s, nomorsk = %s, tanggalsk = %s, masa_jabatan = %s, status = %s WHERE id = %s",(nama_lengkap,jabatan,niap,ttl,agama,golongan,pendidikan_terakhir,nomorsk,tanggalsk,masa_jabatan,status,id))
         mysql.connection.commit()
     return jsonify({"msg" : "SUKSES"})
+
+#Galeri
+@app.route('/admin/galeri')
+def admindgaleri():
+    con = mysql.connection.cursor()
+    con.execute("SELECT * FROM galeri order by id DESC")
+    berita = con.fetchall()
+    info_list = []
+    for sistem in berita:
+        list_data = {
+            'id': str(sistem[0]),
+            'judul': str(sistem[1]),
+            'gambar': str(sistem[2]),
+            'deskripsifull': str(sistem[3]),
+            'tanggal': str(sistem[4])
+        }
+        info_list.append(list_data)
+        
+
+    return render_template("admin/galeri.html", info_list = info_list)
+
+@app.route('/admin/tambah_galeri', methods=['POST'])
+def tambah_galeri():
+    con = mysql.connection.cursor()
+    judul = request.form['judul']
+    link = link.replace("#", "")
+    link = link.replace("?", "")
+    link = link.replace("/", "")
+    link = link.replace(" ", "_")
+    file = request.files['gambar']
+    if file:
+            img = Image.open(file)
+            img = img.convert('RGB')
+            # Resize gambar
+            width, height = 600, 300  # Atur sesuai kebutuhan Anda
+            img = img.resize((width, height))
+
+            # Simpan gambar yang diresize ke BytesIO
+            img_io = BytesIO()
+            img.save(img_io, 'JPEG', quality=70)
+            img_io.seek(0)
+            random_name = uuid.uuid4().hex+".jpg"
+            destination = os.path.join(app.config['UPLOAD_FOLDER'], random_name)
+            img.save(destination)  # Ganti dengan lokasi penyimpanan yang diinginkan
+            
+            # Gunakan img_io atau file yang telah diresize sesuai kebutuhan Anda
+    deskripsi = request.form['deskripsi']
+    con.execute("INSERT INTO galeri (judul, gambar , deskripsi ) VALUES (%s,%s,%s)",(judul,random_name,deskripsi))
+    mysql.connection.commit()
+    return jsonify("msg : SUKSES")
+
+@app.route('/admin/edit_galeri', methods=['POST'])
+def edit_galeri():
+    con = mysql.connection.cursor()
+    id = request.form['id']
+    judul = request.form['judul']
+    try:
+        if request.files['gambar']:
+            file = request.files['gambar']
+            con.execute("SELECT galeri FROM galeri WHERE id = %s", (id,))
+            result = con.fetchone()
+            if result:
+                filename = result[0]
+        
+            # Delete the image file
+                if filename:
+                    image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    if os.path.exists(image_path):
+                        os.remove(image_path)
+                        
+            img = Image.open(file)
+            img = img.convert('RGB')
+            # Resize gambar
+            width, height = 600, 300  # Atur sesuai kebutuhan Anda
+            img = img.resize((width, height))
+
+            # Simpan gambar yang diresize ke BytesIO
+            img_io = BytesIO()
+            img.save(img_io, 'JPEG', quality=70)
+            img_io.seek(0)
+            random_name = uuid.uuid4().hex+".jpg"
+            destination = os.path.join(app.config['UPLOAD_FOLDER'], random_name)
+            img.save(destination)  # Ganti dengan lokasi penyimpanan yang diinginkan
+            deskripsi = request.form['deskripsi']
+            con.execute("UPDATE galeri SET judul = %s, gambar = %s, deskripsi = %s WHERE id = %s",(judul,random_name,deskripsi,id))
+            mysql.connection.commit()
+            # Gunakan img_io atau file yang telah diresize sesuai kebutuhan Anda
+    except:
+        deskripsi = request.form['deskripsi']
+        con.execute("UPDATE galeri SET judul = %s, deskripsi = %s WHERE id = %s",(judul,deskripsi,id))
+        mysql.connection.commit()
+    return jsonify({"msg" : "SUKSES"})
+
+@app.route('/hapus_galeri', methods=['POST'])
+def hapus_berita():
+    con = mysql.connection.cursor()
+    id = request.form['id']
+    
+    # Get the filename of the image associated with the news article
+    con.execute("SELECT gambar FROM galeri WHERE id = %s", (id,))
+    result = con.fetchone()
+    if result:
+        filename = result[0]
+        
+        # Delete the image file
+        if filename:
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            if os.path.exists(image_path):
+                os.remove(image_path)
+    
+    # Delete the news article from the database
+    con.execute("DELETE FROM galeri WHERE id = %s", (id,))
+    mysql.connection.commit()
+    return jsonify({"msg": "SUKSES"})
