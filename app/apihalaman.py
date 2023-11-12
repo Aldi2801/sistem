@@ -31,7 +31,7 @@ def homepage():
             'link': str(sistem[5]),
         }
         info_list.append(list_data)
-    con.execute("SELECT * FROM realisasi_pendapatan group by tahun")
+    con.execute("SELECT tahun FROM realisasi_pendapatan group by tahun")
     list_thn_dana = con.fetchall()
     session['list_thn_dana']= list_thn_dana
     return render_template('homepage.html',info_list = info_list)
@@ -175,6 +175,23 @@ def dana_desa(thn):
         }
         info_list3.append(list_data)
     return render_template("dana.html", info_list = info_list,info_list2 = info_list2,info_list3 = info_list3,   tahun = thn)
+#halaman user galeri
+@app.route('/galeri')
+def galeri():
+    con = mysql.connection.cursor()
+    con.execute("SELECT * FROM galeri order by id DESC")
+    berita = con.fetchall()
+    info_list = []
+    
+    for sistem in berita:
+        list_data = {
+            'id': str(sistem[0]),
+            'judul': str(sistem[1]),
+            'gambar': str(sistem[2]),
+            'tanggal': str(sistem[3])
+        }
+        info_list.append(list_data)
+    return render_template("/galeri.html", info_list = info_list)
 
 #halaman admin
 @app.route('/admin')

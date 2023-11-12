@@ -21,8 +21,9 @@
             <h1 class="mb-0 fw-bold">Realisasi Pendapatan</h1>
             <div class="card">
                     <div class="card-body">
+                        <div class = "table-responsive">
                         {% if info_list %}
-                        <table id="file_export" class="table table-striped table-bordered display text-nowrap">
+                        <table id="file_export" class="table table-striped table-bordered display text-nowrap"style="border:0px; border-bottom: 1px solid ;">
                             <thead>
                             <tr>
                               <th >No</th>
@@ -34,7 +35,7 @@
                             </tr>
                         </thead>
                             {% for i in info_list :%}
-                            <tr>
+                            <tr style="border:0px">
                                 <td>{{i.no}}</td>
                                 <td>{{i.uraian}}</td>
                                 <td>{{i.anggaran}}</td>
@@ -51,13 +52,15 @@
     {% endif %}
                         <!---->
                     </div>
-                    
+                </div>
             </div>
             <h1 class="mb-0 fw-bold">Realisasi Belanja</h1>
             <div class="card">
                     <div class="card-body">
+                        
+          <div class = "table-responsive">
                         {% if info_list2 %}
-                        <table id="file_export" class="table table-striped table-bordered display text-nowrap">
+                        <table id="file_export" class="table table-striped table-bordered display text-nowrap"style="border:0px; border-bottom: 1px solid ;">
                             <thead>
                             <tr>
                               <th >No</th>
@@ -69,7 +72,7 @@
                             </tr>
                         </thead>
                             {% for i in info_list2 :%}
-                            <tr>
+                            <tr style="border:0px">
                                 <td>{{i.no}}</td>
                                 <td>{{i.uraian}}</td>
                                 <td>{{i.anggaran}}</td>
@@ -86,15 +89,16 @@
     {% endif %}
                         <!---->
                     </div>
-                    
+                </div>
             </div>
             <h1 class="mb-0 fw-bold">Realisasi Pembiayaan</h1>
             <div class="card">
                     <div class="card-body">
+                        <div class = "table-responsive">
                         {% if info_list3 %}
-                        <table id="file_export" class="table table-striped table-bordered display text-nowrap">
+                        <table id="file_export" class="table table-striped table-bordered display text-nowrap" style="border:0px; border-bottom: 1px solid ;">
                             <thead>
-                            <tr>
+                            <tr >
                               <th >No</th>
                               <th >Uraian</th>
                               <th >Anggaran</th>
@@ -104,7 +108,7 @@
                             </tr>
                         </thead>
                             {% for i in info_list3 :%}
-                            <tr>
+                            <tr style="border:0px">
                                 <td>{{i.no}}</td>
                                 <td>{{i.uraian}}</td>
                                 <td>{{i.anggaran}}</td>
@@ -121,7 +125,7 @@
     {% endif %}
                         <!---->
                     </div>
-                    
+                </div>
             </div>
         </div>
         
