@@ -1,10 +1,6 @@
 {% extends 'include/include.html' %} {% block content %}
 <head>
-  <link
-    rel="stylesheet"
-    type="text/css"
-    href="../../static/assets/libs/quill/dist/quill.snow.css"
-  />
+ 
 </head>
 
 <div class="page-titles">
@@ -70,23 +66,6 @@
                 </div>
               </div>
             </form>
-            <div class="container-fluid">
-              <div class="row">
-                <div class="col-12">
-                  <div class="card">
-                    <div class="border-bottom title-part-padding">
-                      <h4 class="mb-0">Deskripsi Galeri Foto</h4>
-                    </div>
-                    <div class="card-body">
-                      <!-- Create the editor container -->
-                      <div id="editor">
-                        <p id="val" value="Deskripsi Galeri Foto"></p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
           <div class="modal-footer">
            
@@ -188,22 +167,6 @@
                       </div>
                     </div>
                   </form>
-                  <div class="container-fluid">
-                    <div class="row">
-                      <div class="col-12">
-                        <div class="card">
-                          <div class="border-bottom title-part-padding">
-                            <h4 class="mb-0">Deskripsi Galeri Foto</h4>
-                          </div>
-                            <!-- Create the editor container -->
-                            <div id="editor-{{i.id}}">
-                              {{i.deskripsifull|safe}}
-                              <p  value="Deskripsi Galeri Foto"></p>
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
                 <div class="modal-footer">
                   
@@ -234,13 +197,6 @@
             </div>
           </div>
           <!-- Column -->
-<script>
-  $(document).ready(function () {
-   new Quill("#editor-{{i.id}}", {
-    theme: "snow",
-  });
-});
-</script>
           {% endfor %}
         </div>
         <!-- Row -->
@@ -248,28 +204,22 @@
     </div>
   </div>
 
-  <!-- Initialize Quill editor -->
-
   <!-- All Jquery -->
   <!-- ============================================================= -->
 
   <script>
     $(document).ready(function () {
-      var tambah = new Quill("#editor", {
-        theme: "snow",
-      });
+     
       $( "#tambah" ).on( "click", function() {
-        var value = tambah.getText();
+       
         var jdl = $('#judulgaleribaru').val()
         var formFilebaru = $('#formFilebaru')
-        console.log(String(value))
-
           let formData = new FormData();
           formData.append('judul',jdl)
           jQuery.each(jQuery('#formFilebaru')[0].files, function(i, file) {
             formData.append('gambar', file);
         });
-        formData.append('deskripsi',String(value))
+        
         
           console.log(formData)
           $.ajax({
@@ -283,7 +233,7 @@
           }).done(function (data) {
             console.log(data);
             
-            window.location.href = "/admin/galer";
+            window.location.href = "/admin/galeri";
           });
           event.preventDefault();
       } );
@@ -294,10 +244,7 @@
 </script>
 <script>
   function edit(id){
-    var quilli = new Quill("#editor-"+id, {
-      theme: "snow",
-    });
-    var editvalue = quilli.getText();
+  
     var editjdl = $('#editgaleribaru').val()
     var editformFilebaru = $('#editformFilebaru').val()
     let formData = new FormData();
@@ -306,7 +253,6 @@
     jQuery.each(jQuery('#formFilebaru')[0].files, function(i, file) {
       formData.append('gambar', file);
   });
-  formData.append('deskripsi',String(editvalue))
       $.ajax({
         url: "/admin/edit_galeri",
         data: formData,
@@ -339,9 +285,5 @@
   }
 </script>
 
-<script>
-
-
-</script>
   {% endblock %}
 </div>

@@ -7,6 +7,8 @@ from PIL import Image
 from io import BytesIO
 import locale
 import uuid
+import time
+from datetime import datetime
 
 #halaman homepage
 @app.route('/')
@@ -706,8 +708,7 @@ def admindgaleri():
             'id': str(sistem[0]),
             'judul': str(sistem[1]),
             'gambar': str(sistem[2]),
-            'deskripsifull': str(sistem[3]),
-            'tanggal': str(sistem[4])
+            'tanggal': str(sistem[3])
         }
         info_list.append(list_data)
         
@@ -718,10 +719,7 @@ def admindgaleri():
 def tambah_galeri():
     con = mysql.connection.cursor()
     judul = request.form['judul']
-    link = link.replace("#", "")
-    link = link.replace("?", "")
-    link = link.replace("/", "")
-    link = link.replace(" ", "_")
+    tanggal = datetime.now().date()
     file = request.files['gambar']
     if file:
             img = Image.open(file)
@@ -739,8 +737,7 @@ def tambah_galeri():
             img.save(destination)  # Ganti dengan lokasi penyimpanan yang diinginkan
             
             # Gunakan img_io atau file yang telah diresize sesuai kebutuhan Anda
-    deskripsi = request.form['deskripsi']
-    con.execute("INSERT INTO galeri (judul, gambar , deskripsi ) VALUES (%s,%s,%s)",(judul,random_name,deskripsi))
+    con.execute("INSERT INTO galeri (judul, gambar , tanggal) VALUES (%s,%s,%s)",(judul,random_name,tanggal))
     mysql.connection.commit()
     return jsonify("msg : SUKSES")
 
@@ -776,18 +773,16 @@ def edit_galeri():
             random_name = uuid.uuid4().hex+".jpg"
             destination = os.path.join(app.config['UPLOAD_FOLDER'], random_name)
             img.save(destination)  # Ganti dengan lokasi penyimpanan yang diinginkan
-            deskripsi = request.form['deskripsi']
-            con.execute("UPDATE galeri SET judul = %s, gambar = %s, deskripsi = %s WHERE id = %s",(judul,random_name,deskripsi,id))
+            con.execute("UPDATE galeri SET judul = %s, gambar = %s WHERE id = %s",(judul,random_name,id))
             mysql.connection.commit()
             # Gunakan img_io atau file yang telah diresize sesuai kebutuhan Anda
     except:
-        deskripsi = request.form['deskripsi']
-        con.execute("UPDATE galeri SET judul = %s, deskripsi = %s WHERE id = %s",(judul,deskripsi,id))
+        con.execute("UPDATE galeri SET judul = %s WHERE id = %s",(judul,id))
         mysql.connection.commit()
     return jsonify({"msg" : "SUKSES"})
 
 @app.route('/hapus_galeri', methods=['POST'])
-def hapus_berita():
+def hapus_galeri():
     con = mysql.connection.cursor()
     id = request.form['id']
     
