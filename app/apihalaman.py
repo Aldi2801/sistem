@@ -12,7 +12,15 @@ from datetime import datetime
 
 #halaman homepage
 @app.route('/')
-def homepage():
+def homepahe():
+    con = mysql.connection.cursor()
+    con.execute("SELECT tahun FROM realisasi_pendapatan group by tahun")
+    list_thn_dana = con.fetchall()
+    session['list_thn_dana']= list_thn_dana
+    return render_template('index.html')
+
+@app.route('/news')
+def userberita():
     con = mysql.connection.cursor()
     con.execute("SELECT * FROM berita order by id DESC")
     berita = con.fetchall()
@@ -31,9 +39,7 @@ def homepage():
             'link': str(sistem[5]),
         }
         info_list.append(list_data)
-    con.execute("SELECT tahun FROM realisasi_pendapatan group by tahun")
-    list_thn_dana = con.fetchall()
-    session['list_thn_dana']= list_thn_dana
+  
     return render_template('homepage.html',info_list = info_list)
 #halaman berita
 @app.route('/berita/<link>')
@@ -192,7 +198,58 @@ def galeri():
         }
         info_list.append(list_data)
     return render_template("/galeri.html", info_list = info_list)
-
+#halaman monografi
+@app.route('/monografi')
+def mono():
+    con = mysql.connection.cursor()
+    con.execute("SELECT * FROM monografi")
+    mono = con.fetchall()
+    info_list = []
+    for sistem in mono:
+        list_data = {
+            'id': str(sistem[0]),
+            'tahun': str(sistem[1]),
+            'jpenduduk': str(sistem[2]),
+            'jkk': str(sistem[3]),
+            'laki': str(sistem[4]),
+            'perempuan': str(sistem[5]),
+            'jkkprese': str(sistem[6]),
+            'jkkseja': str(sistem[7]),
+            'jkkkaya': str(sistem[8]),
+            'jkksedang': str(sistem[9]),
+            'jkkmiskin': str(sistem[10]),
+            'islam': str(sistem[11]),
+            'kristen': str(sistem[12]),
+            'protestan': str(sistem[13]),
+            'katolik': str(sistem[14]),
+            'hindu': str(sistem[15]),
+            'budha': str(sistem[16])
+        }
+        info_list.append(list_data)
+    return render_template("user_data_desa/monografi.html", info_list = info_list)
+#Halaman geografi
+@app.route('/geografi')
+def geo():
+    con = mysql.connection.cursor()
+    con.execute("SELECT * FROM wilayah")
+    wilayah = con.fetchall()
+    info_list = []
+    for sistem in wilayah:
+        list_data = {
+            'id': str(sistem[0]),
+            'utara': str(sistem[1]),
+            'selatan': str(sistem[2]),
+            'timur': str(sistem[3]),
+            'barat': str(sistem[4]),
+            'luas': str(sistem[5]),
+            'sawahteri': str(sistem[6]),
+            'sawahhu': str(sistem[7]),
+            'pemukiman': str(sistem[8]),
+            'tahun':str(sistem[9])
+        }
+        info_list.append(list_data)
+        
+    return render_template("user_data_desa/geografi.html", info_list=info_list )
 #halaman admin
 @app.route('/admin')
 def admin():

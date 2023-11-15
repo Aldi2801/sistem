@@ -4,152 +4,140 @@
     <title>Halaman Landing Page dengan 12 Card</title>
     <!-- Tautan ke Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+   
+    <link href="/static/dist/css/style.min.css" rel="stylesheet" />
+    <!-- This Page CSS -->
+   
     <style>
-         body {
-            background-image: url('image/pg_pangkah_infotegal.jpg');
-            background-size: cover; /* Mengisi seluruh latar belakang */
-            background-repeat: no-repeat; /* Tanpa pengulangan gambar */
-        }
-    </style>
+        body {
+           background-image: url('static/image/pg_pangkah_infotegal.jpg');
+           background-size: cover; /* Mengisi seluruh latar belakang */
+           background-repeat: no-repeat; /* Tanpa pengulangan gambar */
+       }
+       
+.parent:hover .child, .parent:focus .child {
+    -ms-transform: scale(1.2);
+    -moz-transform: scale(1.2);
+    -webkit-transform: scale(1.2);
+    -o-transform: scale(1.2);
+    transform: scale(1.2);
+}
+
+.parent:hover .child:before, .parent:focus .child:before {
+    display: block;
+}
+
+.parent:hover a, .parent:focus a {
+    display: block;
+}
+
+.child:before {
+    content: "";
+    display: none;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+   </style>
 </head>
 <body>
-
 <div class="container mt-5" >
     <h1 class="text-center">Selamat Datang di Landing Page</h1>
-    <div class="row mt-5">
+    <div class="row">
         <!-- Kartu Pertama -->
         <div class="col-lg-3 col-md-4 col-sm-6 mb-4 " >
-            <div class="card bg-primary">
-                <img src="gambar1.jpg" class="card-img-top" alt="Gambar 1">
-                <div class="card-body">
-                    <h5 class="card-title">Kartu 1</h5>
-                    <p class="card-text">Deskripsi singkat tentang kartu 1.</p>
+            <div class="card bg-primary" style="background-image:url('/static/image/surat-kabar-koran-media-cetak.jpg');  
+            background-size: cover; 
+            background-repeat: no-repeat; 
+            height:150px;
+            background-color: rgba(52,73,94,0.75);">
+                <a href="/news" class="card-hover parent  mt-4">
+                <div class="card-body child" >
+                    <h5 class="card-title text-white text-center hover" >Berita</h5>  
                 </div>
+                </a>
             </div>
         </div>
         <!-- Kartu Kedua -->
         <div class="col-lg-3 col-md-4 col-sm-6 mb-4 ">
             <div class="card bg-secondary">
+                <a href="/sejarah">
                 <img src="gambar2.jpg" class="card-img-top" alt="Gambar 2">
                 <div class="card-body">
-                    <h5 class="card-title">Kartu 2</h5>
-                    <p class="card-text">Deskripsi singkat tentang kartu 2.</p>
+                    <h5 class="card-title">profile desa</h5>
                 </div>
+                </a>
             </div>
         </div>
         <!-- Kartu Ketiga -->
         <div class="col-lg-3 col-md-4 col-sm-6 mb-4 ">
             <div class="card bg-success">
+                <a href="/pemerintahan_desa">
                 <img src="gambar3.jpg" class="card-img-top" alt="Gambar 3">
                 <div class="card-body">
-                    <h5 class="card-title">Kartu 3</h5>
-                    <p class="card-text">Deskripsi singkat tentang kartu 3.</p>
+                    <h5 class="card-title">anggota pemerintahan desa</h5>
                 </div>
+                </a>
             </div>
         </div>
-                <!-- Kartu Ketiga -->
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4 ">
-                    <div class="card bg-warning">
-                        <img src="gambar3.jpg" class="card-img-top" alt="Gambar 3">
-                        <div class="card-body">
-                            <h5 class="card-title">Kartu 3</h5>
-                            <p class="card-text">Deskripsi singkat tentang kartu 3.</p>
-                        </div>
-                    </div>
+                <!-- Kartu Keempat -->
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4 ">
+            <div class="card bg-warning">
+                <a href="/dana/2022">
+                <img src="gambar3.jpg" class="card-img-top" alt="Gambar 3">
+                <div class="card-body">
+                    <h5 class="card-title">dana desa</h5>
                 </div>
-                        <!-- Kartu Ketiga -->
+                </a>
+            </div>
+        </div>
+                        <!-- Kartu Kelima -->
         <div class="col-lg-3 col-md-4 col-sm-6 mb-4 ">
             <div class="card bg-danger">
+                <a href="https://www.google.com/maps/place/Pangkah,+Tegal+Regency,+Central+Java/@-6.981731,109.15958,15z/data=!4m6!3m5!1s0x2e6fbf7326f79acf:0xb8e2ae524ec7f3c8!8m2!3d-6.9803518!4d109.1627343!16s%2Fg%2F122t1938?entry=ttu">
                 <img src="gambar3.jpg" class="card-img-top" alt="Gambar 3">
                 <div class="card-body">
-                    <h5 class="card-title">Kartu 3</h5>
-                    <p class="card-text">Deskripsi singkat tentang kartu 3.</p>
+                    <h5 class="card-title">peta desa</h5>
                 </div>
+                </a>
             </div>
         </div>
-                <!-- Kartu Ketiga -->
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4 ">
-                    <div class="card " style="background-color: aqua;">
-                        <img src="gambar3.jpg" class="card-img-top" alt="Gambar 3">
-                        <div class="card-body">
-                            <h5 class="card-title">Kartu 3</h5>
-                            <p class="card-text">Deskripsi singkat tentang kartu 3.</p>
-                        </div>
-                    </div>
+        <!-- Kartu Keenam -->
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4 ">
+            <div class="card " style="background-color: aqua;">
+                <a href="/monografi">
+                <img src="gambar3.jpg" class="card-img-top" alt="Gambar 3">
+                <div class="card-body">
+                    <h5 class="card-title">data desa </h5>
                 </div>
-                        <!-- Kartu Ketiga -->
+                </a>
+            </div>
+        </div>
+                        <!-- Kartu Ketujuh -->
         <div class="col-lg-3 col-md-4 col-sm-6 mb-4 ">
             <div class="card" style="background-color: rgba(174, 163, 59, 0.718);">
+                <a href="/galeri">
                 <img src="gambar3.jpg" class="card-img-top" alt="Gambar 3">
                 <div class="card-body">
-                    <h5 class="card-title">Kartu 3</h5>
-                    <p class="card-text">Deskripsi singkat tentang kartu 3.</p>
+                    <h5 class="card-title">galeri foto</h5>
                 </div>
+                </a>
             </div>
         </div>
-                <!-- Kartu Ketiga -->
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card"  style="background-color: blueviolet">
-                        <img src="gambar3.jpg" class="card-img-top" alt="Gambar 3">
-                        <div class="card-body">
-                            <h5 class="card-title">Kartu 3</h5>
-                            <p class="card-text">Deskripsi singkat tentang kartu 3.</p>
-                        </div>
-                    </div>
-                </div>
-                        <!-- Kartu Ketiga -->
+        <!-- Kartu Kedelapan -->
         <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-            <div class="card"  style="background-color: rgba(165, 42, 42, 0.884)">
+            <div class="card"  style="background-color: blueviolet">
+                <a href="/agenda">
                 <img src="gambar3.jpg" class="card-img-top" alt="Gambar 3">
                 <div class="card-body">
-                    <h5 class="card-title">Kartu 3</h5>
-                    <p class="card-text">Deskripsi singkat tentang kartu 3.</p>
+                    <h5 class="card-title">Agenda desa</h5>
                 </div>
+                </a>
             </div>
         </div>
-                <!-- Kartu Ketiga -->
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card"  style="background-color:darkseagreen">
-                        <img src="gambar3.jpg" class="card-img-top" alt="Gambar 3">
-                        <div class="card-body">
-                            <h5 class="card-title">Kartu 3</h5>
-                            <p class="card-text">Deskripsi singkat tentang kartu 3.</p>
-                        </div>
-                    </div>
-                </div>        <!-- Kartu Ketiga -->
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card">
-                        <img src="gambar3.jpg" class="card-img-top" alt="Gambar 3">
-                        <div class="card-body">
-                            <h5 class="card-title">Kartu 3</h5>
-                            <p class="card-text">Deskripsi singkat tentang kartu 3.</p>
-                        </div>
-                    </div>
-                </div>
-                        <!-- Kartu Ketiga -->
-        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-            <div class="card">
-                <img src="gambar3.jpg" class="card-img-top" alt="Gambar 3">
-                <div class="card-body">
-                    <h5 class="card-title">Kartu 3</h5>
-                    <p class="card-text">Deskripsi singkat tentang kartu 3.</p>
-                </div>
-            </div>
-        </div>
-                <!-- Kartu Ketiga -->
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card">
-                        <img src="gambar3.jpg" class="card-img-top" alt="Gambar 3">
-                        <div class="card-body">
-                            <h5 class="card-title">Kartu 3</h5>
-                            <p class="card-text">Deskripsi singkat tentang kartu 3.</p>
-                        </div>
-                    </div>
-                </div>
-
-        <!-- Lanjutkan menambahkan lebih banyak kartu sesuai kebutuhan -->
-        <!-- Kartu Keempat -->
-        <!-- ... -->
+            
     </div>
 </div>
 

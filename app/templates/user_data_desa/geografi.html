@@ -1,0 +1,171 @@
+{% extends 'include/base.html' %} 
+{% block content %}
+<div class="page-titles">
+    <div class="row">
+      <div class="col-lg-8 col-md-6 col-12 align-self-center">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0 d-flex align-items-center">
+            <li class="breadcrumb-item">
+              <a href="index.html" class="link"
+                ><i class="ri-home-3-line fs-5"></i
+              ></a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Info Desa/Geografi</li>
+          </ol>
+        </nav>
+        <h1 class="mb-0 fw-bold">Geografi</h1>
+      </div>
+      <div
+        class="col-lg-4 col-md-6 d-none d-md-flex align-items-center justify-content-end"
+      >
+       
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    <!-- ============================================================= -->
+    <!-- Start Page Content -->
+    <!-- ============================================================= -->
+    <!-- Row -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body border-bottom">
+            <h4 class="card-title">Kondisi Geografi</h4>
+            <div class="col-sm-3">
+              <div class="mb-3">
+                <select class="form-select" id="tahun" name="educationDate">
+                  <option  value="value" selected>Tahun</option>
+                  {% for i in info_list :%}
+                  <option value="{{i.tahun}}">{{i.tahun}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <form class="form-horizontal" action="/admin/wilayah" method="post">
+            <div class="card-body">
+              <h4 class="card-title">Berbatasan Wilayah</h4>
+              <div class="mb-3 row">
+                <label
+                  for="com1"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Berbatasan Utara</label
+                >
+                <div class="col-sm-9">
+                  <p id="utara">{{info_list[0]['utara']}}</p>
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="com1"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Berbatasan Selatan</label
+                >
+                <div class="col-sm-9">
+                  <p id="selatan">{{info_list[0]['selatan']}}</p>
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="com1"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Berbatasan Timur</label
+                >
+                <div class="col-sm-9">
+                  <p id="timur">{{info_list[0]['timur']}}</p>
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="com1"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Berbatasan barat</label
+                >
+                <div class="col-sm-9">
+                  <p id="barat">{{info_list[0]['barat']}}</p>
+                </div>
+              </div>
+            </div>
+            <div class="p-3 border-top">
+              <div class="text-end">
+               
+              </div>
+            </div>
+          </form>
+          <form class="form-horizontal" action="/admin/tanah" method="post" >
+            <div class="card-body">
+              <h4 class="card-title">Luas Desa</h4>
+              <div class="mb-3 row">
+                <label
+                  for="fname"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Luas</label
+                >
+                <div class="col-sm-9">
+                  <p id="luas"> {{info_list[0]['luas']}} Ha</p>
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="lname"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Sawah Teririgasi</label
+                >
+                <div class="col-sm-9">
+                  <p id="sawahteri">{{info_list[0]['sawahteri']}} Ha</p>
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="text"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Sawah Tandah Hujan</label
+                >
+                <div class="col-sm-9">
+                  <p id="sawahhu">{{info_list[0]['sawahhu']}} Ha</p>
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="cono1"
+                  class="col-sm-3 text-end control-label col-form-label"
+                  >Pemukiman</label
+                >
+                <div class="col-sm-9">
+                  <p id="pemukiman" >{{info_list[0]['pemukiman']}} Ha</p>
+                </div>
+              </div>
+              <div class="p-3 border-top">
+                <div class="text-end">
+                 
+                </div>
+              </div>
+            </div>
+          </from>
+        </div>
+      </div>
+    </div>
+  <script>
+    $("#tahun").on("change", function () {
+      var info_list = JSON.parse('{{info_list|tojson}}');
+      console.log(info_list);
+      for (i in info_list) {
+        console.log(info_list[i].tahun);
+        console.log(this.value)
+        if (info_list[i].tahun == this.value) {
+          console.log('berubah')
+          $utara = $("#utara").text(info_list[i].utara);
+          $selatan = $("#selatan").text(info_list[i].selatan);
+          $timur = $("#timur").text(info_list[i].timur);
+          $barat = $("#barat").text(info_list[i].barat);
+          $luas = $("#luas").text(info_list[i].luas);
+          $sawahteri = $("#sawahteri").text(info_list[i].sawahteri);
+          $sawahhu = $("#sawahhu").text(info_list[i].sawahhu);
+          $pemukiman = $("#pemukiman").text(info_list[i].pemukiman);  
+        }
+      }
+    });
+  </script>
+    {% endblock %}
