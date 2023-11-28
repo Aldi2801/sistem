@@ -221,75 +221,75 @@
                   <h4>Nama lengkap</h4>
                   <form>
                     <div class="form-group">
-                      <input type="text" class="form-control" id="editnamalengkapbaru" value="{{i.nama_lengkap}}" />
+                      <input type="text" class="form-control" id="editnamalengkapbaru-{{i.id}}" value="{{i.nama_lengkap}}" />
                     </div>
                   </form>
                   <h4>Input Gambar Baru</h4>
                   <form>
                     <div class="input-group mb-3">
                       <div class="custom-file">
-                        <input class="form-control" type="file" hint="{{i.gambar}}" id="editformFilebaru" />
+                        <input class="form-control" type="file" hint="{{i.gambar}}" id="editfoto-{{i.id}}" />
                       </div>
                     </div>
                   </form>
                   <h4>Jabatan</h4>
             <form>
               <div class="form-group">
-                <input type="text" id="editjabatanbaru" class="form-control" value="{{i.jabatan}}" />
+                <input type="text" id="editjabatanbaru-{{i.id}}" class="form-control" value="{{i.jabatan}}" />
               </div>
             </form>
             <h4>NIAP</h4>
             <form>
               <div class="form-group">
-                <input type="text" id="editniapbaru" class="form-control" />
+                <input type="text" id="editniapbaru-{{i.id}}" class="form-control"  value="{{i.niap}}" />
               </div>
             </form>
             <h4>Tempat, Tanggal Lahir</h4>
             <form>
               <div class="form-group">
-                <input type="text" id="editttlbaru" class="form-control" value="{{i.ttl}}" />
+                <input type="text" id="editttlbaru-{{i.id}}" class="form-control" value="{{i.ttl}}" />
               </div>
             </form>
             <h4>Agama</h4>
             <form>
               <div class="form-group">
-                <input type="text" id="editagamabaru" class="form-control" value="{{i.agama}}" />
+                <input type="text" id="editagamabaru-{{i.id}}" class="form-control" value="{{i.agama}}" />
               </div>
             </form>
             <h4>Pangkat / Golongan</h4>
             <form>
               <div class="form-group">
-                <input type="text" id="editgologanbaru" class="form-control" value="{{i.gologan}}" />
+                <input type="text" id="editgologanbaru-{{i.id}}" class="form-control" value="{{i.gologan}}" />
               </div>
             </form>
             <h4>Pendidikan Terakhir</h4>
             <form>
               <div class="form-group">
-                <input type="text" id="editpendidikanbaru" class="form-control" value="{{i.pendidikan_terakhir}}" />
+                <input type="text" id="editpendidikanbaru-{{i.id}}" class="form-control" value="{{i.pendidikan_terakhir}}" />
               </div>
             </form>
             <h4>Nomor SK</h4>
             <form>
               <div class="form-group">
-                <input type="text" id="editnomorskbaru" class="form-control" value="{{i.nomorsk}}"/>
+                <input type="text" id="editnomorskbaru-{{i.id}}" class="form-control" value="{{i.nomorsk}}"/>
               </div>
             </form>
             <h4>Tanggal SK</h4>
             <form>
               <div class="form-group">
-                <input type="text" id="edittanggalskbaru" class="form-control" value="{{i.tanggalsk}}" />
+                <input type="text" id="edittanggalskbaru-{{i.id}}" class="form-control" value="{{i.tanggalsk}}" />
               </div>
             </form>
             <h4>Masa Jabatan</h4>
             <form>
               <div class="form-group">
-                <input type="text" id="editmasajabatanbaru" class="form-control" value="{{i.masa_jabatan}}"/>
+                <input type="text" id="editmasajabatanbaru-{{i.id}}" class="form-control" value="{{i.masa_jabatan}}"/>
               </div>
             </form>
             <h4>Status</h4>
             <form>
               <div class="form-group">
-                <input type="text" id="editstatusbaru" class="form-control" value="{{i.status}}"/>
+                <input type="text" id="editstatusbaru-{{i.id}}" class="form-control" value="{{i.status}}"/>
               </div>
             </form>
                 </div>
@@ -340,7 +340,7 @@
     $(document).ready(function () {
     
       $( "#tambah" ).on( "click", function() {
-        var nama = $('#Namalengkapbaru').val()
+        var nama = $('#Namalengkapbaru-'+id).val()
         var formFilebaru = $('#formFilebaru')
         var jabatan = $('#jabatanbaru').val()
         var niap = $('#niapbaru').val()
@@ -392,21 +392,20 @@
 });
   function edit(id){
     
-    var editnama = $('#editnamalengkapbaru').val()
-    var editformFilebaru = $('#editformFilebaru').val()
-    var editjabatan = $('#editjabatanbaru').val()
-    var editniap = $('#editniapbaru').val()
-    var editttl = $('#editttlbaru').val()
-    var editagama = $('#editagamabaru').val()
-    var editgolongan = $('#editgologanbaru').val()
-    var editpendidikan = $('#editpendidikanbaru').val()
-    var editnomorsk = $('#editnomorskbaru').val()
-    var edittanggalsk = $('#edittanggalskbaru').val()
-    var editmasajabatan = $('#editmasajabatanbaru').val()
-    var editstatus = $('#editstatusbaru').val()
+    var editnama = $('#editnamalengkapbaru-'+id).val()
+    var editjabatan = $('#editjabatanbaru-'+id).val()
+    var editniap = $('#editniapbaru-'+id).val()
+    var editttl = $('#editttlbaru-'+id).val()
+    var editagama = $('#editagamabaru-'+id).val()
+    var editgolongan = $('#editgologanbaru-'+id).val()
+    var editpendidikan = $('#editpendidikanbaru-'+id).val()
+    var editnomorsk = $('#editnomorskbaru-'+id).val()
+    var edittanggalsk = $('#edittanggalskbaru-'+id).val()
+    var editmasajabatan = $('#editmasajabatanbaru-'+id).val()
+    var editstatus = $('#editstatusbaru-'+id).val()
     formData.append('id',id);
     formData.append('nama_lengkap',editnama)
-    jQuery.each(jQuery('#formFilebaru')[0].files, function(i, file) {
+    jQuery.each(jQuery('#editfoto-'+id)[0].files, function(i, file) {
       formData.append('gambar', file);
   });
     formData.append('jabatan',editjabatan)
@@ -426,7 +425,6 @@
         contentType: false,
         processData: false,
         method: 'POST',
-        type: 'POST', 
       }).done(function (data) {
         console.log(data);
         window.location.href = "/admin/anggota";
@@ -434,7 +432,7 @@
   } 
   function hapusBerita(id) {
     $.ajax({
-      url: '/hapus_berita',
+      url: '/hapus_anggota',
       method: 'POST',
       data: { id: id },
       dataType: 'json',

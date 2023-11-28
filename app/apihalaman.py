@@ -426,6 +426,28 @@ def hapus_berita():
     con.execute("DELETE FROM berita WHERE id = %s", (id,))
     mysql.connection.commit()
     return jsonify({"msg": "SUKSES"})
+#hapus anggota
+@app.route('/hapus_anggota', methods=['POST'])
+def hapus_anggota():
+    con = mysql.connection.cursor()
+    id = request.form['id']
+    
+    # Get the filename of the image associated with the news article
+    con.execute("SELECT gambar FROM anggota WHERE id = %s", (id,))
+    result = con.fetchone()
+    if result:
+        filename = result[0]
+        
+        # Delete the image file
+        if filename:
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            if os.path.exists(image_path):
+                os.remove(image_path)
+    
+    # Delete the news article from the database
+    con.execute("DELETE FROM anggota WHERE id = %s", (id,))
+    mysql.connection.commit()
+    return jsonify({"msg": "SUKSES"})
 #Dana
 @app.template_filter('format_currency')
 def format_currency(value):
@@ -667,7 +689,6 @@ def adminanggota():
     info_list = []
     
     for sistem in anggota:
-        print(str(sistem[1]))
         list_data = {
             'id': str(sistem[0]),
             'nama_lengkap': str(sistem[1]),
@@ -736,9 +757,23 @@ def tambah_anggota():
 def edit_anggota():
     con = mysql.connection.cursor()
     id = request.form['id']
+    print(id+"\n")
     nama_lengkap = request.form['nama_lengkap']
+    jabatan = request.form['jabatan']
+    niap = request.form['niap']
+    ttl = request.form['ttl']
+    agama = request.form['agama']
+    golongan = request.form['golongan']
+    pendidikan_terakhir = request.form['pendidikan_terakhir']
+    nomorsk = request.form['nomorsk']
+    tanggalsk = request.form['tanggalsk']
+    masa_jabatan = request.form['masa_jabatan']
+    status = request.form['status']
     try:
+        print("try")
         if request.files['gambar']:
+            print("if")
+            print(nama_lengkap+"\n"+jabatan+"\n"+niap+"\n"+ttl+"\n"+agama+"\n"+golongan+"\n"+pendidikan_terakhir+"\n"+nomorsk+"\n"+tanggalsk+"\n"+masa_jabatan+"\n"+status)
             file = request.files['gambar']
             con.execute("SELECT gambar FROM anggota WHERE id = %s", (id,))
             result = con.fetchone()
@@ -756,31 +791,14 @@ def edit_anggota():
             random_name = uuid.uuid4().hex+".jpg"
             destination = os.path.join(app.config['UPLOAD_FOLDER'], random_name)
             img.save(destination)  # Ganti dengan lokasi penyimpanan yang diinginkan
-            jabatan = request.form['jabatan']
-            niap = request.form['niap']
-            ttl = request.form['ttl']
-            agama = request.form['agama']
-            golongan = request.form['golongan']
-            pendidikan_terakhir = request.form['pendidikan_terakhir']
-            nomorsk = request.form['nomorsk']
-            tanggalsk = request.form['tanggalsk']
-            masa_jabatan = request.form['masa_jabatan']
-            status = request.form['status']
             con.execute("UPDATE anggota SET nama_lengkap = %s, gambar = %s, jabatan = %s, niap = %s, ttl = %s, agama = %s, golongan = %s, pendidikan_terakhir = %s, nomorsk = %s, tanggalsk = %s, masa_jabatan = %s, status = %s WHERE id = %s",(nama_lengkap,random_name,jabatan,niap,ttl,agama,golongan,pendidikan_terakhir,nomorsk,tanggalsk,masa_jabatan,status,id))
             mysql.connection.commit()
             # Gunakan img_io atau file yang telah diresize sesuai kebutuhan Anda
     except:
-        jabatan = request.form['jabatan']
-        niap = request.form['niap']
-        ttl = request.form['ttl']
-        agama = request.form['agama']
-        golongan = request.form['golongan']
-        pendidikan_terakhir = request.form['pendidikan_terakhir']
-        nomorsk = request.form['nomorsk']
-        tanggalsk = request.form['tanggalsk']
-        masa_jabatan = request.form['masa_jabatan']
-        status = request.form['status']
-        con.execute("UPDATE anggota SET nama_lengkap = %s, jabatan = %s, niap = %s, ttl = %s, agama = %s, golongan = %s, pendidikan_terakhir = %s, nomorsk = %s, tanggalsk = %s, masa_jabatan = %s, status = %s WHERE id = %s",(nama_lengkap,jabatan,niap,ttl,agama,golongan,pendidikan_terakhir,nomorsk,tanggalsk,masa_jabatan,status,id))
+        print("except")
+        print(nama_lengkap+"\n"+jabatan+"\n"+niap+"\n"+ttl+"\n"+agama+"\n"+golongan+"\n"+pendidikan_terakhir+"\n"+nomorsk+"\n"+tanggalsk+"\n"+masa_jabatan+"\n"+status)
+        con.execute("UPDATE anggota SET nama_lengkap = %s, jabatan = %s, niap = %s, ttl = %s, agama = %s, golongan = %s, pendidikan_terakhir = %s, nomorsk = %s, tanggalsk = %s, masa_jabatan = %s, status = %s WHERE id = %s",
+        (nama_lengkap,jabatan,niap,ttl,agama,golongan,pendidikan_terakhir,nomorsk,tanggalsk,masa_jabatan,status,id))
         mysql.connection.commit()
     return jsonify({"msg" : "SUKSES"})
 
