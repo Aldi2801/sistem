@@ -426,6 +426,7 @@ def hapus_berita():
     con.execute("DELETE FROM berita WHERE id = %s", (id,))
     mysql.connection.commit()
     return jsonify({"msg": "SUKSES"})
+
 #hapus anggota
 @app.route('/hapus_anggota', methods=['POST'])
 def hapus_anggota():
