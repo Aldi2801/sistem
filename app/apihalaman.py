@@ -250,6 +250,20 @@ def geo():
         info_list.append(list_data)
         
     return render_template("user_data_desa/geografi.html", info_list=info_list )
+#halaman vidio
+@app.route('/video')
+def vidio():
+    con = mysql.connection.cursor()
+    con.execute("SELECT * FROM vidio order by id DESC")
+    berita = con.fetchall()
+    info_list = []
+    for sistem in berita:
+        list_data = {
+            'id': str(sistem[0]),
+            'vidio': str(sistem[1])        
+        }
+        info_list.append(list_data)
+    return render_template("video.html", info_list = info_list)
 #halaman admin
 @app.route('/admin')
 def admin():
@@ -876,3 +890,29 @@ def hapus_galeri():
     con.execute("DELETE FROM galeri WHERE id = %s", (id,))
     mysql.connection.commit()
     return jsonify({"msg": "SUKSES"})
+#vidio
+@app.route('/admin/vidio')
+def adminvidio():
+    con = mysql.connection.cursor()
+    con.execute("SELECT * FROM vidio order by id DESC")
+    berita = con.fetchall()
+    info_list = []
+    for sistem in berita:
+        list_data = {
+            'id': str(sistem[0]),
+            'vidio': str(sistem[1])
+            
+        }
+        info_list.append(list_data)
+        
+
+    return render_template("admin/vidio.html", info_list = info_list)
+
+@app.route('/admin/edit_vidio', methods=['POST'])
+def edit_vidio():
+    con = mysql.connection.cursor()
+    id = request.form['id']
+    vidio = request.form['vidio']
+    con.execute("UPDATE vidio SET vidio = %s WHERE id = %s",(vidio,id))
+    mysql.connection.commit()
+    return jsonify({"msg" : "SUKSES"})

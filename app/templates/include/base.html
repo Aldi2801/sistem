@@ -131,7 +131,7 @@
                   <a class="dropdown-item" href="/sejarah"
                     >SEJARAH & MONOGRAFI DESA</a
                   >
-                  <a class="dropdown-item" href="#">VIDEO PROFIL DESA</a>
+                  <a class="dropdown-item" href="/video">VIDEO PROFIL DESA</a>
                 </div>
               </div>
               <!-- ============================================================== -->
@@ -388,7 +388,7 @@
               // Send the user's message to the server via AJAX
               $.ajax({
                 type: "GET",
-                url: "http://127.0.0.1:5000/get?msg=" + userMessage, // Replace with your server endpoint
+                url: "http://rizkydwisaputra.my.id/chatbot_adi/get?msg=" + userMessage, // Replace with your server endpoint
                 success: function (response) {
                   // Append bot's response to the chat
                   appendMessage("Bot", response, 'bot-message');

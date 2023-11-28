@@ -45,173 +45,82 @@
             </div>
           </div>
         </div>
-        <form class="form-horizontal" action="/admin/monoedit" method="post">
+      </div>
+          <div class="card">
           <div class="card-body">
             <h4 class="card-title">Kependudukan</h4>
-            <div class="mb-3 row">
-              <label
-                for="cono"
-                class="col-sm-3 text-end control-label col-form-label"
-                >Jumlah Penduduk</label
-              >
-              <div class="col-sm-9">
-                <p id="jpenduduk">{{info_list[0]['jpenduduk']}}</p>
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label
-                for="cono"
-                class="col-sm-3 text-end control-label col-form-label"
-                >Jumlah KK</label
-              >
-              <div class="col-sm-9">
-                <p id="jkk">{{info_list[0]['jkk']}}</p>
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label
-                for="cono1"
-                class="col-sm-3 text-end control-label col-form-label"
-                >Laki-Laki</label
-              >
-              <div class="col-sm-9">
-                <p id="laki">{{info_list[0]['laki']}}</p>
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label
-                for="cono1"
-                class="col-sm-3 text-end control-label col-form-label"
-                >Perempuan</label
-              >
-              <div class="col-sm-9">
-                <p id="perempuan">{{info_list[0]['perempuan']}}</p>
+              <div class = "table-responsive">
+                <table id="file_export" class="table table-striped table-bordered display text-nowrap"style="border:0px; border-bottom: 1px solid ;">
+                  <thead>
+                      <tr>
+                        <th >Jumlah Penduduk</th>
+                        <th >Jumlah KK</th>
+                        <th >Laki-Laki</th>
+                        <th >Perempuan</th>
+                      </tr>
+                  </thead>
+                  <tr style="border:0px">
+                      <td>{{info_list[0]['jpenduduk']}}</td>
+                      <td>{{info_list[0]['jkk']}}</td>
+                      <td>{{info_list[0]['laki']}}</td>
+                      <td>{{info_list[0]['perempuan']}}</td>
+                  </tr>
+                </table>
               </div>
             </div>
           </div>
+        </div>
+        <div class="card">
           <div class="card-body">
             <h4 class="card-title">Kesejahteraan Sosial</h4>
-            <div class="mb-3 row">
-              <label
-                for="com1"
-                class="col-sm-3 text-end control-label col-form-label"
-                >Jumlah KK Prasejahtera</label
-              >
-              <div class="col-sm-9">
-                <p id="jkkprese">{{info_list[0]['jkkprese']}}</p>
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label
-                for="com1"
-                class="col-sm-3 text-end control-label col-form-label"
-                >Jumlah KK Sejahtera</label
-              >
-              <div class="col-sm-9">
-                <p id="jkkseja">{{info_list[0]['jkkseja']}}</p>
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label
-                for="com1"
-                class="col-sm-3 text-end control-label col-form-label"
-                >Jumlah KK Kaya</label
-              >
-              <div class="col-sm-9">
-                <p id="jkkkaya">{{info_list[0]['jkkkaya']}}</p>
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label
-                for="com1"
-                class="col-sm-3 text-end control-label col-form-label"
-                >Jumlah KK Sedang</label
-              >
-              <div class="col-sm-9">
-                <p id="jkksedang">{{info_list[0]['jkksedang']}}</p>
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label
-                for="com1"
-                class="col-sm-3 text-end control-label col-form-label"
-                >Jumlah KK Miskin</label
-              >
-              <div class="col-sm-9">
-                <p id="jkkmiskin">{{info_list[0]['jkkmiskin']}}</p>
-              </div>
+            <div class = "table-responsive">
+              <table id="file_export" class="table table-striped table-bordered display text-nowrap"style="border:0px; border-bottom: 1px solid ;">
+                <thead>
+                    <tr>
+                      <th >Jumlah KK Prasejahtera</th>
+                      <th >Jumlah KK Sejahtera</th>
+                      <th >Jumlah KK Kaya</th>
+                      <th >Jumlah KK Sedang</th>
+                      <th >Jumlah KK Miskin</th>
+                    </tr>
+                </thead>
+                <tr style="border:0px">
+                    <td>{{info_list[0]['jkkprese']}}</td>
+                    <td>{{info_list[0]['jkkseja']}}</td>
+                    <td>{{info_list[0]['jkkkaya']}}</td>
+                    <td>{{info_list[0]['jkksedang']}}</td>
+                    <td>{{info_list[0]['jkkmiskin']}}</td>
+                </tr>
+              </table>
             </div>
           </div>
+        </div>
+      </div>
+          <div class="card">
           <div class="card-body">
             <h4 class="card-title">Agama</h4>
-            <div class="mb-3 row">
-              <label
-                for="com1"
-                class="col-sm-3 text-end control-label col-form-label"
-                >Islam</label
-              >
-              <div class="col-sm-9">
-                <p id="islam">{{info_list[0]['islam']}}</p>
-              </div>
+            <div class = "table-responsive">
+              <table id="file_export" class="table table-striped table-bordered display text-nowrap"style="border:0px; border-bottom: 1px solid ;">
+                <thead>
+                    <tr>
+                      <th >Islam</th>
+                      <th >Kristen</th>
+                      <th >Protestan</th>
+                      <th >Katolik</th>
+                      <th >Hindu</th>
+                      <th >Budha</th>
+                    </tr>
+                </thead>
+                <tr style="border:0px">
+                    <td>{{info_list[0]['islam']}}</td>
+                    <td>{{info_list[0]['Kristen']}}</td>
+                    <td>{{info_list[0]['Protestan']}}</td>
+                    <td>{{info_list[0]['Katolik']}}</td>
+                    <td>{{info_list[0]['Hindu']}}</td>
+                    <td>{{info_list[0]['Budha']}}</td>
+                </tr>
+              </table>
             </div>
-            <div class="mb-3 row">
-              <label
-                for="com1"
-                class="col-sm-3 text-end control-label col-form-label"
-                >Kristen</label
-              >
-              <div class="col-sm-9">
-                <p id="kristen">{{info_list[0]['kristen']}}</p>
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label
-                for="com1"
-                class="col-sm-3 text-end control-label col-form-label"
-                >Protestan</label
-              >
-              <div class="col-sm-9">
-                <p id="protestan">{{info_list[0]['protestan']}}</p>
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label
-                for="com1"
-                class="col-sm-3 text-end control-label col-form-label"
-                >Katolik</label
-              >
-              <div class="col-sm-9">
-                <p id="katolik">{{info_list[0]['katolik']}}</p>
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label
-                for="com1"
-                class="col-sm-3 text-end control-label col-form-label"
-                >Hindu</label
-              >
-              <div class="col-sm-9">
-                <p id="hindu">{{info_list[0]['hindu']}}</p>
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label
-                for="com1"
-                class="col-sm-3 text-end control-label col-form-label"
-                >Budha</label
-              >
-              <div class="col-sm-9">
-                <p id="budha">"{{info_list[0]['budha']}}"</p>
-              </div>
-            </div>
-          </div>
-          <div class="p-3 border-top">
-            <div class="text-end">
-            
-            </div>
-          </div>
-        </form>
-      </div>
     </div>
   </div>
   <script>
