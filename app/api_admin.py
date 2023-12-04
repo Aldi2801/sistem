@@ -1,4 +1,4 @@
-from . import app,mysql
+from . import app,mysql,db
 from flask import render_template, request, jsonify, redirect, url_for,session
 import os
 import pandas as pd
@@ -10,264 +10,10 @@ import uuid
 import time
 from datetime import datetime
 
-#halaman homepage
-@app.route('/')
-def homepahe():
-    con = mysql.connection.cursor()
-    con.execute("SELECT tahun FROM realisasi_pendapatan group by tahun")
-    list_thn_dana = con.fetchall()
-    session['list_thn_dana']= list_thn_dana
-    return render_template('index.html')
-
-@app.route('/news')
-def userberita():
-    con = mysql.connection.cursor()
-    con.execute("SELECT * FROM berita order by id DESC")
-    berita = con.fetchall()
-    info_list = []
-    for sistem in berita:
-        des = str(sistem[3])
-        des = textwrap.shorten(des,width=75, placeholder="...")
-        
-        list_data = {
-            'id': str(sistem[0]),
-            'judul': str(sistem[1]),
-            'gambar': str(sistem[2]),
-            'deskripsi': des,
-            'deskripsifull': str(sistem[3]),
-            'tanggal': str(sistem[4]),
-            'link': str(sistem[5]),
-        }
-        info_list.append(list_data)
-  
-    return render_template('homepage.html',info_list = info_list)
-#halaman berita
-@app.route('/berita/<link>')
-def detail_berita(link):
-    con = mysql.connection.cursor()
-    con.execute("SELECT * FROM berita where link = %s order by id DESC " , (link,))
-    berita = con.fetchall()
-    info_list = []
-    for sistem in berita:
-        des = str(sistem[3])
-        des = textwrap.shorten(des,width=75, placeholder="...")
-        list_data = {
-            'id': str(sistem[0]),
-            'judul': str(sistem[1]),
-            'gambar': str(sistem[2]),
-            'deskripsi': des,
-            'deskripsifull': str(sistem[3]),
-            'tanggal': str(sistem[4])
-        }
-        info_list.append(list_data)
-    return render_template('detail_berita.html',info_list = info_list)
-#halaman sejarah
-@app.route('/sejarah')
-def sejarah():
-    con = mysql.connection.cursor()
-    con.execute("SELECT * FROM sejarah_desa")
-    sejarah = con.fetchall()
-    print(sejarah)
-    info_list = []
-    for sistem in sejarah:
-        print(sistem)
-        list_data = {
-            'id': str(sistem[0]),
-            'sejarah': str(sistem[1])
-        }
-        info_list.append(list_data)
-    return render_template("sejarah.html", info_list = info_list)
-
-#halaman visi misi
-@app.route('/visi_misi')
-def visi_misi():
-    con = mysql.connection.cursor()
-    con.execute("SELECT * FROM sejarah_desa")
-    sejarah = con.fetchall()
-    print(sejarah)
-    info_list = []
-    for sistem in sejarah:
-        print(sistem)
-        list_data = {
-            'id': str(sistem[0]),
-            'visi': str(sistem[2]),
-            'misi': sistem[3],
-        }
-        info_list.append(list_data)
-    return render_template("visimisi.html", info_list = info_list)
-
-#halaman pemerintahan
-@app.route('/pemerintahan_desa')
-def pemerintahan_desa():
-    con = mysql.connection.cursor()
-    con.execute("SELECT * FROM anggota order by id")
-    anggota = con.fetchall()
-    info_list = []
-    
-    for sistem in anggota:
-        print(str(sistem[1]))
-        list_data = {
-            'id': str(sistem[0]),
-            'nama_lengkap': str(sistem[1]),
-            'gambar': str(sistem[2]),
-            'jabatan': str(sistem[3]),
-            'niap': str(sistem[4]),
-            'ttl': str(sistem[5]),
-            'agama': str(sistem[6]),
-            'golongan': str(sistem[7]),
-            'pendidikan_terakhir': str(sistem[8]),
-            'nomorsk': str(sistem[9]),
-            'tanggalsk': str(sistem[10]),
-            'masa_jabatan': str(sistem[11]),
-            'status': str(sistem[12])
-        }
-        info_list.append(list_data)
-    return render_template("pemerintahan_desa.html", info_list = info_list)
-#halaman dana
-@app.route('/dana/<thn>')
-def dana_desa(thn):
-    con = mysql.connection.cursor()
-    con.execute("SELECT * FROM realisasi_pendapatan where tahun = %s order by id",(thn,))
-    dana = con.fetchall()
-    info_list = []
-    
-    for sistem in dana:
-        print(str(sistem[1]))
-        list_data = {
-            'id': str(sistem[0]),
-            'no': str(sistem[1]),
-            'uraian': str(sistem[2]),
-            'anggaran': str(sistem[3]),
-            'realisasi': str(sistem[4]),
-            'lebih_kurang': str(sistem[5]),
-            'tahun': str(sistem[6])
-           
-        }
-        info_list.append(list_data)
-        
-    con.execute("SELECT * FROM realisasi_belanja where tahun = %s order by id",(thn,))
-    dana = con.fetchall()
-    info_list2 = []
-    
-    for sistem in dana:
-        print(str(sistem[1]))
-        list_data = {
-            'id': str(sistem[0]),
-            'no': str(sistem[1]),
-            'uraian': str(sistem[2]),
-            'anggaran': str(sistem[3]),
-            'realisasi': str(sistem[4]),
-            'lebih_kurang': str(sistem[5]),
-            'tahun': str(sistem[6])
-           
-        }
-        info_list2.append(list_data)
-        
-    con.execute("SELECT * FROM realisasi_pembiayaan where tahun = %s order by id",(thn,))
-    dana = con.fetchall()
-    info_list3 = []
-    
-    for sistem in dana:
-        print(str(sistem[1]))
-        list_data = {
-            'id': str(sistem[0]),
-            'no': str(sistem[1]),
-            'uraian': str(sistem[2]),
-            'anggaran': str(sistem[3]),
-            'realisasi': str(sistem[4]),
-            'lebih_kurang': str(sistem[5]),
-            'tahun': str(sistem[6])
-           
-        }
-        info_list3.append(list_data)
-    return render_template("dana.html", info_list = info_list,info_list2 = info_list2,info_list3 = info_list3,   tahun = thn)
-#halaman user galeri
-@app.route('/galeri')
-def galeri():
-    con = mysql.connection.cursor()
-    con.execute("SELECT * FROM galeri order by id DESC")
-    berita = con.fetchall()
-    info_list = []
-    
-    for sistem in berita:
-        list_data = {
-            'id': str(sistem[0]),
-            'judul': str(sistem[1]),
-            'gambar': str(sistem[2]),
-            'tanggal': str(sistem[3])
-        }
-        info_list.append(list_data)
-    return render_template("/galeri.html", info_list = info_list)
-#halaman monografi
-@app.route('/monografi')
-def mono():
-    con = mysql.connection.cursor()
-    con.execute("SELECT * FROM monografi")
-    mono = con.fetchall()
-    info_list = []
-    for sistem in mono:
-        list_data = {
-            'id': str(sistem[0]),
-            'tahun': str(sistem[1]),
-            'jpenduduk': str(sistem[2]),
-            'jkk': str(sistem[3]),
-            'laki': str(sistem[4]),
-            'perempuan': str(sistem[5]),
-            'jkkprese': str(sistem[6]),
-            'jkkseja': str(sistem[7]),
-            'jkkkaya': str(sistem[8]),
-            'jkksedang': str(sistem[9]),
-            'jkkmiskin': str(sistem[10]),
-            'islam': str(sistem[11]),
-            'kristen': str(sistem[12]),
-            'protestan': str(sistem[13]),
-            'katolik': str(sistem[14]),
-            'hindu': str(sistem[15]),
-            'budha': str(sistem[16])
-        }
-        info_list.append(list_data)
-    return render_template("user_data_desa/monografi.html", info_list = info_list)
-#Halaman geografi
-@app.route('/geografi')
-def geo():
-    con = mysql.connection.cursor()
-    con.execute("SELECT * FROM wilayah")
-    wilayah = con.fetchall()
-    info_list = []
-    for sistem in wilayah:
-        list_data = {
-            'id': str(sistem[0]),
-            'utara': str(sistem[1]),
-            'selatan': str(sistem[2]),
-            'timur': str(sistem[3]),
-            'barat': str(sistem[4]),
-            'luas': str(sistem[5]),
-            'sawahteri': str(sistem[6]),
-            'sawahhu': str(sistem[7]),
-            'pemukiman': str(sistem[8]),
-            'tahun':str(sistem[9])
-        }
-        info_list.append(list_data)
-        
-    return render_template("user_data_desa/geografi.html", info_list=info_list )
-#halaman vidio
-@app.route('/video')
-def vidio():
-    con = mysql.connection.cursor()
-    con.execute("SELECT * FROM vidio order by id DESC")
-    berita = con.fetchall()
-    info_list = []
-    for sistem in berita:
-        list_data = {
-            'id': str(sistem[0]),
-            'vidio': str(sistem[1])        
-        }
-        info_list.append(list_data)
-    return render_template("video.html", info_list = info_list)
 #halaman admin
-@app.route('/admin')
-def admin():
-    return render_template("admin/login.html")
+@app.route('/admin/dashboard')
+def dashboard():
+    return render_template('admin/dashboard.html')
 #sejarah
 @app.route('/admin/infodesa')
 def admininfodesa():
@@ -286,8 +32,34 @@ def admininfodesa():
         }
         info_list.append(list_data)
     return render_template("admin/infodesa.html", info_list = info_list)
+#tambah info
 
-@app.route('/admin/edit_sejarah', methods=['GET','POST'], endpoint='edit_sejarah_endpoint')
+@app.route('/tambah_info', methods=['POST'])
+# @jwt_required
+def tambah_info():
+    con = mysql.connection.cursor()
+    sejarah = request.form['sejarah']
+    visi = request.form['visi']
+    misi = request.form['misi']
+    con.execute("INSERT INTO sejarah (sejarah , visi, misi) VALUES (%s,%s,%s)",(sejarah , visi, misi))
+    mysql.connection.commit()
+    return jsonify("msg : SUKSES")
+
+
+#edit info data
+@app.route('/edit_info', methods=['POST'])
+# @jwt_required
+def edit_info():
+    con = mysql.connection.cursor()
+    id = request.form['id']
+    sejarah = request.form['sejarah']
+    visi = request.form['visi']
+    
+    misi = request.form['misi']
+    con.execute("UPDATE sejarah_desa SET sejarah = %s, visi = %s, misi = %s WHERE id = %s",(sejarah,visi,misi,id))
+    mysql.connection.commit()
+    return jsonify("msg : SUKSES")
+@app.route('/admin/edit_sejarah', methods=['GET','POST'])
 def edit_sejarah():
     if request.method == 'POST':
         con = mysql.connection.cursor()
@@ -518,6 +290,59 @@ def admindana():
         
     return render_template("admin/dana.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn)
 
+@app.route('/admin/tambah_berita', methods=['POST'])
+def tambah_berita():
+    con = mysql.connection.cursor()
+    judul = request.form['judul']
+    link = judul
+    link = link.replace("#", "")
+    link = link.replace("?", "")
+    link = link.replace("/", "")
+    link = link.replace(" ", "_")
+    file = request.files['gambar']
+    if file:
+            img = Image.open(file)
+            img = img.convert('RGB')
+            # Resize gambar
+            width, height = 600, 300  # Atur sesuai kebutuhan Anda
+            img = img.resize((width, height))
+
+            # Simpan gambar yang diresize ke BytesIO
+            img_io = BytesIO()
+            img.save(img_io, 'JPEG', quality=70)
+            img_io.seek(0)
+            random_name = uuid.uuid4().hex+".jpg"
+            destination = os.path.join(app.config['UPLOAD_FOLDER'], random_name)
+            img.save(destination)  # Ganti dengan lokasi penyimpanan yang diinginkan
+            
+            # Gunakan img_io atau file yang telah diresize sesuai kebutuhan Anda
+    deskripsi = request.form['deskripsi']
+    con.execute("INSERT INTO berita (judul, gambar , deskripsi,link ) VALUES (%s,%s,%s)",(judul,random_name,deskripsi,link))
+    mysql.connection.commit()
+    return jsonify("msg : SUKSES")
+
+
+
+@app.route('/admin/edit_dana', methods=['POST'])
+def edit_dana():
+    con = mysql.connection.cursor()
+    id = request.form['id']
+    tahun = request.form['tahun']
+    dana = request.form['dana']
+    digunakan = request.form['digunakan']
+    sisah = request.form['sisah']
+    con.execute("UPDATE dana SET tahun = %s, dana = %s, keterangan = %s, sisah = %s WHERE id = %s",(tahun,dana,digunakan,sisah,id))
+    mysql.connection.commit()
+    return jsonify("msg : SUKSES")
+
+#hapus
+@app.route('/admin/hapus_dana', methods=['POST'])
+def hapus_dana():
+    con = mysql.connection.cursor()
+    id = request.form['id']
+    con.execute("DELETE FROM dana WHERE id = %s",(id))
+    mysql.connection.commit()
+    return jsonify("msg : SUKSES")
 
 @app.route('/admin/tambah_dana', methods=['POST'])
 def tambah_dana():
