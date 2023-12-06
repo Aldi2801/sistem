@@ -55,6 +55,35 @@
   </head>
 
   <body>
+    <script>
+      // Simpan token JWT di Local Storage setelah berhasil login
+      function saveTokenToLocalStorage(token) {
+        localStorage.setItem('jwt_token', token);
+      }
+      // Ambil token JWT dari Local Storage
+      function getTokenFromLocalStorage() {
+        return localStorage.getItem('jwt_token');
+      }
+      // Hapus token JWT dari Local Storage setelah logout
+      function removeTokenFromLocalStorage() {
+        localStorage.removeItem('jwt_token');
+      }
+      token = getTokenFromLocalStorage()
+      if (token==null){
+        window.location.href = "/masuk";
+      }
+      function logout(){
+          var result = window.confirm("Apakah Anda yakin?");
+          
+          if (result) {
+              removeTokenFromLocalStorage();
+              window.location.href = "/masuk?msg='login berhasil'";
+              // Lakukan tindakan jika pengguna memilih Yes
+          } else {
+              // Lakukan tindakan jika pengguna memilih No
+          }
+      }
+      </script>
     <!-- ============================================================= -->
     <!-- Preloader - style you can find in spinners.css -->
     <!-- ============================================================= -->
@@ -181,7 +210,7 @@
                       <div class="mt-4">
                         <a
                           class="btn btn-info text-white"
-                          href="/logout"
+                          onclick="logout()"
                         >
                           Logout
                         </a>
@@ -270,5 +299,6 @@
     <script src="../../static/assets/libs/quill/dist/quill.min.js"></script>
     <!-- Table -->
     <script src="../../static/assets/extra-libs/datatables.net/js/jquery.dataTables.min.js"></script>
+
   </body>
 </html>

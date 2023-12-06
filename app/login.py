@@ -8,20 +8,20 @@ def masuk():
 # Endpoint untuk membuat token
 @app.route('/proses_masuk', methods=['POST'])
 def login():
-        username = request.form.get('username', None)
-        password = request.form.get('password', None)
+        username = request.json['username']
+        password = request.json['password']
 
         # Seharusnya Anda memverifikasi kredensial pengguna di sini
         # Misalnya, memeriksa username dan password di database
         if user_datastore.find_user(username=username):
             user = user_datastore.find_user(username=username)
         else:
-            return redirect(url_for('masuk',error="Invalid username"))
+            return "false"
         if user and bcrypt.check_password_hash(user.password, password):
             access_token = create_access_token(identity=username)
-            return redirect(url_for('dashboard',access_token=access_token))
+            return access_token
         else:
-            return redirect(url_for('masuk',error="Invalid password"))
+            return "false"
 
 # Endpoint yang memerlukan autentikasi
 @app.route('/logout')
