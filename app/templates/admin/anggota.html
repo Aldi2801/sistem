@@ -379,6 +379,9 @@
             processData: false,
             method: 'POST',
             type: 'POST', 
+            headers: {
+              'Authorization': 'Bearer ' + token
+          },
           }).done(function (data) {
             console.log(data);
             
@@ -425,6 +428,9 @@
         contentType: false,
         processData: false,
         method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + token
+      },
       }).done(function (data) {
         console.log(data);
         window.location.href = "/admin/anggota";
@@ -434,6 +440,9 @@
     $.ajax({
       url: '/hapus_anggota',
       method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token
+    },
       data: { id: id },
       dataType: 'json',
     }).done(function(response) {

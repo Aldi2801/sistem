@@ -1,10 +1,11 @@
-from flask import Flask
+from flask import Flask,jsonify,request,session
 from flask_sqlalchemy import SQLAlchemy
 from flask_mysqldb import MySQL
 from flask_jwt_extended import JWTManager
 from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin
 from flask_bcrypt import Bcrypt
 from datetime import timedelta
+from functools import wraps
 
 app = Flask(__name__)
 app.config['MYSQL_HOST'] = 'localhost'
@@ -18,6 +19,7 @@ app.config['SECURITY_PASSWORD_HASH'] = 'bcrypt'
 app.config['SECURITY_PASSWORD_SALT'] = b'asahdjhwquoyo192382qo'
 app.config['JWT_SECRET_KEY'] = 'qwdu92y17dqsu81'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=1)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
@@ -48,7 +50,6 @@ user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(datastore=user_datastore, app=app)
 
 jwt = JWTManager(app)
-
 mysql = MySQL()
 mysql.init_app(app)
 

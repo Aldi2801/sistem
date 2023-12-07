@@ -1,3 +1,6 @@
+{% if session['jwt_token'] %}
+<p>You are logged in. Please <a href="/admin/dashboard">go to dashboard</a>.</p>
+{% else %}
 <!-- templates/login.html -->
 <!DOCTYPE html>
 <html lang="en">
@@ -12,7 +15,7 @@
     <div class="container mt-5">
         <h2>Login</h2>
         <form>
-            <p id="msg">usernme / password salah</p>
+            <p id="msg">username / password salah</p>
             <div class="form-group">
                 <label for="username">Username:</label>
                 <input type="text" class="form-control" id="username" name="username" required>
@@ -47,12 +50,18 @@ function kirim(){
         success: function(response) {
             // Proses respons dari server
             console.log(response);
-            if(response=="false"){
+            if(response=="username salah"){
+                document.getElementById("msg").innerHTMl = response
+                document.getElementById("msg").style.display = "block";
+            }
+            else if(response=="password salah"){
+                document.getElementById("msg").innerHTMl = response
                 document.getElementById("msg").style.display = "block";
             }
             else{
                 saveTokenToLocalStorage(response);
-                window.location.href = "admin/dashboard";
+                window.location.href = '/admin/dashboard'
+                
             }
         }
     });
@@ -60,3 +69,5 @@ function kirim(){
 document.getElementById("login").addEventListener("click", kirim);
 </script>
 </html>
+
+{% endif %}

@@ -150,6 +150,9 @@
               processData: false,
               method: 'POST',
               type: 'POST', 
+              headers: {
+                'Authorization': 'Bearer ' + token
+            },
             }).done(function (data) {
               console.log(data);
               window.location.href = "/admin/vidio";

@@ -9,11 +9,13 @@ import locale
 import uuid
 import time
 from datetime import datetime
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 #halaman admin
 @app.route('/admin/dashboard')
 def dashboard():
     return render_template('admin/dashboard.html')
+
 #sejarah
 @app.route('/admin/infodesa')
 def admininfodesa():
@@ -32,10 +34,10 @@ def admininfodesa():
         }
         info_list.append(list_data)
     return render_template("admin/infodesa.html", info_list = info_list)
-#tambah info
 
+#tambah info
 @app.route('/tambah_info', methods=['POST'])
-# @jwt_required
+@jwt_required()
 def tambah_info():
     con = mysql.connection.cursor()
     sejarah = request.form['sejarah']
@@ -45,10 +47,9 @@ def tambah_info():
     mysql.connection.commit()
     return jsonify("msg : SUKSES")
 
-
 #edit info data
 @app.route('/edit_info', methods=['POST'])
-# @jwt_required
+@jwt_required()
 def edit_info():
     con = mysql.connection.cursor()
     id = request.form['id']
@@ -62,6 +63,7 @@ def edit_info():
 @app.route('/admin/edit_sejarah', methods=['GET','POST'])
 def edit_sejarah():
     if request.method == 'POST':
+        jwt_required()
         con = mysql.connection.cursor()
         sejarah = request.form['sejarah']
         print(str(sejarah))
@@ -93,6 +95,7 @@ def adminvisimisi():
     return render_template("admin/visimisi.html", info_list = info_list)
 
 @app.route('/admin/visiedit', methods=['POST'])
+@jwt_required()
 def adminvisiedit():
     con = mysql.connection.cursor()
     visi = request.form['visi']
@@ -102,6 +105,7 @@ def adminvisiedit():
     return redirect(url_for("adminvisimisi"))
 
 @app.route('/admin/misiedit', methods=['POST'])
+@jwt_required()
 def adminmisiedit():
     con = mysql.connection.cursor()
     misi = request.form['misi']
@@ -110,8 +114,6 @@ def adminmisiedit():
     mysql.connection.commit()
     return redirect(url_for("adminvisimisi"))
     
-
-
 #berita
 @app.route('/admin/berita')
 def admindberita():
@@ -131,11 +133,42 @@ def admindberita():
             'tanggal': str(sistem[4])
         }
         info_list.append(list_data)
-        
-
     return render_template("admin/berita.html", info_list = info_list)
 
+@app.route('/admin/tambah_berita', methods=['POST'])
+@jwt_required()
+def tambah_berita():
+    con = mysql.connection.cursor()
+    judul = request.form['judul']
+    link = judul
+    link = link.replace("#", "")
+    link = link.replace("?", "")
+    link = link.replace("/", "")
+    link = link.replace(" ", "_")
+    file = request.files['gambar']
+    if file:
+            img = Image.open(file)
+            img = img.convert('RGB')
+            # Resize gambar
+            width, height = 600, 300  # Atur sesuai kebutuhan Anda
+            img = img.resize((width, height))
+
+            # Simpan gambar yang diresize ke BytesIO
+            img_io = BytesIO()
+            img.save(img_io, 'JPEG', quality=70)
+            img_io.seek(0)
+            random_name = uuid.uuid4().hex+".jpg"
+            destination = os.path.join(app.config['UPLOAD_FOLDER'], random_name)
+            img.save(destination)  # Ganti dengan lokasi penyimpanan yang diinginkan
+            
+            # Gunakan img_io atau file yang telah diresize sesuai kebutuhan Anda
+    deskripsi = request.form['deskripsi']
+    con.execute("INSERT INTO berita (judul, gambar , deskripsi,link ) VALUES (%s,%s,%s)",(judul,random_name,deskripsi,link))
+    mysql.connection.commit()
+    return jsonify("msg : SUKSES")
+
 @app.route('/admin/edit_berita', methods=['POST'])
+@jwt_required()
 def edit_berita():
     con = mysql.connection.cursor()
     id = request.form['id']
@@ -178,6 +211,7 @@ def edit_berita():
     return jsonify({"msg" : "SUKSES"})
 
 @app.route('/hapus_berita', methods=['POST'])
+@jwt_required()
 def hapus_berita():
     con = mysql.connection.cursor()
     id = request.form['id']
@@ -201,6 +235,7 @@ def hapus_berita():
 
 #hapus anggota
 @app.route('/hapus_anggota', methods=['POST'])
+@jwt_required()
 def hapus_anggota():
     con = mysql.connection.cursor()
     id = request.form['id']
@@ -290,40 +325,10 @@ def admindana():
         
     return render_template("admin/dana.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn)
 
-@app.route('/admin/tambah_berita', methods=['POST'])
-def tambah_berita():
-    con = mysql.connection.cursor()
-    judul = request.form['judul']
-    link = judul
-    link = link.replace("#", "")
-    link = link.replace("?", "")
-    link = link.replace("/", "")
-    link = link.replace(" ", "_")
-    file = request.files['gambar']
-    if file:
-            img = Image.open(file)
-            img = img.convert('RGB')
-            # Resize gambar
-            width, height = 600, 300  # Atur sesuai kebutuhan Anda
-            img = img.resize((width, height))
-
-            # Simpan gambar yang diresize ke BytesIO
-            img_io = BytesIO()
-            img.save(img_io, 'JPEG', quality=70)
-            img_io.seek(0)
-            random_name = uuid.uuid4().hex+".jpg"
-            destination = os.path.join(app.config['UPLOAD_FOLDER'], random_name)
-            img.save(destination)  # Ganti dengan lokasi penyimpanan yang diinginkan
-            
-            # Gunakan img_io atau file yang telah diresize sesuai kebutuhan Anda
-    deskripsi = request.form['deskripsi']
-    con.execute("INSERT INTO berita (judul, gambar , deskripsi,link ) VALUES (%s,%s,%s)",(judul,random_name,deskripsi,link))
-    mysql.connection.commit()
-    return jsonify("msg : SUKSES")
-
 
 
 @app.route('/admin/edit_dana', methods=['POST'])
+@jwt_required()
 def edit_dana():
     con = mysql.connection.cursor()
     id = request.form['id']
@@ -337,6 +342,7 @@ def edit_dana():
 
 #hapus
 @app.route('/admin/hapus_dana', methods=['POST'])
+@jwt_required()
 def hapus_dana():
     con = mysql.connection.cursor()
     id = request.form['id']
@@ -345,6 +351,7 @@ def hapus_dana():
     return jsonify("msg : SUKSES")
 
 @app.route('/admin/tambah_dana', methods=['POST'])
+@jwt_required()
 def tambah_dana():
     con = mysql.connection.cursor()
     filependapatan = request.files['excellpendapatan']
@@ -412,6 +419,7 @@ def admingeo():
     return render_template("admin/geografi.html", info_list=info_list, info_list2=info_list2)
 
 @app.route('/admin/wilayah', methods=['POST'])
+@jwt_required()
 def adminwilayahedit():
         con = mysql.connection.cursor()
         utara = request.form['utara']
@@ -427,6 +435,7 @@ def adminwilayahedit():
         return redirect(url_for("admingeo"))
     
 @app.route('/admin/tanah', methods=['POST'])
+@jwt_required()
 def admintanahedit():
         con = mysql.connection.cursor()
         luas = request.form['luas']
@@ -473,6 +482,7 @@ def adminmono():
     return render_template("admin/monografi.html", info_list = info_list)
 
 @app.route('/admin/monoedit', methods=['POST'])
+@jwt_required()
 def adminmonoedit():
         con = mysql.connection.cursor()
         jpenduduk = request.form['jpenduduk']
@@ -536,6 +546,7 @@ def adminanggota():
     return render_template("admin/anggota.html", info_list = info_list)
 
 @app.route('/admin/tambah_anggota', methods=['POST'])
+@jwt_required()
 def tambah_anggota():
     con = mysql.connection.cursor()
     nama_lengkap = request.form['nama_lengkap']
@@ -580,6 +591,7 @@ def tambah_anggota():
     return jsonify("msg : SUKSES")
 ##edit_anggota
 @app.route('/admin/edit_anggota', methods=['POST'])
+@jwt_required()
 def edit_anggota():
     con = mysql.connection.cursor()
     id = request.form['id']
@@ -648,6 +660,7 @@ def admindgaleri():
     return render_template("admin/galeri.html", info_list = info_list)
 
 @app.route('/admin/tambah_galeri', methods=['POST'])
+@jwt_required()
 def tambah_galeri():
     con = mysql.connection.cursor()
     judul = request.form['judul']
@@ -674,6 +687,7 @@ def tambah_galeri():
     return jsonify("msg : SUKSES")
 
 @app.route('/admin/edit_galeri', methods=['POST'])
+@jwt_required()
 def edit_galeri():
     con = mysql.connection.cursor()
     id = request.form['id']
@@ -714,6 +728,7 @@ def edit_galeri():
     return jsonify({"msg" : "SUKSES"})
 
 @app.route('/hapus_galeri', methods=['POST'])
+@jwt_required()
 def hapus_galeri():
     con = mysql.connection.cursor()
     id = request.form['id']
@@ -753,6 +768,7 @@ def adminvidio():
     return render_template("admin/vidio.html", info_list = info_list)
 
 @app.route('/admin/edit_vidio', methods=['POST'])
+@jwt_required()
 def edit_vidio():
     con = mysql.connection.cursor()
     id = request.form['id']

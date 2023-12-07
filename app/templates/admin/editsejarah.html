@@ -96,6 +96,9 @@
                 data: formData,
                 dataType: "json",
                 encode: true,
+                headers: {
+                  'Authorization': 'Bearer ' + token
+              },
               }).done(function (data) {
                 console.log(data);
               });

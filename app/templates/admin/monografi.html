@@ -55,6 +55,7 @@
           </div>
           <form class="form-horizontal" action="/admin/monoedit" method="post">
             <div class="card-body">
+              <input type="hidden" name="Authorization" value="Bearer {{ session['jwt_token'] }}">
               <input
               type="hidden"
               class="form-control"

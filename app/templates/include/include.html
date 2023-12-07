@@ -1,3 +1,4 @@
+{% if session['jwt_token'] %}
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
   <head>
@@ -74,10 +75,9 @@
       }
       function logout(){
           var result = window.confirm("Apakah Anda yakin?");
-          
           if (result) {
               removeTokenFromLocalStorage();
-              window.location.href = "/masuk?msg='login berhasil'";
+              window.location.href = "/keluar";
               // Lakukan tindakan jika pengguna memilih Yes
           } else {
               // Lakukan tindakan jika pengguna memilih No
@@ -192,7 +192,7 @@
                   />
                   <div class="d-none d-md-flex">
                     <span class="ms-2"
-                      >Hi, <span class="text-dark fw-bold">Admin</span></span
+                      >Hi, <span class="text-dark fw-bold">{{ session['username'] }}</span></span
                     >
                     <span>
                       <i data-feather="chevron-down" class="feather-sm"></i>
@@ -206,7 +206,6 @@
                   <ul class="list-style-none">
                     <li class="p-30 pt-0">
                       <!-- Message -->
-
                       <div class="mt-4">
                         <a
                           class="btn btn-info text-white"
@@ -302,3 +301,6 @@
 
   </body>
 </html>
+{% else %}
+<p>You are not logged in. Please <a href="/masuk">login</a>.</p>
+{% endif %}

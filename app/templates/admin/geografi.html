@@ -46,6 +46,8 @@
             </h6>
           </div>
           <form class="form-horizontal" action="/admin/wilayah" method="post">
+            <input type="hidden" name="Authorization" value="Bearer {{ session['jwt_token'] }}">
+      
             <div class="card-body">
               <h4 class="card-title">Berbatasan Wilayah</h4>
               <div class="mb-3 row">
@@ -138,6 +140,7 @@
             </div>
           </form>
           <form class="form-horizontal" action="/admin/tanah" method="post" >
+            <input type="hidden" name="Authorization" value="Bearer {{ session['jwt_token'] }}">
             <div class="card-body">
               <h4 class="card-title">Luas Desa</h4>
               <div class="mb-3 row">

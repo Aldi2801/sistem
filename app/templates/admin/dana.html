@@ -290,6 +290,9 @@
           contentType: false,
           processData: false,
           method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token
+        },
           success: function(data) {
             console.log(data);
             // Redirect to "admindana" after successful AJAX request
