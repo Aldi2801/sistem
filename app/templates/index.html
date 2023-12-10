@@ -7,13 +7,14 @@
    
     <link href="/static/dist/css/style.min.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="/static/assets/extra-libs/prism/prism.css">
-<!--    <style>
+  <style>
         body {
            background-image: url('static/image/pg_pangkah_infotegal.jpg');
            background-size: cover; /* Mengisi seluruh latar belakang */
            background-repeat: no-repeat; /* Tanpa pengulangan gambar */
        }
-       
+    </style>
+    <!--  <style>
 .parent:hover .child, .parent:focus .child {
     -ms-transform: scale(1.2);
     -moz-transform: scale(1.2);
@@ -42,13 +43,14 @@
    </style> -->
 </head>
 <body>
-<div class="container-fluid" style="margin-right:100px">
+<div class="container-fluid mt-3">
     <h1 class="text-center">Selamat Datang di Landing Page</h1>
     <h1 class="text-center">Desa Pangkah</h1>
     <div class="mr-5 ml-5">
     <div class="row gx-3 mr-5 ml-5">
         <div class="col-md-4 col-lg-3">
           <div class="card text-white bg-primary rounded">
+            <a href="/news" >
             <div class="card-body">
                         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="40" height="40" viewBox="0,0,256,256">
                             <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(8,8)"><path d="M3,5v18c0,2.21094 1.78906,4 4,4h18c2.21094,0 4,-1.78906 4,-4v-11h-6v-7zM5,7h16v16c0,0.73047 0.22266,1.41016 0.5625,2h-14.5625c-1.19141,0 -2,-0.80859 -2,-2zM7,9v5h12v-5zM9,11h8v1h-8zM23,14h4v9c0,1.19141 -0.80859,2 -2,2c-1.19141,0 -2,-0.80859 -2,-2zM7,15v2h5v-2zM14,15v2h5v-2zM7,18v2h5v-2zM14,18v2h5v-2zM7,21v2h5v-2zM14,21v2h5v-2z"></path></g></g>
@@ -58,101 +60,110 @@
                 
               </p>
             </div>
+        </a>
           </div>
         </div>
         <div class="col-md-4 col-lg-3">
           <div class="card text-white bg-success rounded">
+            <a href="/sejarah" >
             <div class="card-body">
-              <span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-archive feather-lg fill-white"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
-              </span>
+                <img width="40" height="40"style="
+                filter: invert(1)" src="https://img.icons8.com/external-vitaliy-gorbachev-lineal-vitaly-gorbachev/60/external-village-landscape-vitaliy-gorbachev-lineal-vitaly-gorbachev.png" alt="external-village-landscape-vitaliy-gorbachev-lineal-vitaly-gorbachev"/>
               <h3 class="card-title mt-3 mb-0 text-white"> Profile Desa</h3>
               <p class="card-text text-white-50 fs-3 fw-normal">
                
               </p>
             </div>
+        </a>
           </div>
         </div>
         <div class="col-md-4 col-lg-3">
           <div class="card text-white bg-warning rounded">
+            <a href="/pemerintahan_desa" >
+
             <div class="card-body">
-              <span style="width:50px;height:50px">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users feather-lg fill-white"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-              </span>
-              <h3 class="card-title mt-3 mb-0 text-white">Anggota Pemerintahan</h3>
+                <img width="40" height="40" style="
+                filter: invert(1)" src="https://img.icons8.com/ios/50/conference-call--v1.png" alt="conference-call--v1"/>
+              <h6 class="card-title mt-4 mb-0  text-white" style="font-size:17px; ">Anggota Pemerintahan</h6>
+              
               <p class="card-text text-white-50 fs-3 fw-normal">
                 
               </p>
             </div>
+        </a>
           </div>
         </div>
         <div class="col-md-4 col-lg-3">
           <div class="card text-white bg-danger rounded">
+            <a href="/galeri" >
             <div class="card-body">
-              <span style="width:50px;height:50px">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-gift feather-lg fill-white"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
-              </span>
+                <img width="45" height="45" style="
+                filter: invert(1)" src="https://img.icons8.com/external-others-iconmarket/64/external-galery-navigation-others-iconmarket-3.png" alt="external-galery-navigation-others-iconmarket-3"/>
               <h3 class="card-title mt-3 mb-0 text-white">Galeri foto</h3>
               <p class="card-text text-white-50 fs-3 fw-normal">
                 
               </p>
             </div>
+        </a>
           </div>
         </div>
         <div class="col-md-4 col-lg-3">
           <div class="card text-white bg-info rounded">
+            <a href="/dana/{{session.list_thn_dana[0][0]}}" >
             <div class="card-body">
-              <span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-credit-card feather-lg fill-white"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-              </span>
+                <img width="40" height="40"style="
+                filter: invert(1)" src="https://img.icons8.com/ios/50/investment.png" alt="investment"/>
               <h3 class="card-title mt-3 mb-0 text-white">Dana Desa</h3>
               <p class="card-text text-white-50 fs-3 fw-normal">
                 
               </p>
             </div>
+        </a>
           </div>
         </div>
         <div class="col-md-4 col-lg-3">
           <div class="card text-white bg-secondary rounded">
+            <a href="https://www.google.com/maps/place/Pangkah,+Tegal+Regency,+Central+Java/@-6.981731,109.15958,15z/data=!4m6!3m5!1s0x2e6fbf7326f79acf:0xb8e2ae524ec7f3c8!8m2!3d-6.9803518!4d109.1627343!16s%2Fg%2F122t1938?entry=ttu">
             <div class="card-body">
-              <span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github feather-lg fill-white"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-              </span>
+                <img width="40" height="40"style="
+                filter: invert(1)" src="https://img.icons8.com/ios/50/worldwide-location--v1.png" alt="worldwide-location--v1"/>
               <h3 class="card-title mt-3 mb-0 text-white">peta desa</h3>
               <p class="card-text text-white-50 fs-3 fw-normal">
         
               </p>
             </div>
+        </a>
           </div>
         </div>
         <div class="col-md-4 col-lg-3">
             <div class="card text-white bg-purple rounded">
+                <a href="/data" >
               <div class="card-body">
-                <span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github feather-lg fill-white"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-                </span>
+                <img width="40" height="40" style="
+                filter: invert(1)" src="https://img.icons8.com/ios/50/combo-chart--v1.png" alt="combo-chart--v1"/>
                 <h3 class="card-title mt-3 mb-0 text-white">data desa</h3>
                 <p class="card-text text-white-50 fs-3 fw-normal">
                 </p>
               </div>
+            </a>
             </div>
           </div>
           <div class="col-md-4 col-lg-3">
             <div class="card text-white bg-dark-success rounded">
+                <a href="/agenda" >
               <div class="card-body">
-                <span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github feather-lg fill-white"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-                </span>
+                <img width="40" height="40" style="
+                filter: invert(1)" src="https://img.icons8.com/ios/50/timeline-week.png" alt="timeline-week"/>
                 <h3 class="card-title mt-3 mb-0 text-white">Agenda desa</h3>
                 <p class="card-text text-white-50 fs-3 fw-normal">
                 </p>
               </div>
+            </a>
             </div>
           </div>
       </div>
     </div>
-      <div class="row">
-        <!-- Kartu Pertama -->
+      <!--  <div class="row">
         <div class="col-lg-3 col-md-4 col-sm-6 mb-4 " >
             <div class="card bg-primary" style="background-image:url('/static/image/surat-kabar-koran-media-cetak.jpg');  
             background-size: cover; 
@@ -160,14 +171,13 @@
             height:150px;
             background-color: rgba(52,73,94,0.75);">
             <i class="ri-newspaper-line"></i>
-                <a href="/news" class="card-hover parent  mt-4">
+              
                 <div class="card-body child" >
                     <h5 class="card-title text-white text-center hover" >Berita</h5>  
                 </div>
                 </a>
             </div>
         </div>
-        <!-- Kartu Kedua -->
         <div class="col-lg-3 col-md-4 col-sm-6 mb-4 " >
             <div class="card bg-primary" style="background-image:url('/static/image/df8c91a3fceae759db097dcb5212b390.jpg');  
             background-size: cover; 
@@ -181,7 +191,6 @@
                 </a>
             </div>
         </div>
-        <!-- Kartu Ketiga -->
         <div class="col-lg-3 col-md-4 col-sm-6 mb-4 " >
             <div class="card bg-primary" style="background-image:url('/static/image/WhatsApp Image 2023-11-15 at 21.56.16.jpeg');  
             background-size: cover; 
@@ -195,7 +204,6 @@
                 </a>
             </div>
         </div>
-                <!-- Kartu Keempat -->
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4 " >
                     <div class="card bg-primary" style="background-image:url('/static/image/dana.jpeg');  
                     background-size: cover; 
@@ -209,7 +217,6 @@
                         </a>
                     </div>
                 </div>
-                        <!-- Kartu Kelima -->
         <div class="col-lg-3 col-md-4 col-sm-6 mb-4 ">
             <div class="card bg-primary" style="background-image:url('/static/image/Screenshot 2023-11-15 220202.png');  
             background-size: cover; 
@@ -223,18 +230,16 @@
                     </a>
                 </div>
             </div>
-        <!-- Kartu Keenam -->
         <div class="col-lg-3 col-md-4 col-sm-6 mb-4 ">
             <div class="card " style="background-color: aqua;">
                 <a href="/monografi">
                 <img src="gambar3.jpg" class="card-img-top" alt="Gambar 3">
                 <div class="card-body">
-                    <h5 class="card-title">data desa </h5>
+                    <h5 class="card-title">data desa</h5>
                 </div>
                 </a>
             </div>
         </div>
-                        <!-- Kartu Ketujuh -->
         <div class="col-lg-3 col-md-4 col-sm-6 mb-4 ">
             <div class="card" style="background-color: rgba(174, 163, 59, 0.718);">
                 <a href="/galeri">
@@ -245,7 +250,6 @@
                 </a>
             </div>
         </div>
-        <!-- Kartu Kedelapan -->
         <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
             <div class="card"  style="background-color: blueviolet">
                 <a href="/agenda">
@@ -257,7 +261,7 @@
             </div>
         </div>
             
-    </div>
+    </div> -->
 </div>
 
 <!-- Tautan ke Bootstrap JavaScript dan jQuery (ditempatkan sebelum </body>) -->
