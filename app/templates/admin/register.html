@@ -1,3 +1,4 @@
+{% if session['jwt_token'] %}
 <!-- templates/register.html -->
 <!DOCTYPE html>
 <html lang="en">
@@ -26,3 +27,6 @@
     </div>
 </body>
 </html>
+{% else %}
+<p>You are not logged in. Please <a href="/masuk">login</a>.</p>
+{% endif %}

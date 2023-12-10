@@ -35,29 +35,7 @@ def keluar():
     session.pop('username', None)
     return redirect(url_for('masuk', msg='logout sukses'))
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        if not username or not password:
-            return jsonify({"msg": "Username and password are required"}), 400
 
-        # Check if the username already exists
-        print(username+' | '+password+' | ')
-        if user_datastore.find_user(username=username):
-            return jsonify({"msg": "Username already exists"}), 400
-
-        # Hash the password before storing it
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-
-        # Create a new user
-        user = user_datastore.create_user(username=username, password=hashed_password, active=True)
-        db.session.commit()
-
-        return redirect(url_for('masuk', msg='Registration Successful'))
-
-    return render_template('admin/register.html')
 
 @jwt.expired_token_loader
 def expired_token_callback():

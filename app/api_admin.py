@@ -150,8 +150,8 @@ def tambah_berita():
             img = Image.open(file)
             img = img.convert('RGB')
             # Resize gambar
-            width, height = 600, 300  # Atur sesuai kebutuhan Anda
-            img = img.resize((width, height))
+            # width, height = 600, 300  # Atur sesuai kebutuhan Anda
+            # img = img.resize((width, height))
 
             # Simpan gambar yang diresize ke BytesIO
             img_io = BytesIO()
@@ -163,7 +163,7 @@ def tambah_berita():
             
             # Gunakan img_io atau file yang telah diresize sesuai kebutuhan Anda
     deskripsi = request.form['deskripsi']
-    con.execute("INSERT INTO berita (judul, gambar , deskripsi,link ) VALUES (%s,%s,%s)",(judul,random_name,deskripsi,link))
+    con.execute("INSERT INTO berita (judul, gambar , deskripsi,link ) VALUES (%s,%s,%s,%s)",(judul,random_name,deskripsi,link))
     mysql.connection.commit()
     return jsonify("msg : SUKSES")
 
