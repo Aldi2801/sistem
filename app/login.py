@@ -7,7 +7,7 @@ def masuk():
     return render_template('admin/admin.html')
 # Endpoint untuk membuat token
 @app.route('/proses_masuk', methods=['POST'])
-def login():
+def proses_masuk():
         username = request.json['username']
         password = request.json['password']
 

@@ -1,4 +1,4 @@
-from flask import Flask,jsonify,request,session
+from flask import Flask,jsonify,request,session,render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_mysqldb import MySQL
 from flask_jwt_extended import JWTManager
@@ -61,7 +61,7 @@ def register():
         password = request.form.get('password')
         if not username or not password:
             return jsonify({"msg": "Username and password are required"}), 400
-
+        
         # Check if the username already exists
         print(username+' | '+password+' | ')
         if user_datastore.find_user(username=username):
