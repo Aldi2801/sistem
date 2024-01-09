@@ -776,3 +776,11 @@ def edit_vidio():
     con.execute("UPDATE vidio SET vidio = %s WHERE id = %s",(vidio,id))
     mysql.connection.commit()
     return jsonify({"msg" : "SUKSES"})
+# admin agenda 
+@app.route('/admin/agenda')
+def admin_agenda():
+    con = mysql.connection.cursor()
+    con.execute("SELECT * FROM agenda")
+    result = con.fetchall()
+    print(result)
+    return render_template('admin/agenda.html',list_agenda=result)
