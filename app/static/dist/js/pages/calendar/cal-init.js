@@ -14,6 +14,19 @@
 
   /* on drop */
   (CalendarApp.prototype.onDrop = function (eventObj, date) {
+    // delete  agenda
+    $.ajax({
+      type: "delete",
+      url: "/delete-agenda", 
+      contentType: "application/json",
+      data: JSON.stringify(eventData),
+      success: function(response) {
+          console.log("Event saved successfully:", response);
+      },
+      error: function(error) {
+          console.error("Error saving event:", error);
+      }
+  });
     var $this = this;
     // retrieve the dropped element's stored Event Object
     var originalEventObject = eventObj.data("eventObject");
@@ -33,8 +46,9 @@
   }),
     /* on click on event */
     (CalendarApp.prototype.onEventClick = function (calEvent, jsEvent, view) {
+      // tambah agenda
       var $this = this;
-      var form = $("<form></form>");
+      var form = $("<form action='/add-agenda' method='POST'></form>");
       form.append("<label>Change event name</label>");
       form.append(
         "<div class='input-group'><input class='form-control' type=text value='" +
@@ -76,11 +90,12 @@
     }),
     /* on select */
     (CalendarApp.prototype.onSelect = function (start, end, allDay) {
+      // edit agenda
       var $this = this;
       $this.$modal.show();
       $(".bckdrop").addClass("show");
       $(".bckdrop").removeClass("hide");
-      var form = $("<form></form>");
+      var form = $("<form action='/edit-agenda' method='POST'></form>");
       form.append("<div class='row'></div>");
       form
         .find(".row")
@@ -181,6 +196,7 @@
     });
   /* Initializing */
   (CalendarApp.prototype.init = function () {
+    // ambil db
     this.enableDrag();
     /*  Initialize the calendar  */
     var date = new Date();

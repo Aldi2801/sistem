@@ -11,6 +11,79 @@ import time
 from datetime import datetime
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
+def do_image(do,table,id):
+    if do == "tambah":
+        try:
+            file = request.files['gambar']
+            if file:
+                img = Image.open(file)
+                img = img.convert('RGB')
+                # Resize gambar
+                width, height = 600, 300  # Atur sesuai kebutuhan Anda
+                img = img.resize((width, height))
+                # Simpan gambar yang diresize ke BytesIO
+                img_io = BytesIO()
+                img.save(img_io, 'JPEG', quality=70)
+                img_io.seek(0)
+                random_name = uuid.uuid4().hex+".jpg"
+                destination = os.path.join(app.config['UPLOAD_FOLDER'], random_name)
+                img.save(destination)  # Ganti dengan lokasi penyimpanan yang diinginkan
+                return True
+        except:
+            return False
+    
+    elif do == "delete":
+        # Get the filename of the image associated with the news article
+        try:
+            con.execute("SELECT gambar FROM  WHERE id = %s", (id,))
+            result = con.fetchone()
+            if result:
+                filename = result[0]
+                
+                # Delete the image file
+                if filename:
+                    image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    if os.path.exists(image_path):
+                        os.remove(image_path)
+            
+            return True
+        except:
+            return False
+    
+    elif do == "edit":
+        try:
+            if request.files['gambar']:
+                file = request.files['gambar']
+                con.execute("SELECT galeri FROM %s WHERE id = %s", (table,id,))
+                result = con.fetchone()
+                if result:
+                    filename = result[0]
+            
+                # Delete the image file
+                    if filename:
+                        image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                        if os.path.exists(image_path):
+                            os.remove(image_path)
+                            
+                img = Image.open(file)
+                img = img.convert('RGB')
+                # Resize gambar
+                width, height = 600, 300  # Atur sesuai kebutuhan Anda
+                img = img.resize((width, height))
+
+                # Simpan gambar yang diresize ke BytesIO
+                img_io = BytesIO()
+                img.save(img_io, 'JPEG', quality=70)
+                img_io.seek(0)
+                random_name = uuid.uuid4().hex+".jpg"
+                destination = os.path.join(app.config['UPLOAD_FOLDER'], random_name)
+                img.save(destination)  # Ganti dengan lokasi penyimpanan yang diinginkan
+                con.execute("UPDATE %s SET gambar = %s WHERE id = %s",(table, random_name,id))
+                mysql.connection.commit()
+                return True
+        except:
+            return False
+    
 #halaman admin
 @app.route('/admin/dashboard')
 def dashboard():
@@ -784,3 +857,93 @@ def admin_agenda():
     result = con.fetchall()
     print(result)
     return render_template('admin/agenda.html',list_agenda=result)
+@app.route('/admin/tambah_galeri', methods=['POST'])
+@jwt_required()
+def tambah_galeri():
+    con = mysql.connection.cursor()
+    judul = request.form['judul']
+    tanggal = datetime.now().date()
+    file = request.files['gambar']
+    if file:
+            img = Image.open(file)
+            img = img.convert('RGB')
+            # Resize gambar
+            width, height = 600, 300  # Atur sesuai kebutuhan Anda
+            img = img.resize((width, height))
+
+            # Simpan gambar yang diresize ke BytesIO
+            img_io = BytesIO()
+            img.save(img_io, 'JPEG', quality=70)
+            img_io.seek(0)
+            random_name = uuid.uuid4().hex+".jpg"
+            destination = os.path.join(app.config['UPLOAD_FOLDER'], random_name)
+            img.save(destination)  # Ganti dengan lokasi penyimpanan yang diinginkan
+            
+            # Gunakan img_io atau file yang telah diresize sesuai kebutuhan Anda
+    con.execute("INSERT INTO galeri (judul, gambar , tanggal) VALUES (%s,%s,%s)",(judul,random_name,tanggal))
+    mysql.connection.commit()
+    return jsonify("msg : SUKSES")
+
+@app.route('/admin/edit_galeri', methods=['POST'])
+@jwt_required()
+def edit_galeri():
+    con = mysql.connection.cursor()
+    id = request.form['id']
+    judul = request.form['judul']
+    try:
+        if request.files['gambar']:
+            file = request.files['gambar']
+            con.execute("SELECT galeri FROM galeri WHERE id = %s", (id,))
+            result = con.fetchone()
+            if result:
+                filename = result[0]
+        
+            # Delete the image file
+                if filename:
+                    image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    if os.path.exists(image_path):
+                        os.remove(image_path)
+                        
+            img = Image.open(file)
+            img = img.convert('RGB')
+            # Resize gambar
+            width, height = 600, 300  # Atur sesuai kebutuhan Anda
+            img = img.resize((width, height))
+
+            # Simpan gambar yang diresize ke BytesIO
+            img_io = BytesIO()
+            img.save(img_io, 'JPEG', quality=70)
+            img_io.seek(0)
+            random_name = uuid.uuid4().hex+".jpg"
+            destination = os.path.join(app.config['UPLOAD_FOLDER'], random_name)
+            img.save(destination)  # Ganti dengan lokasi penyimpanan yang diinginkan
+            con.execute("UPDATE galeri SET judul = %s, gambar = %s WHERE id = %s",(judul,random_name,id))
+            mysql.connection.commit()
+            # Gunakan img_io atau file yang telah diresize sesuai kebutuhan Anda
+    except:
+        con.execute("UPDATE galeri SET judul = %s WHERE id = %s",(judul,id))
+        mysql.connection.commit()
+    return jsonify({"msg" : "SUKSES"})
+
+@app.route('/hapus_galeri', methods=['POST'])
+@jwt_required()
+def hapus_galeri():
+    con = mysql.connection.cursor()
+    id = request.form['id']
+    
+    # Get the filename of the image associated with the news article
+    con.execute("SELECT gambar FROM galeri WHERE id = %s", (id,))
+    result = con.fetchone()
+    if result:
+        filename = result[0]
+        
+        # Delete the image file
+        if filename:
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            if os.path.exists(image_path):
+                os.remove(image_path)
+    
+    # Delete the news article from the database
+    con.execute("DELETE FROM galeri WHERE id = %s", (id,))
+    mysql.connection.commit()
+    return jsonify({"msg": "SUKSES"})
