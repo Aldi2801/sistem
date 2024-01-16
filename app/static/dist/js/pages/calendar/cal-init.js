@@ -21,7 +21,7 @@
       contentType: "application/json",
       data: JSON.stringify(eventData),
       success: function(response) {
-          console.log("Event saved successfully:", response);
+          console.log("Agenda saved successfully:", response);
       },
       error: function(error) {
           console.error("Error saving event:", error);
@@ -100,26 +100,26 @@
       form
         .find(".row")
         .append(
-          "<div class='col-md-6'><div class='form-group'><label class='control-label'>Event Name</label><input class='form-control' placeholder='Insert Event Name' type='text' name='title'/></div></div>"
+          "<div class='col-md-6'><div class='form-group'><label class='control-label'>Agenda Name</label><input class='form-control' placeholder='Insert Agenda Name' type='text' name='title'/></div></div>"
         )
         .append(
           "<div class='col-md-6'><div class='form-group'><label class='control-label'>Category</label><select class='form-select' name='category'></select></div></div>"
         )
         .find("select[name='category']")
         .append(
-          "<option value='bg-light-danger border-start border-2 border-danger'>Danger</option>"
+          "<option value='bg-light-danger border-start border-2 border-danger'>Darurat</option>"
         )
         .append(
-          "<option value='bg-light-success border-start border-2 border-success'>Success</option>"
+          "<option value='bg-light-success border-start border-2 border-success'>Event (lomba dsb)</option>"
         )
         .append(
-          "<option value='bg-light-primary border-start border-2 border-primary'>Primary</option>"
+          "<option value='bg-light-primary border-start border-2 border-primary'>Pemilihan</option>"
         )
         .append(
-          "<option value='bg-light-info border-start border-2 border-primary'>Info</option>"
+          "<option value='bg-warning border-start border-2 border-primary'>Penting</option>"
         )
         .append(
-          "<option value='bg-light-warning border-start border-2 border-warning'>Warning</option></div></div>"
+          "<option value='bg-light-warning border-start border-2 border-warning'>Pemberitahuan</option></div></div>"
         );
       $this.$modal
         .find(".delete-event")
@@ -194,6 +194,23 @@
         });
       });
     });
+    function init_tgl(dateStringWithTime){
+      // Pisahkan tanggal, jam, dan menit dari string
+var dateTimeParts = dateStringWithTime.split(' ');
+var datePart = dateTimeParts[0];
+var timePart = dateTimeParts[1];
+
+var dateParts = datePart.split('/');
+var day = parseInt(dateParts[0], 10);
+var month = parseInt(dateParts[1], 10) - 1; // Bulan dimulai dari 0 (Januari = 0, Februari = 1, ...)
+var year = parseInt(dateParts[2], 10);
+
+var timeParts = timePart.split(':');
+var hours = parseInt(timeParts[0], 10);
+var minutes = parseInt(timeParts[1], 10);
+var dateObject = new Date(year, month, day, hours, minutes);
+return dateObject;
+    }
   /* Initializing */
   (CalendarApp.prototype.init = function () {
     // ambil db
@@ -206,53 +223,45 @@
     var form = "";
     var today = new Date($.now());
 
-    var defaultEvents = [
-      {
-        title: "Unlock Design - Real Estate",
-        start: new Date($.now() + 506800000),
-        className: "bg-light-info border-start border-2 border-info",
-      },
-      {
-        title: "Covid 19 App Design and development",
-        start: today,
-        end: today,
-        className: "bg-light-warning border-start border-2 border-warning",
-      },
-      {
-        title: "Health app for doctor",
-        start: new Date($.now() + 848000000),
-        className: "bg-light-info border-start border-2 border-info",
-      },
-      {
-        title: "Covid 19 App Design and development",
-        start: new Date($.now() - 1099000000),
-        end: new Date($.now() - 919000000),
-        className: "bg-light-danger border-start border-2 border-danger",
-      },
-      {
-        title: "Event Conf.",
-        start: new Date($.now() - 1199000000),
-        end: new Date($.now() - 1199000000),
-        className: "bg-light-primary border-start border-2 border-primary",
-      },
-      {
-        title: "Meeting #5",
-        start: new Date($.now() - 399000000),
-        end: new Date($.now() - 219000000),
-        className: "bg-light-info border-start border-2 border-info",
-      },
-      {
-        title: "Submission #2",
-        start: new Date($.now() + 868000000),
-        className: "bg-light-danger border-start border-2 border-danger",
-      },
-      {
-        title: "Seminar #5",
-        start: new Date($.now() + 348000000),
-        className: "bg-light-success border-start border-2 border-success",
-      },
-    ];
+    var DataDB = document.getElementById('data-container').getAttribute('data-db');
+    DataDB = DataDB.replace(/'/g, '"')
+    DataDB = DataDB.replace("'", '"')
+    console.log(DataDB)
+    var defaultEvents = [];
+    var jsonData = JSON.parse(DataDB);
+    for (var i = 0; i < jsonData.length; i++) {
+      // Mengambil nilai id dan total dari setiap objek
+      var title = jsonData[i].title;
+      console.log(title)
+      var start = jsonData[i].start;
+      var end = jsonData[i].end;
+      var kategori= jsonData[i].kategori;
+      var className = '';
+      if (kategori == 'darurat'){ 
+        className = 'bg-light-danger border-start border-2 border-danger';
+      }
+      else if (kategori == 'penting'){ 
+        className = 'bg-warning border-start border-2 border-warning';
+      }
+      else if (kategori == 'event'){ 
+        className = 'bg-light-success border-start border-2 border-success';
+      }
+      else if (kategori == 'pemberitahuan'){ 
+        className = 'bg-light-warning border-start border-2 border-warning';
+      }
+      else if (kategori == 'pemilihan'){ 
+        className = 'bg-light-primary border-start border-2 border-primary';
+      };
 
+      let agenda = {
+        title: title,
+        start: init_tgl(start),
+        end: init_tgl(end),
+        className: className,
+      }
+      defaultEvents.push(agenda);
+
+    }
     var $this = this;
     $this.$calendarObj = $this.$calendar.fullCalendar({
       slotDuration: "00:15:00",
@@ -265,11 +274,11 @@
       header: {
         left: "prev,next today",
         center: "title",
-        right: "month,agendaWeek,agendaDay",
+        right: "month,agendaWeek",
       },
       events: defaultEvents,
       editable: true,
-      droppable: true, // this allows things to be dropped onto the calendar !!!
+      droppable: false, // this allows things to be dropped onto the calendar !!!
       eventLimit: true, // allow "more" link when too many events
       selectable: true,
       drop: function (date) {

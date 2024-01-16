@@ -856,4 +856,18 @@ def admin_agenda():
     con.execute("SELECT * FROM agenda")
     result = con.fetchall()
     print(result)
-    return render_template('admin/agenda.html',list_agenda=result)
+    list_agenda = []
+    for item in result:
+        agenda = {
+            "id": str(item[0]),
+            "start": str(item[1]),
+            "title":str(item[2]),
+            "keterangan":str(item[3]),
+            "foto":str(item[4]),
+            "end":str(item[5]),
+            "kategori":str(item[6]),
+            "pemimpin_kegiatan":str(item[7])
+        }
+        list_agenda.append(agenda)
+    print(list_agenda)
+    return render_template('admin/agenda.html',list_agenda=list_agenda)
