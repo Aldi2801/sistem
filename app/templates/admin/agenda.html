@@ -78,6 +78,22 @@
                   type="button"
                   class="btn btn-danger delete-event waves-effect waves-light"
                   data-bs-dismiss="modal"
+                  onclick="function del(){
+                    
+    // Hapus agenda dengan Ajax
+    $.ajax({
+        type: 'DELETE',
+        url: '/delete-agenda',
+        contentType: 'application/json',
+        data: JSON.stringify(eventObject),
+        success: function (response) {
+            console.log('Agenda deleted successfully:', response);
+        },
+        error: function (error) {
+            console.error('Error deleting agenda:', error);
+        }
+    });
+                  }"
                 >
                   Delete
                 </button>
@@ -128,6 +144,7 @@
                         <option value="inverse">Inverse</option>
                       </select>
                     </div>
+                    
                   </div>
                 </form>
               </div>

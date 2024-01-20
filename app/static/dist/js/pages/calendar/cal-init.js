@@ -14,6 +14,7 @@
 
   /* on drop */
   (CalendarApp.prototype.onDrop = function (eventObj, date) {
+    console.log(date);
     // delete  agenda
     $.ajax({
       type: "delete",
@@ -21,7 +22,7 @@
       contentType: "application/json",
       data: JSON.stringify(eventData),
       success: function(response) {
-          console.log("Agenda saved successfully:", response);
+          console.log("Agenda deleted successfully:", response);
       },
       error: function(error) {
           console.error("Error saving event:", error);
@@ -46,14 +47,14 @@
   }),
     /* on click on event */
     (CalendarApp.prototype.onEventClick = function (calEvent, jsEvent, view) {
-      // tambah agenda
+      // edit agenda
       var $this = this;
-      var form = $("<form action='/add-agenda' method='POST'></form>");
+      var form = $("<form action='/edit-agenda' method='POST'></form>");
       form.append("<label>Change event name</label>");
       form.append(
-        "<div class='input-group'><input class='form-control' type=text value='" +
+        "<div class=''><input class='form-control' type=text value='" +
           calEvent.title +
-          "' /><span class='input-group-btn'><button type='submit' class='btn btn-success waves-effect waves-light'><i class='fa fa-check'></i> Save</button></span></div>"
+          "' /> <br><input type='text' class='form-control' name='pemimpin_kegiatan' value=''><br><span class='input-group-btn'><button type='submit' class='btn btn-success waves-effect waves-light'><i class='fa fa-check'></i> Save</button></span></div>"
       );
       $this.$modal.show();
       $(".bckdrop").addClass("show");
@@ -90,12 +91,12 @@
     }),
     /* on select */
     (CalendarApp.prototype.onSelect = function (start, end, allDay) {
-      // edit agenda
+      // tambah dan delete agenda
       var $this = this;
       $this.$modal.show();
       $(".bckdrop").addClass("show");
       $(".bckdrop").removeClass("hide");
-      var form = $("<form action='/edit-agenda' method='POST'></form>");
+      var form = $("<form action='/tambah-agenda' method='POST'></form>");
       form.append("<div class='row'></div>");
       form
         .find(".row")
@@ -281,14 +282,29 @@ return dateObject;
       droppable: false, // this allows things to be dropped onto the calendar !!!
       eventLimit: true, // allow "more" link when too many events
       selectable: true,
-      drop: function (date) {
+      drop: function (date) { // hapus event agenda
         $this.onDrop($(this), date);
+    // delete  agenda
+    console.log(date);
+    $.ajax({
+      type: "delete",
+      url: "/delete-agenda", 
+      contentType: "application/json",
+      data: JSON.stringify(eventData),
+      success: function(response) {
+          console.log("Agenda deleted successfully:", response);
       },
-      select: function (start, end, allDay) {
+      error: function(error) {
+          console.error("Error saving event:", error);
+      }});
+      },
+      select: function (start, end, allDay) { // edit event agenda
         $this.onSelect(start, end, allDay);
+
       },
-      eventClick: function (calEvent, jsEvent, view) {
+      eventClick: function (calEvent, jsEvent, view) { //tambah event agenda
         $this.onEventClick(calEvent, jsEvent, view);
+
       },
     });
 

@@ -871,3 +871,12 @@ def admin_agenda():
         list_agenda.append(agenda)
     print(list_agenda)
     return render_template('admin/agenda.html',list_agenda=list_agenda)
+@app.route('/delete-agenda')
+def agenda_delete():
+    return jsonify({"msg" : "SUKSES"})
+@app.route('/tambah-agenda')
+def agenda_tambah():
+    return jsonify({"msg" : "SUKSES"})
+@app.route('/edit-agenda')
+def agenda_edit():
+    return jsonify({"msg" : "SUKSES"})

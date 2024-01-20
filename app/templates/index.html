@@ -143,17 +143,21 @@
         </div>
         <div class="p-2">
           <center>
-            <div class="card text-white bg-danger rounded">
-              <a href="/galeri">
+            <div class="card text-white rounded" style="background-color:#006400">
+              {% for data in session.list_thn_dana %}
+                {% if loop.last %}
+                  <a  href="/dana/{{ data[0] }}">
+                {% endif %}
+              {% endfor %}
                 <div class="card-body">
                   <img
                     width="45"
                     height="45"
                     style="filter: invert(1)"
-                    src="https://img.icons8.com/external-others-iconmarket/64/external-galery-navigation-others-iconmarket-3.png"
+                    src="/static/image/save-money.png"
                     alt="external-galery-navigation-others-iconmarket-3"
                   />
-                  <h3 class="card-title mt-3 mb-0 text-white">Galeri foto</h3>
+                  <h3 class="card-title mt-3 mb-0 text-white">Dana Desa</h3>
                   <p class="card-text text-white-50 fs-3 fw-normal"></p>
                 </div>
               </a>

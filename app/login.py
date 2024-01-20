@@ -5,6 +5,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 @app.route('/masuk')
 def masuk():
     return render_template('admin/admin.html')
+
 # Endpoint untuk membuat token
 @app.route('/proses_masuk', methods=['POST'])
 def proses_masuk():
@@ -34,8 +35,6 @@ def keluar():
     session.pop('jwt_token', None)
     session.pop('username', None)
     return redirect(url_for('masuk', msg='logout sukses'))
-
-
 
 @jwt.expired_token_loader
 def expired_token_callback():
