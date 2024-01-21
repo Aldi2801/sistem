@@ -871,12 +871,17 @@ def admin_agenda():
         list_agenda.append(agenda)
     print(list_agenda)
     return render_template('admin/agenda.html',list_agenda=list_agenda)
-@app.route('/delete-agenda')
-def agenda_delete():
+@app.route('/delete-agenda/<id>',methods=["DELETE"])
+def agenda_delete(id):
+    print(id)
+    con = mysql.connection.cursor()
+    # Delete the news article from the database
+    con.execute("DELETE FROM agenda WHERE id = %s", (id,))
+    mysql.connection.commit()
     return jsonify({"msg" : "SUKSES"})
-@app.route('/tambah-agenda')
+@app.route('/tambah-agenda',methods=["POST"])
 def agenda_tambah():
     return jsonify({"msg" : "SUKSES"})
-@app.route('/edit-agenda')
+@app.route('/edit-agenda',methods=["PUT"])
 def agenda_edit():
     return jsonify({"msg" : "SUKSES"})

@@ -14,20 +14,7 @@
 
   /* on drop */
   (CalendarApp.prototype.onDrop = function (eventObj, date) {
-    console.log(date);
-    // delete  agenda
-    $.ajax({
-      type: "delete",
-      url: "/delete-agenda", 
-      contentType: "application/json",
-      data: JSON.stringify(eventData),
-      success: function(response) {
-          console.log("Agenda deleted successfully:", response);
-      },
-      error: function(error) {
-          console.error("Error saving event:", error);
-      }
-  });
+  
     var $this = this;
     // retrieve the dropped element's stored Event Object
     var originalEventObject = eventObj.data("eventObject");
@@ -47,14 +34,39 @@
   }),
     /* on click on event */
     (CalendarApp.prototype.onEventClick = function (calEvent, jsEvent, view) {
-      // edit agenda
+      // edit dan hapus agenda
       var $this = this;
-      var form = $("<form action='/edit-agenda' method='POST'></form>");
-      form.append("<label>Change event name</label>");
-      form.append(
-        "<div class=''><input class='form-control' type=text value='" +
-          calEvent.title +
-          "' /> <br><input type='text' class='form-control' name='pemimpin_kegiatan' value=''><br><span class='input-group-btn'><button type='submit' class='btn btn-success waves-effect waves-light'><i class='fa fa-check'></i> Save</button></span></div>"
+      var form = $("<form action='' method=''></form>");
+      form
+      .append("<div class='row'></div>")
+      .find(".row")
+      .append(
+        "<div class='col-md-12'><div class='form-group'><input class='form-control' placeholder='' value='"+
+        calEvent.id + "' type='hidden' name='id'/></div></div>"
+      )
+      .append(
+        "<div class='col-md-12'><div class='form-group'><label class='control-label'>Judul Agenda</label><input class='form-control' placeholder='Judul Agenda' value='"+
+        calEvent.title + "' type='text' name='title'/></div></div>"
+      )
+      .append(
+        "<div class='col-md-6'><div class='form-group'><label class='control-label'>Dari</label><input class='form-control' placeholder='Jam Mulai' value='"+
+        calEvent.jam_mulai + "' type='datetime-local' name='start'/></div></div>"
+      )
+      .append(
+        "<div class='col-md-6'><div class='form-group'><label class='control-label'>Sampai</label><input class='form-control' placeholder='Jam Selesai'value='"+
+        calEvent.jam_selesai + "' type='datetime-local' name='end'/></div></div>"
+      )
+      .append(
+        "<div class='col-md-12'><div class='form-group'><label class='control-label'>Pemimpin Kegiatan</label><input class='form-control' placeholder='ketua RT' value='"+
+        calEvent.pemimpin_kegiatan + "' type='text' name='pemimpin_kegiatan'/></div></div>"
+      )
+      .append(
+        "<div class='col-md-12'><div class='form-group'><label class='control-label'>Foto browsur <br><small>(*abaikan apabila tidak ada)</small></label><input class='form-control'value='"+
+        calEvent.foto + "' type='file' name='foto'/></div></div>"
+      )
+      .append(
+        "<div class='col-md-12'><div class='form-group'><label class='control-label'>Keterangan Kegiatan</label><textarea class='form-control' name='keterangan' rows='3' placeholder='Acara ini diadakan dalam rangka...'>"+
+        calEvent.keterangan +"</textarea><small id='textHelp' class='form-text text-muted'></small></div></div>"
       );
       $this.$modal.show();
       $(".bckdrop").addClass("show");
@@ -79,19 +91,33 @@
           $this.$modal.hide("hide");
           $(".bckdrop").addClass("hide");
           $(".bckdrop").removeClass("show");
+              // Hapus agenda dengan Ajax
+    $.ajax({
+      type: 'DELETE',
+      url: '/delete-agenda/'+calEvent.id,
+      contentType: 'application/json',
+      success: function (response) {
+          console.log('Agenda deleted successfully:', response);
+      },
+      error: function (error) {
+          console.error('Error deleting agenda:', error);
+      }
+  });
         });
       $this.$modal.find("form").on("submit", function () {
-        calEvent.title = form.find("input[type=text]").val();
+        console.log('submit');
+        calEvent.title = form.find("input[name=title]").val();
         $this.$calendarObj.fullCalendar("updateEvent", calEvent);
         $this.$modal.hide("hide");
         $(".bckdrop").addClass("hide");
         $(".bckdrop").removeClass("show");
+
         return false;
       });
     }),
     /* on select */
     (CalendarApp.prototype.onSelect = function (start, end, allDay) {
-      // tambah dan delete agenda
+      // tambah agenda
       var $this = this;
       $this.$modal.show();
       $(".bckdrop").addClass("show");
@@ -105,6 +131,21 @@
         )
         .append(
           "<div class='col-md-6'><div class='form-group'><label class='control-label'>Category</label><select class='form-select' name='category'></select></div></div>"
+        )
+        .append(
+          "<div class='col-md-6'><div class='form-group'><label class='control-label'>Jam Mulai</label><input class='form-control' placeholder='Jam Mulai' type='datetime-local' name='start'/></div></div>"
+        )
+        .append(
+          "<div class='col-md-6'><div class='form-group'><label class='control-label'>Jam Selesai</label><input class='form-control' placeholder='Jam Selesai' type='datetime-local' name='end'/></div></div>"
+        )
+        .append(
+          "<div class='col-md-12'><div class='form-group'><label class='control-label'>Pemimpin Kegiatan</label><input class='form-control' placeholder='ketua RT'  type='text' name='pemimpin_kegiatan'/></div></div>"
+        )
+        .append(
+          "<div class='col-md-12'><div class='form-group'><label class='control-label'>Foto browsur <br><small>(*abaikan apabila tidak ada)</small></label><input class='form-control' type='file' name='foto'/></div></div>"
+        )
+        .append(
+          "<div class='col-md-12'><div class='form-group'><label class='control-label'>Keterangan Kegiatan</label><textarea class='form-control' name='keterangan' rows='3' placeholder='Acara ini diadakan dalam rangka...'></textarea><small id='textHelp' class='form-text text-muted'></small></div></div>"
         )
         .find("select[name='category']")
         .append(
@@ -195,9 +236,10 @@
         });
       });
     });
-    function init_tgl(dateStringWithTime){
-      // Pisahkan tanggal, jam, dan menit dari string
-var dateTimeParts = dateStringWithTime.split(' ');
+    function init_date(dateStringWithTime){
+
+// Pisahkan tanggal, jam, dan menit dari string
+var dateTimeParts = dateStringWithTime.split(', ');
 var datePart = dateTimeParts[0];
 var timePart = dateTimeParts[1];
 
@@ -206,12 +248,37 @@ var day = parseInt(dateParts[0], 10);
 var month = parseInt(dateParts[1], 10) - 1; // Bulan dimulai dari 0 (Januari = 0, Februari = 1, ...)
 var year = parseInt(dateParts[2], 10);
 
-var timeParts = timePart.split(':');
+var timeParts = timePart.split('.');
 var hours = parseInt(timeParts[0], 10);
 var minutes = parseInt(timeParts[1], 10);
+
+// Membuat objek Date dengan tanggal, jam, dan menit yang ditentukan
 var dateObject = new Date(year, month, day, hours, minutes);
+
+
 return dateObject;
     }
+    function init_datetime_local(dateStringWithTime){
+
+      // Pisahkan tanggal, jam, dan menit dari string
+      var dateTimeParts = dateStringWithTime.split(', ');
+      var datePart = dateTimeParts[0];
+      var timePart = dateTimeParts[1];
+      
+      var dateParts = datePart.split('/');
+      var day = (parseInt(dateParts[0], 10) + 1).toString().padStart(2, '0');
+      var month = (parseInt(dateParts[1], 10) + 1).toString().padStart(2, '0'); // Bulan dimulai dari 1 (Januari = 1, Februari = 2, ...)
+      var year = parseInt(dateParts[2], 10);
+      
+      var timeParts = timePart.split('.');
+      var hours =(parseInt(timeParts[0], 10) + 1).toString().padStart(2, '0');;
+      var minutes = (parseInt(timeParts[1], 10) + 1).toString().padStart(2, '0');;
+      
+      // Membuat objek Date dengan tanggal, jam, dan menit yang ditentukan
+      var dateObject = year+"-"+month+"-"+day+"T"+hours+":"+minutes;
+      
+      return dateObject;
+          }
   /* Initializing */
   (CalendarApp.prototype.init = function () {
     // ambil db
@@ -256,9 +323,16 @@ return dateObject;
 
       let agenda = {
         title: title,
-        start: init_tgl(start),
-        end: init_tgl(end),
+        start: init_date(start),
+        end: init_date(end),
+        jam_mulai: init_datetime_local(start),
+        jam_selesai: init_datetime_local(end),
         className: className,
+        id: jsonData[i].id,
+        keterangan: jsonData[i].keterangan,
+        foto:jsonData[i].foto,
+        kategori:jsonData[i].kategori,
+        pemimpin_kegiatan:jsonData[i].pemimpin_kegiatan
       }
       defaultEvents.push(agenda);
 
