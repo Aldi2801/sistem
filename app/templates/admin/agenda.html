@@ -50,7 +50,7 @@
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header d-flex align-items-center">
-                <h4 class="modal-title"><strong>Add Agenda</strong></h4>
+                <h4 class="modal-title"><strong>edit / delete Agenda</strong></h4>
                 <button
                   type="button"
                   class="btn-close close-dialog"
@@ -60,6 +60,10 @@
               </div>
               <div class="modal-body"></div>
               <div class="modal-footer">
+                <span class='input-group-btn'>
+                  <button type='submit' class='btn btn-success waves-effect waves-light'><i class='fa fa-check'></i> Save
+                  </button>
+                </span>
                 <button
                   type="button"
                   class="btn btn-secondary close-dialog waves-effect"
@@ -78,22 +82,6 @@
                   type="button"
                   class="btn btn-danger delete-event waves-effect waves-light"
                   data-bs-dismiss="modal"
-                  onclick="function del(){
-                    
-    // Hapus agenda dengan Ajax
-    $.ajax({
-        type: 'DELETE',
-        url: '/delete-agenda',
-        contentType: 'application/json',
-        data: JSON.stringify(eventObject),
-        success: function (response) {
-            console.log('Agenda deleted successfully:', response);
-        },
-        error: function (error) {
-            console.error('Error deleting agenda:', error);
-        }
-    });
-                  }"
                 >
                   Delete
                 </button>
