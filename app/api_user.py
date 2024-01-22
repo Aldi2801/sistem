@@ -17,6 +17,28 @@ def homepahe():
     con.execute("SELECT tahun FROM realisasi_pendapatan group by tahun")
     list_thn_dana = con.fetchall()
     session['list_thn_dana']= list_thn_dana
+    # Misalnya, Anda memiliki tuple seperti ini dari hasil query
+    result_tuple = ('John Doe', 25, 'john.doe@example.com')
+
+    # Menggunakan jsonify untuk mengonversi tuple ke JSON
+    result_json = jsonify({
+        'name': result_tuple[0],
+        'age': result_tuple[1],
+        'email': result_tuple[2]
+    })
+
+    # Menggunakan jsonify langsung dari data dictionary
+    # result_json = jsonify(name=result_tuple[0], age=result_tuple[1], email=result_tuple[2])
+
+    # Menggunakan jsonify dari dictionary yang telah diubah dari tuple
+    # result_json = jsonify(dict(name=result_tuple[0], age=result_tuple[1], email=result_tuple[2]))
+
+    # Menggunakan jsonify dari tuple langsung (hanya jika tuple memiliki nama kunci)
+    # result_json = jsonify(result_tuple._asdict())
+
+    print(result_json)
+    result_json = jsonify(result_tuple._asdict())
+    print(result_json)
     return render_template('index.html')
 
 @app.route('/news')
@@ -67,10 +89,8 @@ def sejarah():
     con = mysql.connection.cursor()
     con.execute("SELECT * FROM sejarah_desa")
     sejarah = con.fetchall()
-    print(sejarah)
     info_list = []
     for sistem in sejarah:
-        print(sistem)
         list_data = {
             'id': str(sistem[0]),
             'sejarah': str(sistem[1])
@@ -84,10 +104,8 @@ def visi_misi():
     con = mysql.connection.cursor()
     con.execute("SELECT * FROM sejarah_desa")
     sejarah = con.fetchall()
-    print(sejarah)
     info_list = []
     for sistem in sejarah:
-        print(sistem)
         list_data = {
             'id': str(sistem[0]),
             'visi': str(sistem[2]),
@@ -105,7 +123,6 @@ def pemerintahan_desa():
     info_list = []
     
     for sistem in anggota:
-        print(str(sistem[1]))
         list_data = {
             'id': str(sistem[0]),
             'nama_lengkap': str(sistem[1]),
@@ -132,7 +149,6 @@ def dana_desa(thn):
     info_list = []
     
     for sistem in dana:
-        print(str(sistem[1]))
         list_data = {
             'id': str(sistem[0]),
             'no': str(sistem[1]),
@@ -150,7 +166,6 @@ def dana_desa(thn):
     info_list2 = []
     
     for sistem in dana:
-        print(str(sistem[1]))
         list_data = {
             'id': str(sistem[0]),
             'no': str(sistem[1]),
@@ -168,7 +183,6 @@ def dana_desa(thn):
     info_list3 = []
     
     for sistem in dana:
-        print(str(sistem[1]))
         list_data = {
             'id': str(sistem[0]),
             'no': str(sistem[1]),
@@ -271,10 +285,8 @@ def get_info():
     con = mysql.connection.cursor()
     con.execute("SELECT * FROM sejarah_desa")
     sejarah = con.fetchall()
-    print(sejarah)
     info_list = []
     for sistem in sejarah:
-        print(sistem)
         list_data = {
             'id': str(sistem[0]),
             'sejarah': str(sistem[1]),
