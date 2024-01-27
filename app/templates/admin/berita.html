@@ -255,6 +255,8 @@
 
   <script>
     $(document).ready(function () {
+      var token = "{{csrf_token}}"
+      console.log(token)
       var tambah = new Quill("#editor", {
         theme: "snow",
       });
@@ -280,9 +282,9 @@
             processData: false,
             method: 'POST',
             type: 'POST', 
-            headers: {
+            /* headers: {
               'Authorization': 'Bearer ' + token
-          },
+          },*/
           }).done(function (data) {
             console.log(data);
             
@@ -318,9 +320,9 @@
         processData: false,
         method: 'POST',
         type: 'POST', 
-        headers: {
+        /*headers: {
           'Authorization': 'Bearer ' + token
-      },
+      },*/
       }).done(function (data) {
         console.log(data);
         window.location.href = "/admin/berita";
@@ -330,9 +332,9 @@
     $.ajax({
       url: '/hapus_berita',
       method: 'POST',
-      headers: {
+      /*headers: {
         'Authorization': 'Bearer ' + token
-    },
+    },*/
       data: { id: id },
       dataType: 'json',
     }).done(function(response) {

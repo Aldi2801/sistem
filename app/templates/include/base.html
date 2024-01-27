@@ -177,8 +177,8 @@
                 </button>
                 <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
                   {% for data in session.list_thn_dana %}
-                  <a class="dropdown-item" href="/dana/{{ data[0] }}"
-                  >TAHUN ANGGARAN {{ data[0] }} </a>
+                  <a class="dropdown-item" href="/dana/{{ data.tahun }}"
+                  >TAHUN ANGGARAN {{ data.tahun }} </a>
                   
               {% endfor %}
                 

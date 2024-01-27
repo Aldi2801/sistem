@@ -146,7 +146,7 @@
             <div class="card text-white rounded" style="background-color:#006400">
               {% for data in session.list_thn_dana %}
                 {% if loop.last %}
-                  <a  href="/dana/{{ data[0] }}">
+                  <a  href="/dana/{{ data.tahun }}">
                 {% endif %}
               {% endfor %}
                 <div class="card-body">

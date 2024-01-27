@@ -36,7 +36,7 @@
     (CalendarApp.prototype.onEventClick = function (calEvent, jsEvent, view) {
       // edit dan hapus agenda
       var $this = this;
-      var form = $("<form action='' method=''></form>");
+      var form = $("<form action='/edit-agenda' method='POST'></form>");
       form
       .append("<div class='row'></div>")
       .find(".row")
@@ -75,6 +75,9 @@
         .find(".delete-event")
         .show()
         .end()
+        .find(".edit-event")
+        .show()
+        .end()
         .find(".save-event")
         .hide()
         .end()
@@ -104,15 +107,47 @@
       }
   });
         });
-      $this.$modal.find("form").on("submit", function () {
-        console.log('submit');
-        calEvent.title = form.find("input[name=title]").val();
-        $this.$calendarObj.fullCalendar("updateEvent", calEvent);
-        $this.$modal.hide("hide");
-        $(".bckdrop").addClass("hide");
-        $(".bckdrop").removeClass("show");
-
-        return false;
+      $this.$modal.find(".edit-event")
+      .unbind("click")
+      .click(function () {
+        try {
+          // Kode yang mungkin menyebabkan kesalahan
+          form.submit();
+          calEvent.title = form.find("input[name=title]").val();
+          calEvent.jam_mulai = form.find("input[name=start]").val();
+          calEvent.jam_selesai = form.find("input[name=end]").val();
+          calEvent.pemimpin_kegiatan = form.find("input[name=pemimpin_kegiatan]").val();
+          calEvent.foto = form.find("input[name=foto]").val();
+          calEvent.keterangan = form.find("textarea[name=keterangan]").val();
+          $.ajax({
+            type: 'PUT',
+            url: '/edit-agenda',
+            contentType: 'application/json',
+            data:{
+              "title":calEvent.title,
+              "titl":calEvent.jam_mulai,
+              "tite":calEvent.jam_selesai,
+              "tile":calEvent.pemimpin_kegiatan,
+              "ttle":calEvent.foto,
+              "itle":calEvent.keterangan,
+            },
+            success: function (response) {
+                console.log('Agenda edit successfully:', response);
+            },
+            error: function (error) {
+                console.error('Error editing agenda:', error);
+            }
+        });
+          $this.$calendarObj.fullCalendar("updateEvent", calEvent);
+          $this.$modal.hide("hide");
+          $(".bckdrop").addClass("hide");
+          $(".bckdrop").removeClass("show");
+          $("body").removeClass("modal-open");
+      } catch (error) {
+          // Tangani kesalahan di sini
+          console.error("Terjadi kesalahan:", error);
+          // Anda dapat menambahkan logika atau pemberitahuan kesalahan tambahan di sini
+      }
       });
     }),
     /* on select */
@@ -165,6 +200,9 @@
         );
       $this.$modal
         .find(".delete-event")
+        .hide()
+        .end()
+        .find(".edit-event")
         .hide()
         .end()
         .find(".save-event")

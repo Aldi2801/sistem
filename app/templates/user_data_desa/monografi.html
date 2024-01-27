@@ -70,6 +70,7 @@
             </div>
           </div>
         </div>
+      </div>
         <div class="card">
           <div class="card-body">
             <h4 class="card-title">Kesejahteraan Sosial</h4>
@@ -95,7 +96,40 @@
             </div>
           </div>
         </div>
-      </div>
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Pekerjaan</h4>
+            <div class = "table-responsive">
+              <table id="file_export" class="table table-striped table-bordered display text-nowrap"style="border:0px; border-bottom: 1px solid ;">
+                <thead>
+                    <tr>
+                      <th >Buruh</th>
+                      <th >Petani</th>
+                      <th >Peternak</th>
+                      <th >Pedagang</th>
+                      <th >Tukang Kaya</th>
+                      <th >Tukang Batu</th>
+                      <th >Penjahit</th>
+                      <th >Pns/Polisi/Tni</th>
+                      <th >Pensiunan</th>
+                      <th >Sopir</th>
+                      <th >Perangkat Desa</th>
+                      <th >Jasa/Wiraswasta</th>
+                      <th >Penrajin Batik</th>
+                      <th >Dll</th>
+                    </tr>
+                </thead>
+                <tr style="border:0px">
+                    <td id="jkkprese">{{info_list[0]['jkkprese']}}</td>
+                    <td id="jkkseja">{{info_list[0]['jkkseja']}}</td>
+                    <td id="jkkkaya">{{info_list[0]['jkkkaya']}}</td>
+                    <td id="jkksedang">{{info_list[0]['jkksedang']}}</td>
+                    <td id="jkkmiskin">{{info_list[0]['jkkmiskin']}}</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
           <div class="card">
           <div class="card-body">
             <h4 class="card-title">Agama</h4>
@@ -122,6 +156,7 @@
                 </tr>
               </table>
             </div>
+          </div>
     </div>
   </div>
   <script>

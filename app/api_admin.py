@@ -69,19 +69,8 @@ def delete_image(filename):
 def fetch_data_and_format(query):
     con.execute(query)
     dana = con.fetchall()
-    info_list = []
-
-    for sistem in dana:
-        list_data = {
-            'id': str(sistem[0]),
-            'no': str(sistem[1]),
-            'uraian': str(sistem[2]),
-            'anggaran': format_currency(int(sistem[3])),
-            'realisasi': format_currency(int(sistem[4])),
-            'lebih_kurang': format_currency(int(sistem[5])),
-            'tahun': str(sistem[6])
-        }
-        info_list.append(list_data)
+    column_names = [desc[0] for desc in con.description]
+    info_list = [dict(zip(column_names, row)) for row in dana]
     return info_list
 def fetch_years(query):
     con.execute(query)
@@ -138,7 +127,6 @@ def edit_info():
     id = request.form['id']
     sejarah = request.form['sejarah']
     visi = request.form['visi']
-    
     misi = request.form['misi']
     con.execute("UPDATE sejarah_desa SET sejarah = %s, visi = %s, misi = %s WHERE id = %s",(sejarah,visi,misi,id))
     mysql.connection.commit()
@@ -284,10 +272,7 @@ def admindana():
     info_list2 = fetch_data_and_format("SELECT * FROM realisasi_belanja ORDER BY id")
     info_list3 = fetch_data_and_format("SELECT * FROM realisasi_pembiayaan ORDER BY id")
     thn = fetch_years("SELECT * FROM realisasi_pendapatan GROUP BY tahun")
-
     return render_template("admin/dana.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn)
-
-
 @app.route('/admin/edit_dana', methods=['POST'])
 @jwt_required()
 def edit_dana():
@@ -393,28 +378,8 @@ def adminmono():
     con = mysql.connection.cursor()
     con.execute("SELECT * FROM monografi")
     mono = con.fetchall()
-    info_list = []
-    for sistem in mono:
-        list_data = {
-            'id': str(sistem[0]),
-            'tahun': str(sistem[1]),
-            'jpenduduk': str(sistem[2]),
-            'jkk': str(sistem[3]),
-            'laki': str(sistem[4]),
-            'perempuan': str(sistem[5]),
-            'jkkprese': str(sistem[6]),
-            'jkkseja': str(sistem[7]),
-            'jkkkaya': str(sistem[8]),
-            'jkksedang': str(sistem[9]),
-            'jkkmiskin': str(sistem[10]),
-            'islam': str(sistem[11]),
-            'kristen': str(sistem[12]),
-            'protestan': str(sistem[13]),
-            'katolik': str(sistem[14]),
-            'hindu': str(sistem[15]),
-            'budha': str(sistem[16])
-        }
-        info_list.append(list_data)
+    column_names = [desc[0] for desc in con.description]
+    info_list = [dict(zip(column_names, row)) for row in mono]
     return render_template("admin/monografi.html", info_list = info_list)
 
 @app.route('/admin/monoedit', methods=['POST'])
@@ -458,27 +423,8 @@ def adminanggota():
     con = mysql.connection.cursor()
     con.execute("SELECT * FROM anggota order by id")
     anggota = con.fetchall()
-    info_list = []
-    
-    for sistem in anggota:
-        list_data = {
-            'id': str(sistem[0]),
-            'nama_lengkap': str(sistem[1]),
-            'gambar': str(sistem[2]),
-            'jabatan': str(sistem[3]),
-            'niap': str(sistem[4]),
-            'ttl': str(sistem[5]),
-            'agama': str(sistem[6]),
-            'golongan': str(sistem[7]),
-            'pendidikan_terakhir': str(sistem[8]),
-            'nomorsk': str(sistem[9]),
-            'tanggalsk': str(sistem[10]),
-            'masa_jabatan': str(sistem[11]),
-            'status': str(sistem[12])
-        }
-        info_list.append(list_data)
-        
-
+    column_names = [desc[0] for desc in con.description]
+    info_list = [dict(zip(column_names, row)) for row in anggota]
     return render_template("admin/anggota.html", info_list = info_list)
 
 @app.route('/admin/tambah_anggota', methods=['POST'])

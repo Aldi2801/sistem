@@ -1,13 +1,9 @@
 from . import app,mysql,db
 from flask import render_template, request, jsonify, redirect, url_for,session
-import os
 import pandas as pd
-import textwrap
 from PIL import Image
 from io import BytesIO
-import locale
-import uuid
-import time
+import os,textwrap, locale, json, uuid, time
 from datetime import datetime
 
 #halaman homepage
@@ -15,30 +11,10 @@ from datetime import datetime
 def homepahe():
     con = mysql.connection.cursor()
     con.execute("SELECT tahun FROM realisasi_pendapatan group by tahun")
-    list_thn_dana = con.fetchall()
-    session['list_thn_dana']= list_thn_dana
-    # Misalnya, Anda memiliki tuple seperti ini dari hasil query
-    result_tuple = ('John Doe', 25, 'john.doe@example.com')
-
-    # Menggunakan jsonify untuk mengonversi tuple ke JSON
-    result_json = jsonify({
-        'name': result_tuple[0],
-        'age': result_tuple[1],
-        'email': result_tuple[2]
-    })
-
-    # Menggunakan jsonify langsung dari data dictionary
-    # result_json = jsonify(name=result_tuple[0], age=result_tuple[1], email=result_tuple[2])
-
-    # Menggunakan jsonify dari dictionary yang telah diubah dari tuple
-    # result_json = jsonify(dict(name=result_tuple[0], age=result_tuple[1], email=result_tuple[2]))
-
-    # Menggunakan jsonify dari tuple langsung (hanya jika tuple memiliki nama kunci)
-    # result_json = jsonify(result_tuple._asdict())
-
-    print(result_json)
-    result_json = jsonify(result_tuple._asdict())
-    print(result_json)
+    thn_dana = con.fetchall()
+    column_names = [desc[0] for desc in con.description]
+    thn_dana_list = [dict(zip(column_names, row)) for row in thn_dana]
+    session['list_thn_dana']= thn_dana_list 
     return render_template('index.html')
 
 @app.route('/news')
