@@ -611,8 +611,8 @@ def agenda_edit():
     pemimpin_kegiatan = request.form['pemimpin_kegiatan']
     keterangan = request.form['keterangan']
     try:
-        random_name = do_image("edit","agenda",id)
-        con.execute("UPDATE agenda SET title = %s, start = %s, end = %s, pemimpin_kegiatan = %s, keterangan = %s, gambar = %s WHERE id = %s",(title,jam_mulai,jam_selesai,pemimpin_kegiatan,keterangan,random_name,id))
+        do_image("edit","agenda",id)
+        con.execute("UPDATE agenda SET title = %s, start = %s, end = %s, pemimpin_kegiatan = %s, keterangan = %s WHERE id = %s",(title,jam_mulai,jam_selesai,pemimpin_kegiatan,keterangan,id))
         mysql.connection.commit()
         return jsonify({"msg" : "SUKSES"})
     except Exception as e:
