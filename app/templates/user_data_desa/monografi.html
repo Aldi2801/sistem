@@ -107,7 +107,7 @@
                       <th >Petani</th>
                       <th >Peternak</th>
                       <th >Pedagang</th>
-                      <th >Tukang Kaya</th>
+                      <th >Tukang Kayu</th>
                       <th >Tukang Batu</th>
                       <th >Penjahit</th>
                       <th >Pns/Polisi/Tni</th>
@@ -120,11 +120,11 @@
                     </tr>
                 </thead>
                 <tr style="border:0px">
-                    <td id="jkkprese">{{info_list[0]['jkkprese']}}</td>
-                    <td id="jkkseja">{{info_list[0]['jkkseja']}}</td>
-                    <td id="jkkkaya">{{info_list[0]['jkkkaya']}}</td>
-                    <td id="jkksedang">{{info_list[0]['jkksedang']}}</td>
-                    <td id="jkkmiskin">{{info_list[0]['jkkmiskin']}}</td>
+                    <td id="buruh">{{info_list[0]['buruh']}}</td>
+                    <td id="petani">{{info_list[0]['petani']}}</td>
+                    <td id="peternak">{{info_list[0]['peternak']}}</td>
+                    <td id="pedagang">{{info_list[0]['pedagang']}}</td>
+                    <td id="tukangkayu">{{info_list[0]['tukangkayu']}}</td>
                 </tr>
               </table>
             </div>
@@ -177,6 +177,20 @@
           $jkkkaya = $("#jkkkaya").text(info_list[i].jkkkaya);
           $jkksedang = $("#jkksedang").text(info_list[i].jkksedang);
           $jkkmiskin = $("#jkkmiskin").text(info_list[i].jkkmiskin);
+          $buruh = $("#buruh").text(info_list[i].buruh);
+          $petani = $("#petani").text(info_list[i].petani);
+          $peternak = $("#peternak").text(info_list[i].peternak);
+          $pedagang = $("#pedagang").text(info_list[i].pedagang);
+          $tukangkayu = $("#tukangkayu").text(info_list[i].tukangkayu);
+          $tukangkbatu = $("#tukangbatu").text(info_list[i].tukangbatu);
+          $penjahit = $("#penjahit").text(info_list[i].penjahit);
+          $asn = $("#asn").text(info_list[i].asn);
+          $pensiunan = $("#pensiunan").text(info_list[i].pensiunan);
+          $sopir = $("#sopir").text(info_list[i].sopir);
+          $perangkatdesa = $("#perangkatdesa").text(info_list[i].perangkatdesa);
+          $jasa_wirawasta = $("#jasa_wirawasta").text(info_list[i].jasa_wiraswasta);
+          $pengrajinbatik = $("#pengrajinbatik").text(info_list[i].pengrajinbatik);
+          $dll = $("#dll").text(info_list[i].dll);
           $islam = $("#islam").text(info_list[i].islam);
           $kristen = $("#kristen").text(info_list[i].kristen);
           $protestan = $("#protestan").text(info_list[i].protestan);

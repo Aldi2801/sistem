@@ -11,7 +11,66 @@
       (this.$saveCategoryBtn = $(".save-category")),
       (this.$calendarObj = null);
   };
+  function init_date(dateStringWithTime){
 
+    // Pisahkan tanggal, jam, dan menit dari string
+    var dateTimeParts = dateStringWithTime.split(', ');
+    var datePart = dateTimeParts[0];
+    var timePart = dateTimeParts[1];
+    
+    var dateParts = datePart.split('/');
+    var day = parseInt(dateParts[0], 10);
+    var month = parseInt(dateParts[1], 10) - 1; // Bulan dimulai dari 0 (Januari = 0, Februari = 1, ...)
+    var year = parseInt(dateParts[2], 10);
+    
+    var timeParts = timePart.split('.');
+    var hours = parseInt(timeParts[0], 10);
+    var minutes = parseInt(timeParts[1], 10);
+    
+    // Membuat objek Date dengan tanggal, jam, dan menit yang ditentukan
+    var dateObject = new Date(year, month, day, hours, minutes);
+    
+    
+    return dateObject;
+        }
+        function reverse_datetime_local(dateStringWithTime){
+          // Membuat objek Date dari string input
+          var date = new Date(dateStringWithTime);
+    
+          // Mendapatkan komponen waktu
+          var day = date.getDate();
+          var month = date.getMonth() + 1; // bulan dimulai dari 1
+          var year = date.getFullYear();
+          var hours = date.getHours();
+          var minutes = date.getMinutes();
+    
+          // Mengatur format sesuai keinginan
+          var formattedDate = `${day}/${month}/${year}, ${hours}.${minutes}`;
+          
+          
+          return formattedDate ;
+              }
+        function init_datetime_local(dateStringWithTime){
+    
+          // Pisahkan tanggal, jam, dan menit dari string
+          var dateTimeParts = dateStringWithTime.split(', ');
+          var datePart = dateTimeParts[0];
+          var timePart = dateTimeParts[1];
+          
+          var dateParts = datePart.split('/');
+          var day = (parseInt(dateParts[0], 10)).toString().padStart(2, '0');
+          var month = (parseInt(dateParts[1], 10) ).toString().padStart(2, '0'); // Bulan dimulai dari 1 (Januari = 1, Februari = 2, ...)
+          var year = parseInt(dateParts[2], 10);
+          
+          var timeParts = timePart.split('.');
+          var hours =(parseInt(timeParts[0], 10) + 1).toString().padStart(2, '0');;
+          var minutes = (parseInt(timeParts[1], 10) + 1).toString().padStart(2, '0');;
+          
+          // Membuat objek Date dengan tanggal, jam, dan menit yang ditentukan
+          var dateObject = year+"-"+month+"-"+day+"T"+hours+":"+minutes;
+          
+          return dateObject;
+              }
   /* on drop */
   (CalendarApp.prototype.onDrop = function (eventObj, date) {
   
@@ -36,6 +95,9 @@
     (CalendarApp.prototype.onEventClick = function (calEvent, jsEvent, view) {
       // edit dan hapus agenda
       var $this = this;
+      $this.$modal.find(".modal-title")
+      .empty()
+      .append("edit / hapus agenda")
       var form = $("<form action='/edit-agenda' method='POST'></form>");
       form
       .append("<div class='row'></div>")
@@ -62,7 +124,7 @@
       )
       .append(
         "<div class='col-md-12'><div class='form-group'><label class='control-label'>Foto browsur <br><small>(*abaikan apabila tidak ada)</small></label><input class='form-control'value='"+
-        calEvent.foto + "' type='file' name='foto'/></div></div>"
+        calEvent.foto + "' type='file' id='fotoo' name='foto'/></div></div>"
       )
       .append(
         "<div class='col-md-12'><div class='form-group'><label class='control-label'>Keterangan Kegiatan</label><textarea class='form-control' name='keterangan' rows='3' placeholder='Acara ini diadakan dalam rangka...'>"+
@@ -112,30 +174,45 @@
       .click(function () {
         try {
           // Kode yang mungkin menyebabkan kesalahan
-          form.submit();
           calEvent.title = form.find("input[name=title]").val();
           calEvent.jam_mulai = form.find("input[name=start]").val();
           calEvent.jam_selesai = form.find("input[name=end]").val();
           calEvent.pemimpin_kegiatan = form.find("input[name=pemimpin_kegiatan]").val();
           calEvent.foto = form.find("input[name=foto]").val();
           calEvent.keterangan = form.find("textarea[name=keterangan]").val();
+          var jam_mulai = reverse_datetime_local(calEvent.jam_mulai)
+          var jam_selesai = reverse_datetime_local(calEvent.jam_selesai)
+          let formData = new FormData();
+          formData.append('id',calEvent.id);
+          formData.append('title',calEvent.title);
+          formData.append('jam_mulai',jam_mulai );
+          formData.append('jam_selesai',jam_selesai);
+          formData.append('pemimpin_kegiatan',calEvent.pemimpin_kegiatan);
+          jQuery.each(jQuery('#fotoo')[0].files, function(i, file) {
+              formData.append('gambar', file);
+          });
+          formData.append('keterangan',String(calEvent.keterangan))
           $.ajax({
-            type: 'PUT',
+            cache: false,
+            contentType: false,
+            processData: false,
+            method: 'PUT',
+            type: 'PUT', 
             url: '/edit-agenda',
-            contentType: 'application/json',
-            data:{
-              "title":calEvent.title,
-              "titl":calEvent.jam_mulai,
-              "tite":calEvent.jam_selesai,
-              "tile":calEvent.pemimpin_kegiatan,
-              "ttle":calEvent.foto,
-              "itle":calEvent.keterangan,
-            },
+            data: formData,
             success: function (response) {
-                console.log('Agenda edit successfully:', response);
+                console.log('Agenda edit successfully:', response.msg);
+                if(response.msg=="SUKSES"){
+                  alert("Agenda edit successfully")
+                  location.href("/admin/agenda")
+                }
+                else{
+                  alert("Error:"+response.msg)
+                }
             },
             error: function (error) {
                 console.error('Error editing agenda:', error);
+                alert('Error:', error);
             }
         });
           $this.$calendarObj.fullCalendar("updateEvent", calEvent);
@@ -155,6 +232,9 @@
       // tambah agenda
       var $this = this;
       $this.$modal.show();
+      $this.$modal.find(".modal-title")
+      .empty()
+      .append("tambah agenda")
       $(".bckdrop").addClass("show");
       $(".bckdrop").removeClass("hide");
       var form = $("<form action='/tambah-agenda' method='POST'></form>");
@@ -274,49 +354,7 @@
         });
       });
     });
-    function init_date(dateStringWithTime){
 
-// Pisahkan tanggal, jam, dan menit dari string
-var dateTimeParts = dateStringWithTime.split(', ');
-var datePart = dateTimeParts[0];
-var timePart = dateTimeParts[1];
-
-var dateParts = datePart.split('/');
-var day = parseInt(dateParts[0], 10);
-var month = parseInt(dateParts[1], 10) - 1; // Bulan dimulai dari 0 (Januari = 0, Februari = 1, ...)
-var year = parseInt(dateParts[2], 10);
-
-var timeParts = timePart.split('.');
-var hours = parseInt(timeParts[0], 10);
-var minutes = parseInt(timeParts[1], 10);
-
-// Membuat objek Date dengan tanggal, jam, dan menit yang ditentukan
-var dateObject = new Date(year, month, day, hours, minutes);
-
-
-return dateObject;
-    }
-    function init_datetime_local(dateStringWithTime){
-
-      // Pisahkan tanggal, jam, dan menit dari string
-      var dateTimeParts = dateStringWithTime.split(', ');
-      var datePart = dateTimeParts[0];
-      var timePart = dateTimeParts[1];
-      
-      var dateParts = datePart.split('/');
-      var day = (parseInt(dateParts[0], 10) + 1).toString().padStart(2, '0');
-      var month = (parseInt(dateParts[1], 10) + 1).toString().padStart(2, '0'); // Bulan dimulai dari 1 (Januari = 1, Februari = 2, ...)
-      var year = parseInt(dateParts[2], 10);
-      
-      var timeParts = timePart.split('.');
-      var hours =(parseInt(timeParts[0], 10) + 1).toString().padStart(2, '0');;
-      var minutes = (parseInt(timeParts[1], 10) + 1).toString().padStart(2, '0');;
-      
-      // Membuat objek Date dengan tanggal, jam, dan menit yang ditentukan
-      var dateObject = year+"-"+month+"-"+day+"T"+hours+":"+minutes;
-      
-      return dateObject;
-          }
   /* Initializing */
   (CalendarApp.prototype.init = function () {
     // ambil db

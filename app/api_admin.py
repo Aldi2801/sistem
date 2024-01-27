@@ -589,7 +589,31 @@ def agenda_delete(id):
     return jsonify({"msg" : "SUKSES"})
 @app.route('/tambah-agenda',methods=["POST"])
 def agenda_tambah():
+    con = mysql.connection.cursor()
+    id = request.form['id']
+    judul = request.form['judul']
+    try:
+        do_image("tambah","galeri","")
+        con.execute("INSERT INTO  galeri SET judul = %s WHERE id = %s",(judul,id))
+        mysql.connection.commit()
+        return jsonify({"msg" : "SUKSES"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
     return jsonify({"msg" : "SUKSES"})
 @app.route('/edit-agenda',methods=["PUT"])
 def agenda_edit():
-    return jsonify({"msg" : "SUKSES"})
+    con = mysql.connection.cursor()
+    id = request.form['id']
+    title = request.form['title']
+    jam_mulai = request.form['jam_mulai']
+    jam_selesai = request.form['jam_selesai']
+    pemimpin_kegiatan = request.form['pemimpin_kegiatan']
+    keterangan = request.form['keterangan']
+    try:
+        random_name = do_image("edit","agenda",id)
+        con.execute("UPDATE agenda SET title = %s, start = %s, end = %s, pemimpin_kegiatan = %s, keterangan = %s, gambar = %s WHERE id = %s",(title,jam_mulai,jam_selesai,pemimpin_kegiatan,keterangan,random_name,id))
+        mysql.connection.commit()
+        return jsonify({"msg" : "SUKSES"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
