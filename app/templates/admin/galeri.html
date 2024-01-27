@@ -208,8 +208,9 @@
   <!-- ============================================================= -->
 
   <script>
+        var token = "{{ session['jwt_token'] }}"
+    console.log(token)
     $(document).ready(function () {
-     
       $( "#tambah" ).on( "click", function() {
        
         var jdl = $('#judulgaleribaru').val()

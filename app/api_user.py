@@ -6,14 +6,17 @@ from io import BytesIO
 import os,textwrap, locale, json, uuid, time
 from datetime import datetime
 
+def fetch_data_and_format(query):
+    con = mysql.connection.cursor()
+    con.execute(query)
+    data = con.fetchall()
+    column_names = [desc[0] for desc in con.description]
+    info_list = [dict(zip(column_names, row)) for row in data]
+    return info_list
 #halaman homepage
 @app.route('/')
 def homepahe():
-    con = mysql.connection.cursor()
-    con.execute("SELECT tahun FROM realisasi_pendapatan group by tahun")
-    thn_dana = con.fetchall()
-    column_names = [desc[0] for desc in con.description]
-    thn_dana_list = [dict(zip(column_names, row)) for row in thn_dana]
+    thn_dana_list =fetch_data_and_format("SELECT tahun FROM realisasi_pendapatan group by tahun")
     session['list_thn_dana']= thn_dana_list 
     return render_template('index.html')
 
@@ -96,25 +99,8 @@ def pemerintahan_desa():
     con = mysql.connection.cursor()
     con.execute("SELECT * FROM anggota order by id")
     anggota = con.fetchall()
-    info_list = []
-    
-    for sistem in anggota:
-        list_data = {
-            'id': str(sistem[0]),
-            'nama_lengkap': str(sistem[1]),
-            'gambar': str(sistem[2]),
-            'jabatan': str(sistem[3]),
-            'niap': str(sistem[4]),
-            'ttl': str(sistem[5]),
-            'agama': str(sistem[6]),
-            'golongan': str(sistem[7]),
-            'pendidikan_terakhir': str(sistem[8]),
-            'nomorsk': str(sistem[9]),
-            'tanggalsk': str(sistem[10]),
-            'masa_jabatan': str(sistem[11]),
-            'status': str(sistem[12])
-        }
-        info_list.append(list_data)
+    column_names = [desc[0] for desc in con.description]
+    info_list = [dict(zip(column_names, row)) for row in anggota]
     return render_template("pemerintahan_desa.html", info_list = info_list)
 #halaman dana
 @app.route('/dana/<thn>')
@@ -122,55 +108,17 @@ def dana_desa(thn):
     con = mysql.connection.cursor()
     con.execute("SELECT * FROM realisasi_pendapatan where tahun = %s order by id",(thn,))
     dana = con.fetchall()
-    info_list = []
-    
-    for sistem in dana:
-        list_data = {
-            'id': str(sistem[0]),
-            'no': str(sistem[1]),
-            'uraian': str(sistem[2]),
-            'anggaran': str(sistem[3]),
-            'realisasi': str(sistem[4]),
-            'lebih_kurang': str(sistem[5]),
-            'tahun': str(sistem[6])
-           
-        }
-        info_list.append(list_data)
-        
+    column_names = [desc[0] for desc in con.description]
+    info_list = [dict(zip(column_names, row)) for row in dana]
     con.execute("SELECT * FROM realisasi_belanja where tahun = %s order by id",(thn,))
     dana = con.fetchall()
-    info_list2 = []
-    
-    for sistem in dana:
-        list_data = {
-            'id': str(sistem[0]),
-            'no': str(sistem[1]),
-            'uraian': str(sistem[2]),
-            'anggaran': str(sistem[3]),
-            'realisasi': str(sistem[4]),
-            'lebih_kurang': str(sistem[5]),
-            'tahun': str(sistem[6])
-           
-        }
-        info_list2.append(list_data)
-        
+    column_names = [desc[0] for desc in con.description]
+    info_list2 = [dict(zip(column_names, row)) for row in dana]
     con.execute("SELECT * FROM realisasi_pembiayaan where tahun = %s order by id",(thn,))
     dana = con.fetchall()
-    info_list3 = []
-    
-    for sistem in dana:
-        list_data = {
-            'id': str(sistem[0]),
-            'no': str(sistem[1]),
-            'uraian': str(sistem[2]),
-            'anggaran': str(sistem[3]),
-            'realisasi': str(sistem[4]),
-            'lebih_kurang': str(sistem[5]),
-            'tahun': str(sistem[6])
-           
-        }
-        info_list3.append(list_data)
-    return render_template("dana.html", info_list = info_list,info_list2 = info_list2,info_list3 = info_list3,   tahun = thn)
+    column_names = [desc[0] for desc in con.description]
+    info_list3 = [dict(zip(column_names, row)) for row in dana]
+    return render_template("dana.html", info_list = info_list,info_list2 = info_list2,info_list3 = info_list3, tahun = thn)
 #halaman user galeri
 @app.route('/galeri')
 def galeri():
@@ -203,22 +151,8 @@ def geo():
     con = mysql.connection.cursor()
     con.execute("SELECT * FROM wilayah")
     wilayah = con.fetchall()
-    info_list = []
-    for sistem in wilayah:
-        list_data = {
-            'id': str(sistem[0]),
-            'utara': str(sistem[1]),
-            'selatan': str(sistem[2]),
-            'timur': str(sistem[3]),
-            'barat': str(sistem[4]),
-            'luas': str(sistem[5]),
-            'sawahteri': str(sistem[6]),
-            'sawahhu': str(sistem[7]),
-            'pemukiman': str(sistem[8]),
-            'tahun':str(sistem[9])
-        }
-        info_list.append(list_data)
-        
+    column_names = [desc[0] for desc in con.description]
+    info_list = [dict(zip(column_names, row)) for row in wilayah]
     return render_template("user_data_desa/geografi.html", info_list=info_list )
 #halaman vidio
 @app.route('/video')

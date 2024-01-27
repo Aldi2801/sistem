@@ -130,7 +130,8 @@
     </div>
     <script>
         var btnedit = document.getElementById('edit');
-
+        var token = "{{ session['jwt_token'] }}"
+    console.log(token)
         // Add a click event listener to the button
         btnedit.addEventListener('click', function() {
             // This function will be executed when the button is clicked

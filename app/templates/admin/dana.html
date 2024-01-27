@@ -246,6 +246,8 @@
       <!-- Modal tambah -->
     </div>
     <script>
+          var token = "{{ session['jwt_token'] }}"
+    console.log(token)
       $( "#tahun").val("tahun");
       $( "#tahun" ).change( "click", function() {
         var data_thn =  JSON.parse('{{ tahun | tojson | safe }}');

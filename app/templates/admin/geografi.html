@@ -45,8 +45,7 @@
               and give class <mark><code>row</code></mark> with mb-3.
             </h6>
           </div>
-          <form class="form-horizontal" action="/admin/wilayah" method="post">
-            <input type="hidden" name="Authorization" value="Bearer {{ session['jwt_token'] }}">
+          <form class="form-horizontal" >
       
             <div class="card-body">
               <h4 class="card-title">Berbatasan Wilayah</h4>
@@ -114,7 +113,8 @@
             <div class="p-3 border-top">
               <div class="text-end">
                 <button
-                  type="submit"
+                  type="button"
+                  id="edit-wilayah"
                   class="
                     btn btn-info
                     rounded-pill
@@ -126,7 +126,7 @@
                   Save
                 </button>
                 <button
-                  type="submit"
+                  type="button"
                   class="
                     btn btn-dark
                     rounded-pill
@@ -139,8 +139,7 @@
               </div>
             </div>
           </form>
-          <form class="form-horizontal" action="/admin/tanah" method="post" >
-            <input type="hidden" name="Authorization" value="Bearer {{ session['jwt_token'] }}">
+          <form class="form-horizontal"  >
             <div class="card-body">
               <h4 class="card-title">Luas Desa</h4>
               <div class="mb-3 row">
@@ -206,7 +205,8 @@
               <div class="p-3 border-top">
                 <div class="text-end">
                   <button
-                    type="submit"
+                    type="button"
+                    id="edit-tanah"
                     class="
                       btn btn-info
                       rounded-pill
@@ -217,7 +217,7 @@
                     Save
                   </button>
                   <button
-                    type="submit"
+                    type="button"
                     class="
                       btn btn-dark
                       rounded-pill
@@ -235,4 +235,50 @@
       </div>
     </div>
 
+    {% endblock %}
+    {% block js %}
+    <script>
+    var token = "{{ session['jwt_token'] }}"
+    console.log(token)
+    $(document).ready(function () {
+      $( "#edit-tanah" ).on( "click", function() {
+        let formData = new FormData();
+        formData.append('status',status)
+          console.log(formData)
+          $.ajax({
+            url: "/admin/tambah_anggota",
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            method: 'POST',
+            type: 'POST', 
+            headers: {
+              'Authorization': 'Bearer ' + token
+          },
+          }).done(function (data) {
+            handleResponse(data, "menambah", "/admin/anggota");
+          });
+      });
+      $( "#edit-wilayah" ).on( "click", function() {
+        let formData = new FormData();
+        formData.append('status',status)
+          console.log(formData)
+          $.ajax({
+            url: "/admin/tambah_anggota",
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            method: 'POST',
+            type: 'POST', 
+            headers: {
+              'Authorization': 'Bearer ' + token
+          },
+          }).done(function (data) {
+            handleResponse(data, "menambah", "/admin/anggota");
+          });
+      });
+    });
+    </script>
     {% endblock %}

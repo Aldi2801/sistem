@@ -11,69 +11,65 @@
       (this.$saveCategoryBtn = $(".save-category")),
       (this.$calendarObj = null);
   };
-  function init_date(dateStringWithTime){
-
+  function init_date(dateStringWithTime) {
     // Pisahkan tanggal, jam, dan menit dari string
-    var dateTimeParts = dateStringWithTime.split(', ');
+    var dateTimeParts = dateStringWithTime.split(", ");
     var datePart = dateTimeParts[0];
     var timePart = dateTimeParts[1];
-    
-    var dateParts = datePart.split('/');
+
+    var dateParts = datePart.split("/");
     var day = parseInt(dateParts[0], 10);
     var month = parseInt(dateParts[1], 10) - 1; // Bulan dimulai dari 0 (Januari = 0, Februari = 1, ...)
     var year = parseInt(dateParts[2], 10);
-    
-    var timeParts = timePart.split('.');
+
+    var timeParts = timePart.split(".");
     var hours = parseInt(timeParts[0], 10);
     var minutes = parseInt(timeParts[1], 10);
-    
+
     // Membuat objek Date dengan tanggal, jam, dan menit yang ditentukan
     var dateObject = new Date(year, month, day, hours, minutes);
-    
-    
+
     return dateObject;
-        }
-        function reverse_datetime_local(dateStringWithTime){
-          // Membuat objek Date dari string input
-          var date = new Date(dateStringWithTime);
-    
-          // Mendapatkan komponen waktu
-          var day = date.getDate();
-          var month = date.getMonth() + 1; // bulan dimulai dari 1
-          var year = date.getFullYear();
-          var hours = date.getHours();
-          var minutes = date.getMinutes();
-    
-          // Mengatur format sesuai keinginan
-          var formattedDate = `${day}/${month}/${year}, ${hours}.${minutes}`;
-          
-          
-          return formattedDate ;
-              }
-        function init_datetime_local(dateStringWithTime){
-    
-          // Pisahkan tanggal, jam, dan menit dari string
-          var dateTimeParts = dateStringWithTime.split(', ');
-          var datePart = dateTimeParts[0];
-          var timePart = dateTimeParts[1];
-          
-          var dateParts = datePart.split('/');
-          var day = (parseInt(dateParts[0], 10)).toString().padStart(2, '0');
-          var month = (parseInt(dateParts[1], 10) ).toString().padStart(2, '0'); // Bulan dimulai dari 1 (Januari = 1, Februari = 2, ...)
-          var year = parseInt(dateParts[2], 10);
-          
-          var timeParts = timePart.split('.');
-          var hours =(parseInt(timeParts[0], 10) + 1).toString().padStart(2, '0');;
-          var minutes = (parseInt(timeParts[1], 10) + 1).toString().padStart(2, '0');;
-          
-          // Membuat objek Date dengan tanggal, jam, dan menit yang ditentukan
-          var dateObject = year+"-"+month+"-"+day+"T"+hours+":"+minutes;
-          
-          return dateObject;
-              }
+  }
+  function reverse_datetime_local(dateStringWithTime) {
+    // Membuat objek Date dari string input
+    var date = new Date(dateStringWithTime);
+
+    // Mendapatkan komponen waktu
+    var day = date.getDate();
+    var month = date.getMonth() + 1; // bulan dimulai dari 1
+    var year = date.getFullYear();
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+
+    // Mengatur format sesuai keinginan
+    var formattedDate = `${day}/${month}/${year}, ${hours}.${minutes}`;
+
+    return formattedDate;
+  }
+  function init_datetime_local(dateStringWithTime) {
+    // Pisahkan tanggal, jam, dan menit dari string
+    var dateTimeParts = dateStringWithTime.split(", ");
+    var datePart = dateTimeParts[0];
+    var timePart = dateTimeParts[1];
+
+    var dateParts = datePart.split("/");
+    var day = parseInt(dateParts[0], 10).toString().padStart(2, "0");
+    var month = parseInt(dateParts[1], 10).toString().padStart(2, "0"); // Bulan dimulai dari 1 (Januari = 1, Februari = 2, ...)
+    var year = parseInt(dateParts[2], 10);
+
+    var timeParts = timePart.split(".");
+    var hours = (parseInt(timeParts[0], 10) + 1).toString().padStart(2, "0");
+    var minutes = (parseInt(timeParts[1], 10) + 1).toString().padStart(2, "0");
+
+    // Membuat objek Date dengan tanggal, jam, dan menit yang ditentukan
+    var dateObject =
+      year + "-" + month + "-" + day + "T" + hours + ":" + minutes;
+
+    return dateObject;
+  }
   /* on drop */
   (CalendarApp.prototype.onDrop = function (eventObj, date) {
-  
     var $this = this;
     // retrieve the dropped element's stored Event Object
     var originalEventObject = eventObj.data("eventObject");
@@ -95,41 +91,46 @@
     (CalendarApp.prototype.onEventClick = function (calEvent, jsEvent, view) {
       // edit dan hapus agenda
       var $this = this;
-      $this.$modal.find(".modal-title")
-      .empty()
-      .append("edit / hapus agenda")
+      $this.$modal.find(".modal-title").empty().append("edit / hapus agenda");
       var form = $("<form action='/edit-agenda' method='POST'></form>");
       form
-      .append("<div class='row'></div>")
-      .find(".row")
-      .append(
-        "<div class='col-md-12'><div class='form-group'><input class='form-control' placeholder='' value='"+
-        calEvent.id + "' type='hidden' name='id'/></div></div>"
-      )
-      .append(
-        "<div class='col-md-12'><div class='form-group'><label class='control-label'>Judul Agenda</label><input class='form-control' placeholder='Judul Agenda' value='"+
-        calEvent.title + "' type='text' name='title'/></div></div>"
-      )
-      .append(
-        "<div class='col-md-6'><div class='form-group'><label class='control-label'>Dari</label><input class='form-control' placeholder='Jam Mulai' value='"+
-        calEvent.jam_mulai + "' type='datetime-local' name='start'/></div></div>"
-      )
-      .append(
-        "<div class='col-md-6'><div class='form-group'><label class='control-label'>Sampai</label><input class='form-control' placeholder='Jam Selesai'value='"+
-        calEvent.jam_selesai + "' type='datetime-local' name='end'/></div></div>"
-      )
-      .append(
-        "<div class='col-md-12'><div class='form-group'><label class='control-label'>Pemimpin Kegiatan</label><input class='form-control' placeholder='ketua RT' value='"+
-        calEvent.pemimpin_kegiatan + "' type='text' name='pemimpin_kegiatan'/></div></div>"
-      )
-      .append(
-        "<div class='col-md-12'><div class='form-group'><label class='control-label'>Foto browsur <br><small>(*abaikan apabila tidak ada)</small></label><input class='form-control'value='"+
-        calEvent.foto + "' type='file' id='fotoo' name='foto'/></div></div>"
-      )
-      .append(
-        "<div class='col-md-12'><div class='form-group'><label class='control-label'>Keterangan Kegiatan</label><textarea class='form-control' name='keterangan' rows='3' placeholder='Acara ini diadakan dalam rangka...'>"+
-        calEvent.keterangan +"</textarea><small id='textHelp' class='form-text text-muted'></small></div></div>"
-      );
+        .append("<div class='row'></div>")
+        .find(".row")
+        .append(
+          "<div class='col-md-12'><div class='form-group'><input class='form-control' placeholder='' value='" +
+            calEvent.id +
+            "' type='hidden' name='id'/></div></div>"
+        )
+        .append(
+          "<div class='col-md-12'><div class='form-group'><label class='control-label'>Judul Agenda</label><input class='form-control' placeholder='Judul Agenda' value='" +
+            calEvent.title +
+            "' type='text' name='title'/></div></div>"
+        )
+        .append(
+          "<div class='col-md-6'><div class='form-group'><label class='control-label'>Dari</label><input class='form-control' placeholder='Jam Mulai' value='" +
+            calEvent.jam_mulai +
+            "' type='datetime-local' name='start'/></div></div>"
+        )
+        .append(
+          "<div class='col-md-6'><div class='form-group'><label class='control-label'>Sampai</label><input class='form-control' placeholder='Jam Selesai'value='" +
+            calEvent.jam_selesai +
+            "' type='datetime-local' name='end'/></div></div>"
+        )
+        .append(
+          "<div class='col-md-12'><div class='form-group'><label class='control-label'>Pemimpin Kegiatan</label><input class='form-control' placeholder='ketua RT' value='" +
+            calEvent.pemimpin_kegiatan +
+            "' type='text' name='pemimpin_kegiatan'/></div></div>"
+        )
+        .append(
+          "<div class='col-md-12'><div class='form-group'><label class='control-label'>Foto browsur <br><small>(*abaikan apabila tidak ada)</small></label><input class='form-control'value='" +
+            calEvent.foto +
+            "' type='file' id='fotoo' name='foto'/></div></div>"
+        )
+        .append(
+          "<div class='col-md-12'><div class='form-group'><label class='control-label'>Keterangan Kegiatan</label><textarea class='form-control' name='keterangan' rows='3' placeholder='Acara ini diadakan dalam rangka...'>" +
+            calEvent.keterangan +
+            "</textarea><small id='textHelp' class='form-text text-muted'></small></div></div>"
+        );
       $this.$modal.show();
       $(".bckdrop").addClass("show");
       $(".bckdrop").removeClass("hide");
@@ -156,85 +157,91 @@
           $this.$modal.hide("hide");
           $(".bckdrop").addClass("hide");
           $(".bckdrop").removeClass("show");
-              // Hapus agenda dengan Ajax
-    $.ajax({
-      type: 'DELETE',
-      url: '/delete-agenda/'+calEvent.id,
-      contentType: 'application/json',
-      success: function (response) {
-          console.log('Agenda deleted successfully:', response);
-      },
-      error: function (error) {
-          console.error('Error deleting agenda:', error);
-      }
-  });
-        });
-      $this.$modal.find(".edit-event")
-      .unbind("click")
-      .click(function () {
-        try {
-          // Kode yang mungkin menyebabkan kesalahan
-          calEvent.title = form.find("input[name=title]").val();
-          calEvent.jam_mulai = form.find("input[name=start]").val();
-          calEvent.jam_selesai = form.find("input[name=end]").val();
-          calEvent.pemimpin_kegiatan = form.find("input[name=pemimpin_kegiatan]").val();
-          calEvent.foto = form.find("input[name=foto]").val();
-          calEvent.keterangan = form.find("textarea[name=keterangan]").val();
-          var jam_mulai = reverse_datetime_local(calEvent.jam_mulai)
-          var jam_selesai = reverse_datetime_local(calEvent.jam_selesai)
-          let formData = new FormData();
-          formData.append('id',calEvent.id);
-          formData.append('title',calEvent.title);
-          formData.append('jam_mulai',jam_mulai );
-          formData.append('jam_selesai',jam_selesai);
-          formData.append('pemimpin_kegiatan',calEvent.pemimpin_kegiatan);
-          jQuery.each(jQuery('#fotoo')[0].files, function(i, file) {
-              formData.append('gambar', file);
-          });
-          formData.append('keterangan',String(calEvent.keterangan))
+          // Hapus agenda dengan Ajax
           $.ajax({
-            cache: false,
-            contentType: false,
-            processData: false,
-            method: 'PUT',
-            type: 'PUT', 
-            url: '/edit-agenda',
-            data: formData,
+            type: "DELETE",
+            url: "/delete-agenda/" + calEvent.id,
+            contentType: "application/json",
+            headers: {
+              Authorization: "Bearer " + token,
+            },
             success: function (response) {
-                console.log('Agenda edit successfully:', response.msg);
-                if(response.msg=="SUKSES"){
-                  alert("Agenda edit successfully")
-                  location.href("/admin/agenda")
-                }
-                else{
-                  alert("Error:"+response.msg)
-                }
+              console.log("Agenda deleted successfully:", response);
             },
             error: function (error) {
-                console.error('Error editing agenda:', error);
-                alert('Error:', error);
-            }
+              console.error("Error deleting agenda:", error);
+            },
+          });
         });
-          $this.$calendarObj.fullCalendar("updateEvent", calEvent);
-          $this.$modal.hide("hide");
-          $(".bckdrop").addClass("hide");
-          $(".bckdrop").removeClass("show");
-          $("body").removeClass("modal-open");
-      } catch (error) {
-          // Tangani kesalahan di sini
-          console.error("Terjadi kesalahan:", error);
-          // Anda dapat menambahkan logika atau pemberitahuan kesalahan tambahan di sini
-      }
-      });
+      $this.$modal
+        .find(".edit-event")
+        .unbind("click")
+        .click(function () {
+          try {
+            // Kode yang mungkin menyebabkan kesalahan
+            calEvent.title = form.find("input[name=title]").val();
+            calEvent.jam_mulai = form.find("input[name=start]").val();
+            calEvent.jam_selesai = form.find("input[name=end]").val();
+            calEvent.pemimpin_kegiatan = form
+              .find("input[name=pemimpin_kegiatan]")
+              .val();
+            calEvent.foto = form.find("input[name=foto]").val();
+            calEvent.keterangan = form.find("textarea[name=keterangan]").val();
+            var jam_mulai = reverse_datetime_local(calEvent.jam_mulai);
+            var jam_selesai = reverse_datetime_local(calEvent.jam_selesai);
+            let formData = new FormData();
+            formData.append("id", calEvent.id);
+            formData.append("title", calEvent.title);
+            formData.append("jam_mulai", jam_mulai);
+            formData.append("jam_selesai", jam_selesai);
+            formData.append("pemimpin_kegiatan", calEvent.pemimpin_kegiatan);
+            jQuery.each(jQuery("#fotoo")[0].files, function (i, file) {
+              formData.append("gambar", file);
+            });
+            formData.append("keterangan", String(calEvent.keterangan));
+            $.ajax({
+              cache: false,
+              contentType: false,
+              processData: false,
+              method: "PUT",
+              type: "PUT",
+              url: "/edit-agenda",
+              data: formData,
+              headers: {
+                Authorization: "Bearer " + token,
+              },
+              success: function (response) {
+                console.log("Agenda edit successfully:", response.msg);
+                if (response.msg == "SUKSES") {
+                  alert("Agenda edit successfully");
+                  location.href("/admin/agenda");
+                } else {
+                  alert("Error:" + response.msg);
+                }
+              },
+              error: function (error) {
+                console.error("Error editing agenda:", error);
+                alert("Error:", error);
+              },
+            });
+            $this.$calendarObj.fullCalendar("updateEvent", calEvent);
+            $this.$modal.hide("hide");
+            $(".bckdrop").addClass("hide");
+            $(".bckdrop").removeClass("show");
+            $("body").removeClass("modal-open");
+          } catch (error) {
+            // Tangani kesalahan di sini
+            console.error("Terjadi kesalahan:", error);
+            // Anda dapat menambahkan logika atau pemberitahuan kesalahan tambahan di sini
+          }
+        });
     }),
     /* on select */
     (CalendarApp.prototype.onSelect = function (start, end, allDay) {
       // tambah agenda
       var $this = this;
       $this.$modal.show();
-      $this.$modal.find(".modal-title")
-      .empty()
-      .append("tambah agenda")
+      $this.$modal.find(".modal-title").empty().append("tambah agenda");
       $(".bckdrop").addClass("show");
       $(".bckdrop").removeClass("hide");
       var form = $("<form action='/tambah-agenda' method='POST'></form>");
@@ -367,35 +374,33 @@
     var form = "";
     var today = new Date($.now());
 
-    var DataDB = document.getElementById('data-container').getAttribute('data-db');
-    DataDB = DataDB.replace(/'/g, '"')
-    DataDB = DataDB.replace("'", '"')
-    console.log(DataDB)
+    var DataDB = document
+      .getElementById("data-container")
+      .getAttribute("data-db");
+    DataDB = DataDB.replace(/'/g, '"');
+    DataDB = DataDB.replace("'", '"');
+    console.log(DataDB);
     var defaultEvents = [];
     var jsonData = JSON.parse(DataDB);
     for (var i = 0; i < jsonData.length; i++) {
       // Mengambil nilai id dan total dari setiap objek
       var title = jsonData[i].title;
-      console.log(title)
+      console.log(title);
       var start = jsonData[i].start;
       var end = jsonData[i].end;
-      var kategori= jsonData[i].kategori;
-      var className = '';
-      if (kategori == 'darurat'){ 
-        className = 'bg-light-danger border-start border-2 border-danger';
+      var kategori = jsonData[i].kategori;
+      var className = "";
+      if (kategori == "darurat") {
+        className = "bg-light-danger border-start border-2 border-danger";
+      } else if (kategori == "penting") {
+        className = "bg-warning border-start border-2 border-warning";
+      } else if (kategori == "event") {
+        className = "bg-light-success border-start border-2 border-success";
+      } else if (kategori == "pemberitahuan") {
+        className = "bg-light-warning border-start border-2 border-warning";
+      } else if (kategori == "pemilihan") {
+        className = "bg-light-primary border-start border-2 border-primary";
       }
-      else if (kategori == 'penting'){ 
-        className = 'bg-warning border-start border-2 border-warning';
-      }
-      else if (kategori == 'event'){ 
-        className = 'bg-light-success border-start border-2 border-success';
-      }
-      else if (kategori == 'pemberitahuan'){ 
-        className = 'bg-light-warning border-start border-2 border-warning';
-      }
-      else if (kategori == 'pemilihan'){ 
-        className = 'bg-light-primary border-start border-2 border-primary';
-      };
 
       let agenda = {
         title: title,
@@ -406,12 +411,11 @@
         className: className,
         id: jsonData[i].id,
         keterangan: jsonData[i].keterangan,
-        foto:jsonData[i].foto,
-        kategori:jsonData[i].kategori,
-        pemimpin_kegiatan:jsonData[i].pemimpin_kegiatan
-      }
+        foto: jsonData[i].foto,
+        kategori: jsonData[i].kategori,
+        pemimpin_kegiatan: jsonData[i].pemimpin_kegiatan,
+      };
       defaultEvents.push(agenda);
-
     }
     var $this = this;
     $this.$calendarObj = $this.$calendar.fullCalendar({
@@ -432,29 +436,17 @@
       droppable: false, // this allows things to be dropped onto the calendar !!!
       eventLimit: true, // allow "more" link when too many events
       selectable: true,
-      drop: function (date) { // hapus event agenda
+      drop: function (date) {
+        // hapus event agenda
         $this.onDrop($(this), date);
-    // delete  agenda
-    console.log(date);
-    $.ajax({
-      type: "delete",
-      url: "/delete-agenda", 
-      contentType: "application/json",
-      data: JSON.stringify(eventData),
-      success: function(response) {
-          console.log("Agenda deleted successfully:", response);
       },
-      error: function(error) {
-          console.error("Error saving event:", error);
-      }});
-      },
-      select: function (start, end, allDay) { // edit event agenda
+      select: function (start, end, allDay) {
+        // edit event agenda
         $this.onSelect(start, end, allDay);
-
       },
-      eventClick: function (calEvent, jsEvent, view) { //tambah event agenda
+      eventClick: function (calEvent, jsEvent, view) {
+        //tambah event agenda
         $this.onEventClick(calEvent, jsEvent, view);
-
       },
     });
 

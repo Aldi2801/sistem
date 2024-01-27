@@ -75,7 +75,9 @@
     <!-- All Jquery -->
     <!-- ============================================================= -->
     
-  <script>
+  <script>    
+  var token = "{{ session['jwt_token'] }}"
+    console.log(token)
     $(document).ready(function () {
         var quill = new Quill("#editor", {
             theme: "snow",

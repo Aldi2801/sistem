@@ -252,6 +252,24 @@
     <!-- Bootstrap tether Core JavaScript -->
     <script src="../../static/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <!-- apps -->
+    <script>
+      function handleResponse(data,crud,url) {
+        console.log(data);
+        try {
+            if (data.msg === "SUKSES") {
+                alert("Sukses "+crud+" data");
+                window.location.href = url;
+            } else {
+                alert("Gagal "+crud+" data");
+                window.location.href = url;
+            }
+        } catch (error) {
+            console.log(error);
+            alert("Error: " + error);
+            window.location.href = url;
+        }
+      }
+    </script>
     <script src="../../static/dist/js/app.min.js"></script>
     <script src="../../static/dist/js/app.init.stylish.js"></script>
     <script src="../../static/dist/js/app-style-switcher.js"></script>
@@ -275,8 +293,7 @@
     <!-- page agenda js-->
 
     <script src="../../static/assets/libs/moment/min/moment.min.js"></script>
-    <script src="../../static/assets/libs/fullcalendar/dist/fullcalendar.min.js"></script>
-    <script src="../../static/dist/js/pages/calendar/cal-init.js"></script>
+
     {% block js %}{% endblock js %}
   </body>
 </html>

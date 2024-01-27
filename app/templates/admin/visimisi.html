@@ -120,6 +120,8 @@
 </from>
 </div>
 <script>
+      var token = "{{ session['jwt_token'] }}"
+    console.log(token)
     $(document).ready(function () {
         var quill = new Quill("#editor", {
             theme: "snow",

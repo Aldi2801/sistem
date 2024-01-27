@@ -6,13 +6,16 @@ from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMix
 from flask_bcrypt import Bcrypt
 from datetime import timedelta
 from functools import wraps
+import os
 
 app = Flask(__name__)
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'sistem'
-app.config['UPLOAD_FOLDER'] = 'D:/KULIAH/sistemdesa/app/static/image'
+project_directory = os.path.abspath(os.path.dirname(__file__))
+upload_folder = os.path.join(project_directory, 'static', 'image')
+app.config['UPLOAD_FOLDER'] = upload_folder 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root@localhost/sistem'
 app.config['SECRET_KEY'] = 'bukan rahasia'
 app.config['SECURITY_PASSWORD_HASH'] = 'bcrypt'
