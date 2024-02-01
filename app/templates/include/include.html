@@ -1,3 +1,6 @@
+{% if session['jwt_token'] %}
+    <!-- Jika jwt_token ada -->
+
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
   <head>
@@ -15,13 +18,7 @@
     />
     <meta name="robots" content="noindex,nofollow" />
     <title>Admin Desa Pangkah</title>
-    <!-- Favicon icon -->
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="../../static/assets/images/favicon.png"
-    />
+    
     <!-- Side Bar -->
     <link
       rel="stylesheet"
@@ -285,7 +282,6 @@
     <script src="../../static/dist/js/custom.min.js"></script>
     <!-- This Page JS -->
     <script src="../../static/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
-    <script src="../../static/dist/js/pages/widget/card-custom.js"></script>
     <!-- Quill editor -->
     <script src="../../static/assets/libs/quill/dist/quill.min.js"></script>
     <!-- Table -->
@@ -297,3 +293,9 @@
     {% block js %}{% endblock js %}
   </body>
 </html>
+{% else %}
+    <!-- Jika jwt_token tidak ada -->
+    <script>
+        window.location.href = "/";
+    </script>
+{% endif %}

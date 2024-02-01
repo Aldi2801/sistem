@@ -4,7 +4,6 @@
       rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
     />
-    {% block head %}
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <!-- Tell the browser to be responsive to screen width -->
@@ -13,6 +12,22 @@
     <title>sistemdesa</title>
    
     <link href="../static/dist/css/style.min.css" rel="stylesheet" />
+    
+  <!-- Table -->
+  <link
+  href="../static/assets/extra-libs/datatables.net-bs4/css/dataTables.bootstrap4.css"
+  rel="stylesheet">
+    
+    <link href="../static/dist/css/style.min.css" rel="stylesheet" />
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="../static/assets/libs/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="../static/assets/extra-libs/taskboard/js/jquery-ui.min.js"></script>
     <style type="text/css">
       .text-yellow {
         color: #ffff00 !important;
@@ -52,6 +67,7 @@
         padding: 5px;
         margin: 5px;
         border-radius: 10px;
+        border-bottom-right-radius: 0px;
         display: inline-block;
         align-self: flex-end; /* Let user's message align to the right */
       }
@@ -64,6 +80,7 @@
         padding: 5px;
         margin: 5px;
         border-radius: 10px;
+        border-bottom-left-radius: 0px;
         display: inline-block;
         align-self: flex-start; /* Let bot's message align to the left */
       }
@@ -73,11 +90,41 @@
         display: flex;
         flex-direction: column; /* Stack messages vertically */
       }
+      /* CSS */
+      .floating-button {
+        position: fixed;
+        z-index:99999;
+        bottom: 20px; /* Atur sesuai dengan posisi vertikal yang diinginkan */
+        right: 20px; /* Atur sesuai dengan posisi horizontal yang diinginkan */
+        border: none;
+        padding: 15px 25px; /* Padding untuk meningkatkan area klik */
+        border-radius: 50%; /* Agar tombol berbentuk lingkaran */
+        font-size: 16px;
+        cursor: pointer;
+        /* Tambahkan efek hover jika diinginkan */
+        transition: background-color 0.3s ease;
+      }
+      .Bot-time {
+        float: left;
+        margin: 5px;
+        text-align: left;
+        display: inline-block;
+        align-self: flex-start; /* Let bot's message align to the left */
+      }
+      .You-time {
+        float: right;
+        margin: 5px;
+        text-align: right;
+        display: inline-block;
+        align-self: flex-end; /* Let user's message align to the right */
+      }
+      .chat-time {
+        font-size: 12px;
+        color: #888;
+        margin-top: 5px;
+      }
     </style>
-    {% endblock %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    {% block head %}{% endblock %}
   </head>
 
   <body style="background-color: #e6f4ff">
@@ -156,9 +203,7 @@
                   <a class="dropdown-item" href="/pemerintahan_desa"
                     >PEMERINTAH DESA</a
                   >
-                  <a class="dropdown-item" href="#"
-                    >BADAN PERMUSYAWARATAN DESA</a
-                  >
+                  <a class="dropdown-item" href="#">BADAN PERMUSYAWARATAN DESA</a>
                 </div>
               </div>
             </li>
@@ -228,25 +273,21 @@
             </li>
             <li class="nav-item">
               <div class="btn-group" role="group">
-                <button
-                  id="btnGroupDrop1"
-                  type="button"
-                  class="dropdown-item btn text-secondary font-weight-medium dropdown-toggle"
-                  data-bs-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  Agenda
-                </button>
+                <a href="/agenda"
+                id="btnGroupDrop1"
+                class="dropdown-item btn text-secondary font-weight-medium dropdown-toggle">
+                Agenda Kegiatan 
+                </a>
               </div>
             </li>
             <button
               type="button"
-              class="btn btn-primary"
-              data-toggle="modal"
-              data-target="#chatModal"
+              class="btn btn-primary floating-button"
+              data-bs-toggle="modal"
+              data-bs-target="#chatModal"
+              onclick="set_time()"
             >
-              Open Chat Bot
+              Chat Bot
             </button>
             <!-- ============================================================== -->
             <!-- End Messages -->
@@ -342,17 +383,20 @@
               
                 <div class="modal-header">
                   <h4 class="modal-title">Chat Bot</h4>
-                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
                 </div>
                 
                 <div class="modal-body">
-                  <div id="chatMessages" class="pre-scrollable" style="max-height:350px; margin-bottom:20px;"></div>
+                  <div id="chatMessages" class="pre-scrollable" style="max-height:350px; margin-bottom:20px;">
+                    <div class="bot-message " style="border-bottom-left-radius: 0px;"><strong>Bot:</strong> Welcome to the chat bot. How can I help you?</div>
+                    <div class="Bot-time chat-time"id="welcome-time"></div>
+                  </div>
                   <input type="text"  id="userMessage"  class="form-control" placeholder="Type a message...">
                   <button type="button" class="btn btn-primary mt-2" id="sendMessage">Send</button>
                 </div>
                 
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
                 
               </div>
@@ -360,12 +404,13 @@
           </div>
 
         <script>
+          function set_time(){
+            const currentTime = new Date(); 
+            $('#welcome-time').html(`${currentTime.getHours()}:${currentTime.getMinutes()}`)
+          }
           $(document).ready(function () {
             // Initial message from the bot
-            appendMessage(
-              "Bot",
-              "Welcome to the chat bot. How can I help you?"
-            );
+          
 
             $("#sendMessage").click(function () {
               sendtoserver();
@@ -402,7 +447,8 @@
               });
             }
             function appendMessage(sender, message, messageClass) {
-                var messageHTML = `<div class="${messageClass}"><strong>${sender}:</strong> ${message}</div>`;
+                const currentTime = new Date(); 
+                var messageHTML = `<div class="${messageClass} "><strong>${sender}:</strong> ${message}</div><div class="${sender}-time chat-time">${currentTime.getHours()}:${currentTime.getMinutes()}</div>`;
                 $("#chatMessages").append(messageHTML);
               }
           });
@@ -416,49 +462,27 @@
       </div>
       2023© All Rights Reserved
     </footer>
-    <script src="../static/assets/libs/jquery/dist/jquery.min.js"></script>
     <script src="../static/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../static/dist/js/app.min.js"></script>
     <script src="../static/dist/js/app.init.stylish.js"></script>
     <script src="../static/dist/js/app-style-switcher.js"></script>
+    <!-- slimscrollbar scrollbar JavaScript -->
     <script src="../static/assets/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
     <script src="../static/assets/extra-libs/sparkline/sparkline.js"></script>
+    <!--Wave Effects -->
     <script src="../static/dist/js/waves.js"></script>
-    <script src="../static/dist/js/sidebarmenu.js"></script>
+    <!--Custom JavaScript -->
+    <script src="../../static/dist/js/feather.min.js"></script>
     <script src="../static/dist/js/feather.min.js"></script>
     <script src="../static/dist/js/custom.min.js"></script>
-    <script>
-      var paket = "";
-      $("input").on("click", function () {
-        console.log($("input:checked").val() + " is checked!");
-        var paket = $("input:checked").val();
-      });
-      function send() {
-        var email = $("#email").val();
-        var pswd = $("#pswd").val();
-        var reqhero = $("#reqhero").val();
-        var catatan = $("#catatan").val();
-        var userid = $("#userid").val();
-        var loginmethod = $("#loginvia").val();
-        var paket = $("input:checked").val();
-        console.log(email, pswd, reqhero, catatan, userid, loginmethod, paket);
-        var url =
-          "https://wa.me/6281227589209?text=email:%20" +
-          email +
-          "%0D%0Apassword:%20" +
-          pswd +
-          "%0D%0ARequest%20Hero:%20" +
-          reqhero +
-          "%0D%0ACatatan:%20" +
-          catatan +
-          "%0D%0AUser%20ID%20dan%20Nick%20Name:%20" +
-          userid +
-          "%0D%0ALogin%20Via:%20" +
-          loginmethod +
-          "%0D%0APaket:%20" +
-          paket;
-        window.open(url, "_blank");
-      }
-    </script>
+    <!-- This Page JS -->
+    <!-- Quill editor -->
+    <script src="../static/assets/libs/quill/dist/quill.min.js"></script>
+    <!-- Table -->
+    <script src="../static/assets/extra-libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <!-- page agenda js-->
+
+    <script src="../static/assets/libs/moment/min/moment.min.js"></script>
+    {% block js %}{% endblock js %}
   </body>
 </html>

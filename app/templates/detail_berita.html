@@ -1,106 +1,109 @@
-{% extends 'include/base.html' %} 
+{% extends 'include/base.html' %}
 {% block head %}
 {{ super() }}
 <style>
-    .image-container {
-    max-width: 100%; /* Maksimum lebar sesuai dengan lebar layar */
-    height: auto; /* Tinggi disesuaikan agar proporsinya tetap */
-    text-align: center; /* Untuk memusatkan gambar jika perlu */
-}
+  .image-container {
+    max-width: 100%;
+    /* Maksimum lebar sesuai dengan lebar layar */
+    height: auto;
+    /* Tinggi disesuaikan agar proporsinya tetap */
+    text-align: center;
+    /* Untuk memusatkan gambar jika perlu */
+  }
 
-.image-container img {
-    max-width: 100%; /* Maksimum lebar gambar sesuai dengan lebar layar */
-    height: auto; /* Tinggi disesuaikan agar proporsinya tetap */
-    display: inline-block; /* Untuk menghindari space ekstra di bawah gambar */
-}
-
+  .image-container img {
+    max-width: 100%;
+    /* Maksimum lebar gambar sesuai dengan lebar layar */
+    height: auto;
+    /* Tinggi disesuaikan agar proporsinya tetap */
+    display: inline-block;
+    /* Untuk menghindari space ekstra di bawah gambar */
+  }
 </style>
 {% endblock %}
 {% block content %}
 
 <div class="page-titles">
-    <div class="row">
-      <div class="col-lg-8 col-md-6 col-12 align-self-center">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb mb-0 d-flex align-items-center">
-            <li class="breadcrumb-item">
-              <a href="index.html" class="link"
-                ><i class="ri-home-3-line fs-5"></i
-              ></a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">Detail Berita</li>
-          </ol>
-        </nav>
-        <h1 class="mb-0 fw-bold">{{info_list[0]['judul']}}</h1>
-      </div>
-      
+  <div class="row">
+    <div class="col-lg-8 col-md-6 col-12 align-self-center">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0 d-flex align-items-center">
+          <li class="breadcrumb-item">
+            <a href="index.html" class="link"><i class="ri-home-3-line fs-5"></i></a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">Detail Berita</li>
+        </ol>
+      </nav>
+      <h1 class="mb-0 fw-bold">{{info_list[0]['judul']}}</h1>
     </div>
+
   </div>
-  <div class="container-fluid">
-    <!-- ============================================================= -->
-    <!-- Start Page Content -->
-    <!-- ============================================================= -->
-    <!-- user card -->
-    
-    <div class="row">
-      <div class="col-lg-8">
-        <div style="margin: 0px">
-      <div class="card">
-        <div class="card-body">
-          <h4 class="card-title">{{info_list[0]['judul']}}</h4>
-          
-          <div class="py-3 d-flex align-items-center">
-            <span class="btn btn-primary btn-circle">
-              <i  data-feather="user" ></i> </span>
-            <div class="ms-3">
-              <h5 class="mb-0 fw-bold">Admin</h5>
-              <span class="text-muted fs-9">{{info_list[0]['tanggal']}}</span>
+</div>
+<div class="container-fluid">
+  <!-- ============================================================= -->
+  <!-- Start Page Content -->
+  <!-- ============================================================= -->
+  <!-- user card -->
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div style="margin: 0px">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">{{info_list[0]['judul']}}</h4>
+
+            <div class="py-3 d-flex align-items-center">
+              <span class="btn btn-primary btn-circle">
+                <i data-feather="user"></i> </span>
+              <div class="ms-3">
+                <h5 class="mb-0 fw-bold">Admin</h5>
+                <span class="text-muted fs-9">{{info_list[0]['tanggal']}}</span>
+              </div>
+
             </div>
-           
+            <div class="image-container">
+              <img src="../static/image/{{info_list[0]['gambar']}}" class="responsive-image"
+                alt="Deskripsi gambar Anda">
+            </div><br>
+            {{info_list[0]['deskripsifull']|safe}}
           </div>
-        <div class="image-container">
-            <img src="../static/image/{{info_list[0]['gambar']}}"  class="responsive-image"  alt="Deskripsi gambar Anda">
-        </div><br>
-          {{info_list[0]['deskripsifull']|safe}}
         </div>
       </div>
-    </div>
     </div>
 
 
     <div class="col-lg-4 mt-4 mt-md-0">
       <div class="card">
-          <div class="card-body">
-              <center>
-                  <img src="../static/image/logo.png" style="width: 150px; height: 100px;"
-                      alt="logo admin"><br><br>
-              </center>
-              <h4>Sistem Informasi desa pangkah</h4>
-              <p><strong>Desa pangkah</strong> berada di kecamatan Pangkah Kab. Tegal, dengan sebagian
-                  besar penduduknya sebagai Perindustrian/jasa menjadikan desa pangkah memiliki potensi
-                  wisata .</p><br>
-              <p>Dengan luas wilayah 62.98 m<sup>2</sup> ini populasinya dianggap cukup karena dari total
-                  penduduk sebesar 2950, terbagi para laki-laki di pangkah sebanyak 1474 orang dan 1476
-                  sisanya wanita.</p><br>
-              <br><br><br><br><br><br><br><br><br><br><br><br>
-          </div>
+        <div class="card-body">
+          <center>
+            <img src="../static/image/logo.png" style="width: 150px; height: 100px;" alt="logo admin"><br><br>
+          </center>
+          <h4>Sistem Informasi desa pangkah</h4>
+          <p><strong>Desa pangkah</strong> berada di kecamatan Pangkah Kab. Tegal, dengan sebagian
+            besar penduduknya sebagai Perindustrian/jasa menjadikan desa pangkah memiliki potensi
+            wisata .</p><br>
+          <p>Dengan luas wilayah 62.98 m<sup>2</sup> ini populasinya dianggap cukup karena dari total
+            penduduk sebesar 2950, terbagi para laki-laki di pangkah sebanyak 1474 orang dan 1476
+            sisanya wanita.</p><br>
+          <br><br><br><br><br><br><br><br><br><br><br><br>
+        </div>
       </div>
       <div class="card">
-          <div class="card-body">
-              <h4 class="text-uppercase">Kontak Bantuan</h4>
-              <hr>
-              <h4 class="d-flex align-item-center">
-                  <i class="ri-smartphone-line"></i> 081227589209
-              </h4>
-              <small>Please contact with us if you have any questions. We are
-                  avalible 24h.</small>
-          </div>
+        <div class="card-body">
+          <h4 class="text-uppercase">Kontak Bantuan</h4>
+          <hr>
+          <h4 class="d-flex align-item-center">
+            <i class="ri-smartphone-line"></i> 081227589209
+          </h4>
+          <small>Please contact with us if you have any questions. We are
+            avalible 24h.</small>
+        </div>
       </div>
+    </div>
   </div>
-  </div>/y 7654
-    <!-- ============================================================= -->
-    <!-- End PAge Content -->
-    <!-- ============================================================= -->
-  </div>
-  
+  <!-- ============================================================= -->
+  <!-- End PAge Content -->
+  <!-- ============================================================= -->
+</div>
+
 {% endblock %}

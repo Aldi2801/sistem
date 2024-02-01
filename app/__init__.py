@@ -1,4 +1,4 @@
-from flask import Flask,jsonify,request,session,render_template
+from flask import Flask,jsonify,request,session,render_template,g
 from flask_sqlalchemy import SQLAlchemy
 from flask_mysqldb import MySQL
 from flask_jwt_extended import JWTManager

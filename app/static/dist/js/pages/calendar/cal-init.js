@@ -68,6 +68,21 @@
 
     return dateObject;
   }
+  function init_classname(kategori){
+    let className = "";
+    if (kategori == "darurat") {
+      className = "bg-light-danger border-start border-2 border-danger";
+    } else if (kategori == "penting") {
+      className = "bg-warning border-start border-2 border-warning";
+    } else if (kategori == "event") {
+      className = "bg-light-success border-start border-2 border-success";
+    } else if (kategori == "pemberitahuan") {
+      className = "bg-light-warning border-start border-2 border-warning";
+    } else if (kategori == "pemilihan") {
+      className = "bg-light-primary border-start border-2 border-primary";
+    }
+    return className;
+  }
   /* on drop */
   (CalendarApp.prototype.onDrop = function (eventObj, date) {
     var $this = this;
@@ -97,9 +112,8 @@
         .append("<div class='row'></div>")
         .find(".row")
         .append(
-          "<div class='col-md-12'><div class='form-group'><input class='form-control' placeholder='' value='" +
-            calEvent.id +
-            "' type='hidden' name='id'/></div></div>"
+          "<div class='col-md-12'><div class='form-group'><input class='form-control' placeholder='' value='" + 
+          calEvent.id + "' type='hidden' name='id'/></div></div>"
         )
         .append(
           "<div class='col-md-12'><div class='form-group'><label class='control-label'>Judul Agenda</label><input class='form-control' placeholder='Judul Agenda' value='" +
@@ -124,7 +138,7 @@
         .append(
           "<div class='col-md-12'><div class='form-group'><label class='control-label'>Foto browsur <br><small>(*abaikan apabila tidak ada)</small></label><input class='form-control'value='" +
             calEvent.foto +
-            "' type='file' id='fotoo' name='foto'/></div></div>"
+            "' type='file' id='foto_edit' name='foto'/></div></div>"
         )
         .append(
           "<div class='col-md-12'><div class='form-group'><label class='control-label'>Keterangan Kegiatan</label><textarea class='form-control' name='keterangan' rows='3' placeholder='Acara ini diadakan dalam rangka...'>" +
@@ -195,7 +209,7 @@
             formData.append("jam_mulai", jam_mulai);
             formData.append("jam_selesai", jam_selesai);
             formData.append("pemimpin_kegiatan", calEvent.pemimpin_kegiatan);
-            jQuery.each(jQuery("#fotoo")[0].files, function (i, file) {
+            jQuery.each(jQuery("#foto_edit")[0].files, function (i, file) {
               formData.append("gambar", file);
             });
             formData.append("keterangan", String(calEvent.keterangan));
@@ -235,6 +249,16 @@
             // Anda dapat menambahkan logika atau pemberitahuan kesalahan tambahan di sini
           }
         });
+        $this.$modal.find(".close-dialog").click(function () {
+          $this.$modal.hide("hide");
+          $(".bckdrop").addClass("hide");
+          $(".bckdrop").removeClass("show");
+          $("body").removeClass("modal-open");
+        });
+        $("body").addClass("modal-open");
+       
+        $this.$calendarObj.fullCalendar("unselect");
+  
     }),
     /* on select */
     (CalendarApp.prototype.onSelect = function (start, end, allDay) {
@@ -264,7 +288,7 @@
           "<div class='col-md-12'><div class='form-group'><label class='control-label'>Pemimpin Kegiatan</label><input class='form-control' placeholder='ketua RT'  type='text' name='pemimpin_kegiatan'/></div></div>"
         )
         .append(
-          "<div class='col-md-12'><div class='form-group'><label class='control-label'>Foto browsur <br><small>(*abaikan apabila tidak ada)</small></label><input class='form-control' type='file' name='foto'/></div></div>"
+          "<div class='col-md-12'><div class='form-group'><label class='control-label'>Foto browsur <br><small>(*abaikan apabila tidak ada)</small></label><input class='form-control' type='file' name='foto_tambah'/></div></div>"
         )
         .append(
           "<div class='col-md-12'><div class='form-group'><label class='control-label'>Keterangan Kegiatan</label><textarea class='form-control' name='keterangan' rows='3' placeholder='Acara ini diadakan dalam rangka...'></textarea><small id='textHelp' class='form-text text-muted'></small></div></div>"
@@ -316,29 +340,93 @@
       $("body").addClass("modal-open");
       $this.$modal.find("form").on("submit", function () {
         var title = form.find("input[name='title']").val();
-        var beginning = form.find("input[name='beginning']").val();
-        var ending = form.find("input[name='ending']").val();
+        try {
+          // Kode yang mungkin menyebabkan kesalahan 
+          var beginning = form.find("input[name='beginning']").val();
+          var ending = form.find("input[name='ending']").val();
+          var title = form.find("input[name=title]").val();
+          var jam_mulai = form.find("input[name=start]").val();
+          var jam_selesai = form.find("input[name=end]").val();
+          var pemimpin_kegiatan = form
+            .find("input[name=pemimpin_kegiatan]")
+            .val();
+          var foto = form.find("input[name=foto]").val();
+          var keterangan = form.find("textarea[name=keterangan]").val();
+          var jam_mulai = reverse_datetime_local(jam_mulai);
+          var jam_selesai = reverse_datetime_local(jam_selesai);
+          let formData = new FormData();
+          formData.append("title", title);
+          formData.append("jam_mulai", jam_mulai);
+          formData.append("jam_selesai", jam_selesai);
+          formData.append("pemimpin_kegiatan", pemimpin_kegiatan);
+          jQuery.each(jQuery("#foto_tambah")[0].files, function (i, file) {
+            formData.append("gambar", file);
+          });
+          formData.append("keterangan", String(keterangan));
+          $.ajax({
+            cache: false,
+            contentType: false,
+            processData: false,
+            method: "POST",
+            type: "POST",
+            url: "/tambah-agenda",
+            data: formData,
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+            success: function (response) {
+              console.log("Agenda add successfully:", response.msg);
+              if (response.msg == "SUKSES") {
+                alert("Agenda add successfully");
+                location.href("/admin/agenda");
+                if (title !== null && title.length != 0) {
+                  $this.$calendarObj.fullCalendar(
+                    "renderEvent",
+                    {
+                      title: title,
+                      start: init_date(start),
+                      end: init_date(end),
+                      jam_mulai: init_datetime_local(start),
+                      jam_selesai: init_datetime_local(end),
+                      className: className,
+                      id: response.id,
+                      keterangan: keterangan,
+                      foto: foto,
+                      kategori: kategori,
+                      pemimpin_kegiatan: pemimpin_kegiatan,
+                      allDay: false,
+                      className: categoryClass,
+                    },
+                    true
+                  );
+                  $this.$modal.hide("hide");
+                  $(".bckdrop").addClass("hide");
+                  $(".bckdrop").removeClass("show");
+        
+                } else {
+                  alert("You have to give a title to your event");
+                }
+              } else {
+                alert("Error:" + response.msg);
+              }
+            },
+            error: function (error) {
+              console.error("Error add agenda:", error);
+              alert("Error:", error);
+              
+            },
+          });
+        }
+          catch (error) {
+            // Tangani kesalahan di sini
+            console.error("Terjadi kesalahan:", error);
+            // Anda dapat menambahkan logika atau pemberitahuan kesalahan tambahan di sini
+          }
+        
         var categoryClass = form
           .find("select[name='category'] option:checked")
           .val();
-        if (title !== null && title.length != 0) {
-          $this.$calendarObj.fullCalendar(
-            "renderEvent",
-            {
-              title: title,
-              start: start,
-              end: end,
-              allDay: false,
-              className: categoryClass,
-            },
-            true
-          );
-          $this.$modal.hide("hide");
-          $(".bckdrop").addClass("hide");
-          $(".bckdrop").removeClass("show");
-        } else {
-          alert("You have to give a title to your event");
-        }
+        
         return false;
       });
       $this.$calendarObj.fullCalendar("unselect");
@@ -389,19 +477,7 @@
       var start = jsonData[i].start;
       var end = jsonData[i].end;
       var kategori = jsonData[i].kategori;
-      var className = "";
-      if (kategori == "darurat") {
-        className = "bg-light-danger border-start border-2 border-danger";
-      } else if (kategori == "penting") {
-        className = "bg-warning border-start border-2 border-warning";
-      } else if (kategori == "event") {
-        className = "bg-light-success border-start border-2 border-success";
-      } else if (kategori == "pemberitahuan") {
-        className = "bg-light-warning border-start border-2 border-warning";
-      } else if (kategori == "pemilihan") {
-        className = "bg-light-primary border-start border-2 border-primary";
-      }
-
+      var className = init_classname(kategori);
       let agenda = {
         title: title,
         start: init_date(start),
