@@ -232,6 +232,8 @@
                       </div>
                     </div>
                   </form>
+                    <label class="form-check-label" for="inlineCheckbox1">Reset Gambar?</label>
+                    <input class="form-check-input" type="checkbox" id="reset-{{i.id}}">
                   <h4>Jabatan</h4>
             <form>
               <div class="form-group">
@@ -405,9 +407,11 @@
     var edittanggalsk = $('#edittanggalskbaru-'+id).val()
     var editmasajabatan = $('#editmasajabatanbaru-'+id).val()
     var editstatus = $('#editstatusbaru-'+id).val()
+    var reset = $('#reset-'+id).prop('checked');
+    console.log(reset)
     formData.append('id',id);
     formData.append('nama_lengkap',editnama)
-    jQuery.each(jQuery('#editfoto-'+id)[0].files, function(i, file) {
+    $.each($('#editfoto-'+id)[0].files, function(i, file) {
       formData.append('gambar', file);
   });
     formData.append('jabatan',editjabatan)
@@ -420,6 +424,7 @@
     formData.append('tanggalsk',edittanggalsk)
     formData.append('masa_jabatan',editmasajabatan)
     formData.append('status',editstatus)
+    formData.append('reset',reset)
       $.ajax({
         url: "/admin/edit_anggota",
         data: formData,

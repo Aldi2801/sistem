@@ -180,7 +180,7 @@
               Authorization: "Bearer " + token,
             },
             success: function (response) {
-              console.log("Agenda deleted successfully:", response);
+              handleResponse(response, "menghapus", "/admin/agenda");
             },
             error: function (error) {
               console.error("Error deleting agenda:", error);
@@ -196,9 +196,7 @@
             calEvent.title = form.find("input[name=title]").val();
             calEvent.jam_mulai = form.find("input[name=start]").val();
             calEvent.jam_selesai = form.find("input[name=end]").val();
-            calEvent.pemimpin_kegiatan = form
-              .find("input[name=pemimpin_kegiatan]")
-              .val();
+            calEvent.pemimpin_kegiatan = form .find("input[name=pemimpin_kegiatan]") .val();
             calEvent.foto = form.find("input[name=foto]").val();
             calEvent.keterangan = form.find("textarea[name=keterangan]").val();
             var jam_mulai = reverse_datetime_local(calEvent.jam_mulai);
@@ -209,7 +207,7 @@
             formData.append("jam_mulai", jam_mulai);
             formData.append("jam_selesai", jam_selesai);
             formData.append("pemimpin_kegiatan", calEvent.pemimpin_kegiatan);
-            jQuery.each(jQuery("#foto_edit")[0].files, function (i, file) {
+            $.each($("#foto_edit")[0].files, function (i, file) {
               formData.append("gambar", file);
             });
             formData.append("keterangan", String(calEvent.keterangan));
@@ -225,13 +223,7 @@
                 Authorization: "Bearer " + token,
               },
               success: function (response) {
-                console.log("Agenda edit successfully:", response.msg);
-                if (response.msg == "SUKSES") {
-                  alert("Agenda edit successfully");
-                  location.href("/admin/agenda");
-                } else {
-                  alert("Error:" + response.msg);
-                }
+                handleResponse(response, "mengedit", "/admin/agenda");
               },
               error: function (error) {
                 console.error("Error editing agenda:", error);
@@ -288,7 +280,7 @@
           "<div class='col-md-12'><div class='form-group'><label class='control-label'>Pemimpin Kegiatan</label><input class='form-control' placeholder='ketua RT'  type='text' name='pemimpin_kegiatan'/></div></div>"
         )
         .append(
-          "<div class='col-md-12'><div class='form-group'><label class='control-label'>Foto browsur <br><small>(*abaikan apabila tidak ada)</small></label><input class='form-control' type='file' name='foto_tambah'/></div></div>"
+          "<div class='col-md-12'><div class='form-group'><label class='control-label'>Foto browsur <br><small>(*abaikan apabila tidak ada)</small></label><input class='form-control' type='file' id='foto_tambah'></div></div>"
         )
         .append(
           "<div class='col-md-12'><div class='form-group'><label class='control-label'>Keterangan Kegiatan</label><textarea class='form-control' name='keterangan' rows='3' placeholder='Acara ini diadakan dalam rangka...'></textarea><small id='textHelp' class='form-text text-muted'></small></div></div>"
@@ -339,18 +331,12 @@
       });
       $("body").addClass("modal-open");
       $this.$modal.find("form").on("submit", function () {
-        var title = form.find("input[name='title']").val();
         try {
           // Kode yang mungkin menyebabkan kesalahan 
-          var beginning = form.find("input[name='beginning']").val();
-          var ending = form.find("input[name='ending']").val();
           var title = form.find("input[name=title]").val();
           var jam_mulai = form.find("input[name=start]").val();
           var jam_selesai = form.find("input[name=end]").val();
-          var pemimpin_kegiatan = form
-            .find("input[name=pemimpin_kegiatan]")
-            .val();
-          var foto = form.find("input[name=foto]").val();
+          var pemimpin_kegiatan = form .find("input[name=pemimpin_kegiatan]") .val();
           var keterangan = form.find("textarea[name=keterangan]").val();
           var jam_mulai = reverse_datetime_local(jam_mulai);
           var jam_selesai = reverse_datetime_local(jam_selesai);
@@ -359,7 +345,7 @@
           formData.append("jam_mulai", jam_mulai);
           formData.append("jam_selesai", jam_selesai);
           formData.append("pemimpin_kegiatan", pemimpin_kegiatan);
-          jQuery.each(jQuery("#foto_tambah")[0].files, function (i, file) {
+          $.each($("#foto_tambah")[0].files, function (i, file) {
             formData.append("gambar", file);
           });
           formData.append("keterangan", String(keterangan));
@@ -375,45 +361,14 @@
               Authorization: "Bearer " + token,
             },
             success: function (response) {
-              console.log("Agenda add successfully:", response.msg);
-              if (response.msg == "SUKSES") {
-                alert("Agenda add successfully");
-                location.href("/admin/agenda");
-                if (title !== null && title.length != 0) {
-                  $this.$calendarObj.fullCalendar(
-                    "renderEvent",
-                    {
-                      title: title,
-                      start: init_date(start),
-                      end: init_date(end),
-                      jam_mulai: init_datetime_local(start),
-                      jam_selesai: init_datetime_local(end),
-                      className: className,
-                      id: response.id,
-                      keterangan: keterangan,
-                      foto: foto,
-                      kategori: kategori,
-                      pemimpin_kegiatan: pemimpin_kegiatan,
-                      allDay: false,
-                      className: categoryClass,
-                    },
-                    true
-                  );
-                  $this.$modal.hide("hide");
-                  $(".bckdrop").addClass("hide");
-                  $(".bckdrop").removeClass("show");
-        
-                } else {
-                  alert("You have to give a title to your event");
-                }
-              } else {
-                alert("Error:" + response.msg);
-              }
+              $this.$modal.hide("hide");
+              $(".bckdrop").addClass("hide");
+              $(".bckdrop").removeClass("show");
+              handleResponse(response, "tambah", "/admin/agenda");
             },
             error: function (error) {
               console.error("Error add agenda:", error);
               alert("Error:", error);
-              
             },
           });
         }
@@ -422,10 +377,6 @@
             console.error("Terjadi kesalahan:", error);
             // Anda dapat menambahkan logika atau pemberitahuan kesalahan tambahan di sini
           }
-        
-        var categoryClass = form
-          .find("select[name='category'] option:checked")
-          .val();
         
         return false;
       });

@@ -16,21 +16,30 @@ def teardown_request(exception):
         g.con.close()
         
 def do_image(do, table, id):
-        if do == "tambah":
-            file = request.files['gambar']
-            if file:
-                return resize_and_save_image(file)
-            else:
-                return  jsonify({"status": True,"msg":"default.jpg"})
-        elif do == "delete":
+    try:
+        if do == "delete":
             filename = get_image_filename(table, id)
             delete_image(filename)
             return True
-        elif do == "edit":
-            file = request.files['gambar']
+        file = request.files['gambar']
+        if file is None or file.filename == '':
+            return "default.jpg"                  
+        else:
             filename = get_image_filename(table, id)
-            delete_image(filename)
+            delete_image(filename) 
             return resize_and_save_image(file, table, id)
+    except KeyError:
+        if do == "edit":
+            reset = request.form['reset']
+            print(reset)
+            if reset=="true":
+                g.con.execute(f"UPDATE {table} SET gambar = %s WHERE id = %s", ("default.jpg", id))
+                mysql.connection.commit()
+        return "default.jpg"# Tangkap kesalahan jika kunci 'gambar' tidak ada dalam request.files
+    except FileNotFoundError:
+        pass  # atau return "File tidak ditemukan."
+    except Exception as e:
+        return str(e)
 
 def resize_and_save_image(file, table=None, id=None):
     img = Image.open(file).convert('RGB').resize((600, 300))
@@ -42,7 +51,7 @@ def resize_and_save_image(file, table=None, id=None):
     img.save(destination)
     if table and id:
         g.con.execute(f"UPDATE {table} SET gambar = %s WHERE id = %s", (random_name, id))
-        g.con.commit()
+        mysql.connection.commit()
         return True
     else:
         return random_name
@@ -75,7 +84,7 @@ def insert_data_from_dataframe(df, table):
     for index, row in df.iterrows():
         sql = f"INSERT INTO {table} (no, uraian, anggaran, realisasi, `lebih/(kurang)`, tahun) VALUES (%s, %s, %s, %s, %s, %s)"
         g.con.execute(sql, (row[0], row[1], row[2], row[3], row[4], row[5]))
-    g.con.commit()
+    mysql.connection.commit()
 
 #halaman admin
 @app.route('/admin/dashboard')
@@ -96,27 +105,27 @@ def tambah_info():
     visi = request.form['visi']
     misi = request.form['misi']
     g.con.execute("INSERT INTO sejarah (sejarah , visi, misi) VALUES (%s,%s,%s)",(sejarah , visi, misi))
-    g.con.commit()
+    mysql.connection.commit()
     return jsonify("msg : SUKSES")
 
 #edit info data
 @app.route('/edit_info', methods=['POST'])
 @jwt_required()
-def edit_info():
+def infoedit():
     id = request.form['id']
     sejarah = request.form['sejarah']
     visi = request.form['visi']
     misi = request.form['misi']
     g.con.execute("UPDATE sejarah_desa SET sejarah = %s, visi = %s, misi = %s WHERE id = %s",(sejarah,visi,misi,id))
-    g.con.commit()
+    mysql.connection.commit()
     return jsonify("msg : SUKSES")
 @app.route('/admin/edit_sejarah', methods=['GET','POST'])
-def edit_sejarah():
+def sejarahedit():
     if request.method == 'POST':
         jwt_required()
         sejarah = request.form['sejarah']
         g.con.execute("UPDATE sejarah_desa SET sejarah = %s WHERE id = 1",(str(sejarah),))
-        g.con.commit()
+        mysql.connection.commit()
         return jsonify("msg : SUKSES")
     else:
         info=fetch_data_and_format("SELECT * FROM sejarah_desa WHERE id = 1")
@@ -134,7 +143,7 @@ def adminvisiedit():
     visi = request.form['visi']
     visi = str(visi)
     g.con.execute("UPDATE sejarah_desa SET visi= %s WHERE id = 1",(visi,))
-    g.con.commit()
+    mysql.connection.commit()
     return redirect(url_for("adminvisimisi"))
 
 @app.route('/admin/misiedit', methods=['POST'])
@@ -143,7 +152,7 @@ def adminmisiedit():
     misi = request.form['misi']
     misi = str(misi)
     g.con.execute("UPDATE sejarah_desa SET misi= %s WHERE id = 1",(misi,))
-    g.con.commit()
+    mysql.connection.commit()
     return redirect(url_for("adminvisimisi"))
     
 #berita
@@ -161,13 +170,13 @@ def tambah_berita():
     try: 
         random_name = do_image("tambah","berita","")
         g.con.execute("INSERT INTO berita (judul, gambar , deskripsi,link ) VALUES (%s,%s,%s,%s)",(judul,random_name,deskripsi,link))
-        g.con.commit()
+        mysql.connection.commit()
         return jsonify("msg : SUKSES")
     except Exception as e:
         return jsonify({"error": str(e)})
 @app.route('/admin/edit_berita', methods=['POST'])
 @jwt_required()
-def edit_berita():
+def berita_edit():
     id = request.form['id']
     judul = request.form['judul']
     deskripsi = request.form['deskripsi']
@@ -175,7 +184,7 @@ def edit_berita():
         status = do_image("edit","berita",id)
         if status == True:
             g.con.execute("UPDATE berita SET judul = %s, deskripsi = %s WHERE id = %s",(judul,deskripsi,id))
-            g.con.commit()
+            mysql.connection.commit()
             return jsonify({"msg" : "SUKSES"})
         else:
             return jsonify({"msg":status})
@@ -189,7 +198,7 @@ def hapus_berita():
     try:
         do_image("delete","berita",id)
         g.con.execute("DELETE FROM berita WHERE id = %s", (id,))
-        g.con.commit()
+        mysql.connection.commit()
         return jsonify({"msg": "SUKSES"})
     except Exception as e:
         return jsonify({"error": str(e)})
@@ -204,7 +213,7 @@ def hapus_anggota():
         print(status)
         if status == True:
             g.con.execute("DELETE FROM anggota WHERE id = %s", (id,))
-            g.con.commit()
+            mysql.connection.commit()
             return jsonify({"msg": "SUKSES"})
         else:
             return jsonify({"msg": status})
@@ -232,7 +241,7 @@ def edit_dana():
     digunakan = request.form['digunakan']
     sisah = request.form['sisah']
     g.con.execute("UPDATE dana SET tahun = %s, dana = %s, keterangan = %s, sisah = %s WHERE id = %s",(tahun,dana,digunakan,sisah,id))
-    g.con.commit()
+    mysql.connection.commit()
     return jsonify("msg : SUKSES")
 
 #hapus
@@ -241,7 +250,7 @@ def edit_dana():
 def hapus_dana():
     id = request.form['id']
     g.con.execute("DELETE FROM dana WHERE id = %s",(id))
-    g.con.commit()
+    mysql.connection.commit()
     return jsonify("msg : SUKSES")
 
 @app.route('/admin/tambah_dana', methods=['POST'])
@@ -278,7 +287,7 @@ def adminwilayahedit():
     timur= request.form['timur']
     barat = request.form['barat']
     g.con.execute("UPDATE wilayah SET utara = %s, selatan = %s, timur = %s, barat = %s WHERE id = 1",(str(utara),str(selatan),str(timur),str(barat)))
-    g.con.commit()
+    mysql.connection.commit()
     return redirect(url_for("admingeo"))
     
 @app.route('/admin/tanah', methods=['POST'])
@@ -289,7 +298,7 @@ def admintanahedit():
     sawahhu= request.form['sawahhu']
     pemukiman = request.form['pemukiman']
     g.con.execute("UPDATE tanah SET luas = %s, sawahteri = %s, sawahhu = %s, pemukiman = %s WHERE id = 1",(str(luas),str(sawahteri),str(sawahhu),str(pemukiman)))
-    g.con.commit()
+    mysql.connection.commit()
     return redirect(url_for("admingeo"))
 
 #monografi
@@ -305,7 +314,7 @@ def adminmonoedit():
     fields = ['jpenduduk', 'jkk', 'laki', 'perempuan', 'jkkprese', 'jkkseja', 'jkkkaya', 'jkksedang', 'jkkmiskin', 'islam', 'kristen', 'protestan', 'katolik', 'hindu', 'budha']
     query = f"UPDATE monografi SET {' = %s, '.join(fields)} = %s WHERE id = 1"
     g.con.execute(query, tuple(form_data[field] for field in fields))
-    g.con.commit()
+    mysql.connection.commit()
     return redirect(url_for("adminmono"))
     
 #anggota
@@ -323,13 +332,13 @@ def tambah_anggota():
         random_name = do_image("tambah","anggota","")
         query = f"INSERT INTO anggota ({', '.join(fields + ['gambar'])}) VALUES ({', '.join(['%s'] * (len(fields) + 1))})"
         g.con.execute(query, tuple(form_data[field] for field in fields) + (random_name,))
-        g.con.commit()
+        mysql.connection.commit()
         return jsonify({"msg" : "SUKSES"})
     except Exception as e:
         return jsonify({"error": str(e)})
 ##edit_anggota
 @app.route('/admin/edit_anggota', methods=['POST'])
-def edit_anggota():
+def anggota_edit():
     id = request.form['id']
     nama_lengkap = request.form['nama_lengkap']
     jabatan = request.form['jabatan']
@@ -343,10 +352,10 @@ def edit_anggota():
     masa_jabatan = request.form['masa_jabatan']
     status = request.form['status']
     try:
-        print(do_image("edit","anggota",id))
+        do_image("edit","anggota",id)
         g.con.execute("UPDATE anggota SET nama_lengkap = %s, jabatan = %s, niap = %s, ttl = %s, agama = %s, golongan = %s, pendidikan_terakhir = %s, nomorsk = %s, tanggalsk = %s, masa_jabatan = %s, status = %s WHERE id = %s",
         (nama_lengkap,jabatan,niap,ttl,agama,golongan,pendidikan_terakhir,nomorsk,tanggalsk,masa_jabatan,status,id))
-        g.con.commit()
+        mysql.connection.commit()
         return jsonify({"msg" : "SUKSES"})
     except Exception as e:
         return jsonify({"error": str(e)})
@@ -365,20 +374,20 @@ def tambah_galeri():
     try:
         random_name = do_image("tambah","galeri","")
         g.con.execute("INSERT INTO galeri (judul, gambar , tanggal) VALUES (%s,%s,%s)",(judul,random_name,tanggal))
-        g.con.commit()
+        mysql.connection.commit()
         return jsonify("msg : SUKSES")
     except Exception as e:
         return jsonify({"error": str(e)})
 
 @app.route('/admin/edit_galeri', methods=['POST'])
 @jwt_required()
-def edit_galeri():
+def galeri_edit():
     id = request.form['id']
     judul = request.form['judul']
     try:
         do_image("edit","galeri",id)
         g.con.execute("UPDATE galeri SET judul = %s WHERE id = %s",(judul,id))
-        g.con.commit()
+        mysql.connection.commit()
         return jsonify({"msg" : "SUKSES"})
     except Exception as e:
         return jsonify({"error": str(e)})
@@ -390,7 +399,7 @@ def hapus_galeri():
     try:
         do_image("delete","galeri",id)
         g.con.execute("DELETE FROM galeri WHERE id = %s", (id,))
-        g.con.commit()
+        mysql.connection.commit()
         return jsonify({"msg": "SUKSES"})
     except Exception as e:
         return jsonify({"error": str(e)})
@@ -402,11 +411,11 @@ def adminvidio():
 
 @app.route('/admin/edit_vidio', methods=['POST'])
 @jwt_required()
-def edit_vidio():
+def vidioedit():
     id = request.form['id']
     vidio = request.form['vidio']
     g.con.execute("UPDATE vidio SET vidio = %s WHERE id = %s",(vidio,id))
-    g.con.commit()
+    mysql.connection.commit()
     return jsonify({"msg" : "SUKSES"})
 
 # admin agenda 
@@ -418,7 +427,7 @@ def admin_agenda():
 @jwt_required()
 def agenda_delete(id):
     g.con.execute("DELETE FROM agenda WHERE id = %s", (id,))
-    g.con.commit()
+    mysql.connection.commit()
     return jsonify({"msg" : "SUKSES"})
 @app.route('/tambah-agenda',methods=["POST"])
 @jwt_required()
@@ -430,12 +439,10 @@ def agenda_tambah():
     keterangan = request.form['keterangan']
     try:
         random_name = do_image("tambah","agenda","")
-        print(random_name)
-        g.con.execute("INSERT INTO agenda(title , start , end , pemimpin_kegiatan , keterangan , gambar ) VALUES(%s,%s,%s,%s,%s,%s)",(title,jam_mulai,jam_selesai,pemimpin_kegiatan,keterangan,random_name))
-        g.con.commit()
+        g.con.execute("INSERT INTO agenda(title, start, end, pemimpin_kegiatan, keterangan, gambar) VALUES(%s, %s, %s, %s, %s, %s)", (title, jam_mulai, jam_selesai, pemimpin_kegiatan, keterangan, random_name))
+        mysql.connection.commit()  # Commit setelah INSERT
         g.con.execute("SELECT LAST_INSERT_ID()")
-        new_id = cursor.fetchone()[0]
-        print(new_id)
+        new_id = g.con.fetchone()[0]
         return jsonify({"msg": "SUKSES", "id": new_id})
     except Exception as e:
         return jsonify({"error": str(e)})
@@ -451,7 +458,7 @@ def agenda_edit():
     try:
         do_image("edit","agenda",id)
         g.con.execute("UPDATE agenda SET title = %s, start = %s, end = %s, pemimpin_kegiatan = %s, keterangan = %s WHERE id = %s",(title,jam_mulai,jam_selesai,pemimpin_kegiatan,keterangan,id))
-        g.con.commit()
+        mysql.connection.commit()
         return jsonify({"msg" : "SUKSES"})
     except Exception as e:
         return jsonify({"error": str(e)})

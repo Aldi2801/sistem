@@ -18,7 +18,13 @@
     />
     <meta name="robots" content="noindex,nofollow" />
     <title>Admin Desa Pangkah</title>
-    
+    <!-- Favicon icon -->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="../../static/assets/images/favicon.png"
+    />
     <!-- Side Bar -->
     <link
       rel="stylesheet"
@@ -48,9 +54,11 @@
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="../../static/assets/libs/jquery/dist/jquery.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="../../static/assets/extra-libs/taskboard/js/jquery-ui.min.js"></script>
+    {% block head %}{% endblock %}
   </head>
 
   <body>
@@ -161,9 +169,7 @@
                     class="profile-pic rounded-circle"
                   />
                   <div class="d-none d-md-flex">
-                    <span class="ms-2"
-                      >Hi, <span class="text-dark fw-bold">Admin</span></span
-                    >
+                    <span class="ms-2">Hi, <span class="text-dark fw-bold">{{ session['username'] }}</span></span >
                     <span>
                       <i data-feather="chevron-down" class="feather-sm"></i>
                     </span>
