@@ -230,7 +230,7 @@ def tambah_surat():
     hp = request.form['hp']
     keterangan = request.form['keterangan']
     g.con.execute("INSERT INTO surat (nama , hp, keterangan) VALUES (%s,%s,%s)",(nama,hp,keterangan))
-    g.con.commit()
+    mysql.connection.commit()
     return jsonify("msg : SUKSES")
 
 @app.route('/edit_surat', methods=['POST'])
@@ -240,12 +240,12 @@ def edit_surat():
     hp = request.form['hp']
     keterangan = request.form['keterangan']
     g.con.execute("UPDATE surat SET nama = %s, hp = %s, keterangan = %s WHERE id = %s",(nama,hp,keterangan,id))
-    g.con.commit()
+    mysql.connection.commit()
     return jsonify("msg : SUKSES")
 
 @app.route('/hapus_surat', methods=['POST'])
 def hapus_surat():
     id = request.form['id']
     g.con.execute("DELETE FROM surat WHERE id = %s",(id))
-    g.con.commit()
+    mysql.connection.commit()
     return jsonify("msg : SUKSES")

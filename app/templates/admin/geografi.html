@@ -22,7 +22,7 @@
           class="btn btn-info d-flex align-items-center ms-2"
         >
         <i data-feather="edit" style="width: 18px; height: 18px; margin-right: 10px"></i>
-          Edit
+          tambah
         </a>
       </div>
     </div>
@@ -38,12 +38,19 @@
         <div class="card">
           <div class="card-body border-bottom">
             <h4 class="card-title">Kondisi Geografi</h4>
-            <h6 class="card-subtitle mb-0">
-              This is the basic horizontal form with labels on left and
-              form controls on right in one line. To use add class
-              <mark><code>form-horizontal</code></mark> to the form tag
-              and give class <mark><code>row</code></mark> with mb-3.
-            </h6>
+            <div class="col-sm-3">
+              <div class="mb-3">
+                <select
+                  class="form-select"
+                  id="tahun"
+                  name="educationDate"
+                >
+                  <option>Tahun</option>
+                  {% for i in info_list :%}
+                  <option value="{{i.tahun}}">{{i.tahun}}</option>
+                  {% endfor %}
+                </select>
+              </div>
           </div>
           <form class="form-horizontal" >
       
@@ -60,7 +67,7 @@
                     type="text"
                     class="form-control"
                     name="utara"
-                    value="{{info_list2[0]['utara']}}"
+                    value="{{info_list[0]['utara']}}"
                   ></input>
                 </div>
               </div>
@@ -75,7 +82,7 @@
                     type="text"
                     class="form-control"
                     name="selatan"
-                    value="{{info_list2[0]['selatan']}}"
+                    value="{{info_list[0]['selatan']}}"
                   />
                 </div>
               </div>
@@ -90,7 +97,7 @@
                     type="text"
                     class="form-control"
                     name="timur"
-                    value="{{info_list2[0]['timur']}}"
+                    value="{{info_list[0]['timur']}}"
                   />
                 </div>
               </div>
@@ -105,7 +112,7 @@
                     type="text"
                     class="form-control"
                     name="barat"
-                    value="{{info_list2[0]['barat']}}"
+                    value="{{info_list[0]['barat']}}"
                   />
                 </div>
               </div>
@@ -238,26 +245,24 @@
     {% endblock %}
     {% block js %}
     <script>
-    var token = "{{ session['jwt_token'] }}"
-    console.log(token)
     $(document).ready(function () {
       $( "#edit-tanah" ).on( "click", function() {
         let formData = new FormData();
         formData.append('status',status)
           console.log(formData)
           $.ajax({
-            url: "/admin/tambah_anggota",
+            url: "/admin/tanah",
             data: formData,
             cache: false,
             contentType: false,
             processData: false,
-            method: 'POST',
-            type: 'POST', 
+            method: 'PUT',
+            type: 'PUT', 
             headers: {
-              'Authorization': 'Bearer ' + token
+              'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
           },
           }).done(function (data) {
-            handleResponse(data, "menambah", "/admin/anggota");
+            handleResponse(data, "menambah", "/admin/geografi");
           });
       });
       $( "#edit-wilayah" ).on( "click", function() {
@@ -265,18 +270,18 @@
         formData.append('status',status)
           console.log(formData)
           $.ajax({
-            url: "/admin/tambah_anggota",
+            url: "/admin/wilayah",
             data: formData,
             cache: false,
             contentType: false,
             processData: false,
-            method: 'POST',
-            type: 'POST', 
+            method: 'PUT',
+            type: 'PUT', 
             headers: {
-              'Authorization': 'Bearer ' + token
+              'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
           },
           }).done(function (data) {
-            handleResponse(data, "menambah", "/admin/anggota");
+            handleResponse(data, "menambah", "/admin/geografi");
           });
       });
     });

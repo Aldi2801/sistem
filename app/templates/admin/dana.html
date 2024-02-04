@@ -296,9 +296,7 @@
             'Authorization': 'Bearer ' + token
         },
           success: function(data) {
-            console.log(data);
-            // Redirect to "admindana" after successful AJAX request
-            window.location.href = "/admin/dana";
+            handleResponse(data,"tambah","admin/dana");
           }
         });
         event.preventDefault();

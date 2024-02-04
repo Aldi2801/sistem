@@ -460,7 +460,7 @@
           </div>
         </div>
       </div>
-      2023© All Rights Reserved
+      <p id='copyright'></p>
     </footer>
     <script src="../static/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../static/dist/js/app.min.js"></script>
@@ -484,5 +484,10 @@
 
     <script src="../static/assets/libs/moment/min/moment.min.js"></script>
     {% block js %}{% endblock js %}
+    <script>
+      var tahunSaatIni = new Date().getFullYear();
+      document.getElementById('copyright').innerHTML = tahunSaatIni + " © All Rights Reserved";
+  </script>
+  
   </body>
 </html>

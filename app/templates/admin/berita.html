@@ -143,7 +143,9 @@
                               <input class="form-control" type="file" hint="{{i.gambar}}" id="editformFilebaru" />
                             </div>
                           </div>
-                        </form>
+                        </form>                    
+                        <label class="form-check-label" for="inlineCheckbox1">Hapus Gambar?</label>
+                        <input class="form-check-input" type="checkbox" id="reset-{{i.id}}">
                         <div class="container-fluid">
                           <div class="row">
                             <div class="col-12">
@@ -162,7 +164,6 @@
                         </div>
                       </div>
                       <div class="modal-footer">
-
                         <button type="submit" onclick="edit('{{i.id}}')"
                           class="btn btn-info d-flex align-items-center ms-2">
                           Submit
@@ -233,13 +234,11 @@
           processData: false,
           method: 'POST',
           type: 'POST',
-          /* headers: {
+          headers: {
             'Authorization': 'Bearer ' + token
-        },*/
+        },
         }).done(function (data) {
-          console.log(data);
-
-          window.location.href = "/admin/berita";
+          handleResponse(data,"tambah","/admin/berita")
         });
         event.preventDefault();
       });
@@ -256,6 +255,7 @@
       var editvalue = quilli.getText();
       var editjdl = $('#editjudulberitabaru').val()
       var editformFilebaru = $('#editjudulberitabaru').val()
+      var reset = $('#reset-'+id).prop('checked');
       let formData = new FormData();
       formData.append('id', id);
       formData.append('judul', editjdl);
@@ -263,37 +263,33 @@
         formData.append('gambar', file);
       });
       formData.append('deskripsi', String(editvalue))
+      formData.append("reset", reset);
       $.ajax({
         url: "/admin/edit_berita",
         data: formData,
         cache: false,
         contentType: false,
         processData: false,
-        method: 'POST',
-        type: 'POST',
+        method: 'PUT',
+        type: 'PUT',
         headers: {
           'Authorization': 'Bearer ' + token
         },
       }).done(function (data) {
-        console.log(data);
-        window.location.href = "/admin/berita";
+        handleResponse(data,"mengedit","/admin/berita");
       });
     }
     function hapusBerita(id) {
       $.ajax({
         url: '/hapus_berita',
-        method: 'POST',
+        method: 'DELETE',
         headers: {
           'Authorization': 'Bearer ' + token
         },
         data: { id: id },
         dataType: 'json',
       }).done(function (response) {
-        console.log(response);
-        // Handle the response or perform any necessary actions
-
-        // Optional: Reload the page after successful deletion
-        window.location.href = "/admin/berita";
+        handleResponse(response,"hapus","/admin/berita")
       }).fail(function (error) {
         console.error(error);
         // Handle the error case

@@ -130,8 +130,6 @@
     </div>
     <script>
         var btnedit = document.getElementById('edit');
-        var token = "{{ session['jwt_token'] }}"
-    console.log(token)
         // Add a click event listener to the button
         btnedit.addEventListener('click', function() {
             // This function will be executed when the button is clicked
@@ -149,14 +147,13 @@
               cache: false,
               contentType: false,
               processData: false,
-              method: 'POST',
-              type: 'POST', 
+              method: 'PUT',
+              type: 'PUT',
               headers: {
-                'Authorization': 'Bearer ' + token
+                'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
             },
             }).done(function (data) {
-              console.log(data);
-              window.location.href = "/admin/vidio";
+              handleResponse(data,"edit","/admin/vidio");
             });
         } 
     </script>

@@ -121,6 +121,9 @@
             "' type='text' name='title'/></div></div>"
         )
         .append(
+          "<div class='col-md-12'><div class='form-group'><label class='control-label'>Category</label><select class='form-select' name='category'></select></div></div>"
+        )
+        .append(
           "<div class='col-md-6'><div class='form-group'><label class='control-label'>Dari</label><input class='form-control' placeholder='Jam Mulai' value='" +
             calEvent.jam_mulai +
             "' type='datetime-local' name='start'/></div></div>"
@@ -140,11 +143,18 @@
             calEvent.foto +
             "' type='file' id='foto_edit' name='foto'/></div></div>"
         )
+        .append("<div class='col-md-12 mt-1 d-flex'><label class='form-check-label' style='margin-right:14px' for='inlineCheckbox1'>Reset Gambar?</label><input class='form-check-input' type='checkbox' id='reset'>")
         .append(
           "<div class='col-md-12'><div class='form-group'><label class='control-label'>Keterangan Kegiatan</label><textarea class='form-control' name='keterangan' rows='3' placeholder='Acara ini diadakan dalam rangka...'>" +
             calEvent.keterangan +
             "</textarea><small id='textHelp' class='form-text text-muted'></small></div></div>"
-        );
+        )
+        .find("select[name='category']")
+        .append( "<option value='darurat'>Darurat</option>" )
+        .append( "<option value='penting'>Penting</option>" )
+        .append( "<option value='event'>Event</option>" )
+        .append( "<option value='pemberitahuan'>Pemberitahuan</option>" )
+        .append( "<option value='pemilihan'>Pemilihan</option>" );
       $this.$modal.show();
       $(".bckdrop").addClass("show");
       $(".bckdrop").removeClass("hide");
@@ -162,6 +172,18 @@
         .empty()
         .prepend(form)
         .end()
+      if (calEvent.kategori == "darurat") {
+        $("select[name='category'] option[value='darurat']").prop('selected', true);
+      } else if (calEvent.kategori == "penting") {
+        $("select[name='category'] option[value='penting']").prop('selected', true);
+      } else if (calEvent.kategori == "event") {
+        $("select[name='category'] option[value='event']").prop('selected', true);
+      } else if (calEvent.kategori == "pemberitahuan") {
+        $("select[name='category'] option[value='pemberitahuan']").prop('selected', true);
+      } else if (calEvent.kategori == "pemilihan") {
+        $("select[name='category'] option[value='pemilihan']").prop('selected', true);
+      }
+      $this.$modal
         .find(".delete-event")
         .unbind("click")
         .click(function () {
@@ -196,16 +218,20 @@
             calEvent.title = form.find("input[name=title]").val();
             calEvent.jam_mulai = form.find("input[name=start]").val();
             calEvent.jam_selesai = form.find("input[name=end]").val();
-            calEvent.pemimpin_kegiatan = form .find("input[name=pemimpin_kegiatan]") .val();
+            calEvent.pemimpin_kegiatan = form.find("input[name=pemimpin_kegiatan]").val();
             calEvent.foto = form.find("input[name=foto]").val();
             calEvent.keterangan = form.find("textarea[name=keterangan]").val();
+            var kategori = form.find("select[name='category'] option:checked").val();
             var jam_mulai = reverse_datetime_local(calEvent.jam_mulai);
             var jam_selesai = reverse_datetime_local(calEvent.jam_selesai);
+            var reset = $('#reset').prop('checked');
             let formData = new FormData();
             formData.append("id", calEvent.id);
             formData.append("title", calEvent.title);
             formData.append("jam_mulai", jam_mulai);
             formData.append("jam_selesai", jam_selesai);
+            formData.append("reset", reset);
+            formData.append("kategori", kategori);
             formData.append("pemimpin_kegiatan", calEvent.pemimpin_kegiatan);
             $.each($("#foto_edit")[0].files, function (i, file) {
               formData.append("gambar", file);
@@ -265,13 +291,13 @@
       form
         .find(".row")
         .append(
-          "<div class='col-md-6'><div class='form-group'><label class='control-label'>Agenda Name</label><input class='form-control' placeholder='Insert Agenda Name' type='text' name='title'/></div></div>"
+          "<div class='col-md-12'><div class='form-group'><label class='control-label'>Agenda Name</label><input class='form-control' placeholder='Insert Agenda Name' type='text' name='title'/></div></div>"
         )
         .append(
-          "<div class='col-md-6'><div class='form-group'><label class='control-label'>Category</label><select class='form-select' name='category'></select></div></div>"
+          "<div class='col-md-12'><div class='form-group'><label class='control-label'>Category</label><select class='form-select' name='category'></select></div></div>"
         )
         .append(
-          "<div class='col-md-6'><div class='form-group'><label class='control-label'>Jam Mulai</label><input class='form-control' placeholder='Jam Mulai' type='datetime-local' name='start'/></div></div>"
+          "<div class='col-md-6'><div class='form-group'><label class='control-label'>Jam Mulai</label><input class='form-control' placeholder='Jam Mulai' type='datetime-local' name='start' value='"+init_datetime_local(reverse_datetime_local(start))+"'/></div></div>"
         )
         .append(
           "<div class='col-md-6'><div class='form-group'><label class='control-label'>Jam Selesai</label><input class='form-control' placeholder='Jam Selesai' type='datetime-local' name='end'/></div></div>"
@@ -286,21 +312,11 @@
           "<div class='col-md-12'><div class='form-group'><label class='control-label'>Keterangan Kegiatan</label><textarea class='form-control' name='keterangan' rows='3' placeholder='Acara ini diadakan dalam rangka...'></textarea><small id='textHelp' class='form-text text-muted'></small></div></div>"
         )
         .find("select[name='category']")
-        .append(
-          "<option value='bg-light-danger border-start border-2 border-danger'>Darurat</option>"
-        )
-        .append(
-          "<option value='bg-light-success border-start border-2 border-success'>Event (lomba dsb)</option>"
-        )
-        .append(
-          "<option value='bg-light-primary border-start border-2 border-primary'>Pemilihan</option>"
-        )
-        .append(
-          "<option value='bg-warning border-start border-2 border-primary'>Penting</option>"
-        )
-        .append(
-          "<option value='bg-light-warning border-start border-2 border-warning'>Pemberitahuan</option></div></div>"
-        );
+        .append( "<option value='darurat'>Darurat</option>" )
+        .append( "<option value='penting'>Penting</option>" )
+        .append( "<option value='event'>Event</option>" )
+        .append( "<option value='pemberitahuan'>Pemberitahuan</option>" )
+        .append( "<option value='pemilihan'>Pemilihan</option>" );
       $this.$modal
         .find(".delete-event")
         .hide()
@@ -336,19 +352,23 @@
           var title = form.find("input[name=title]").val();
           var jam_mulai = form.find("input[name=start]").val();
           var jam_selesai = form.find("input[name=end]").val();
-          var pemimpin_kegiatan = form .find("input[name=pemimpin_kegiatan]") .val();
-          var keterangan = form.find("textarea[name=keterangan]").val();
+          var pemimpin_kegiatan = form.find("input[name=pemimpin_kegiatan]").val();
+          var keterangan = form.find("textarea[name=keterangan]").val();  
+          var kategori = form.find("select[name='category'] option:checked").val();
+          console.log(kategori)
           var jam_mulai = reverse_datetime_local(jam_mulai);
           var jam_selesai = reverse_datetime_local(jam_selesai);
           let formData = new FormData();
           formData.append("title", title);
           formData.append("jam_mulai", jam_mulai);
           formData.append("jam_selesai", jam_selesai);
+          formData.append("kategori", kategori);
           formData.append("pemimpin_kegiatan", pemimpin_kegiatan);
           $.each($("#foto_tambah")[0].files, function (i, file) {
             formData.append("gambar", file);
           });
           formData.append("keterangan", String(keterangan));
+          console.log(formData)
           $.ajax({
             cache: false,
             contentType: false,
@@ -373,11 +393,8 @@
           });
         }
           catch (error) {
-            // Tangani kesalahan di sini
             console.error("Terjadi kesalahan:", error);
-            // Anda dapat menambahkan logika atau pemberitahuan kesalahan tambahan di sini
           }
-        
         return false;
       });
       $this.$calendarObj.fullCalendar("unselect");
@@ -412,7 +429,6 @@
     var y = date.getFullYear();
     var form = "";
     var today = new Date($.now());
-
     var DataDB = document
       .getElementById("data-container")
       .getAttribute("data-db");

@@ -231,8 +231,7 @@
         <!-- ============================================================= -->
         <!-- footer -->
         <!-- ============================================================= -->
-        <footer class="footer text-center">
-          2021© All Rights Reserved by Wrappixel
+        <footer class="footer text-center"id='copyright'>
         </footer>
         <!-- ============================================================= -->
         <!-- End footer -->
@@ -297,6 +296,10 @@
     <script src="../../static/assets/libs/moment/min/moment.min.js"></script>
 
     {% block js %}{% endblock js %}
+    <script>
+      var tahunSaatIni = new Date().getFullYear();
+      document.getElementById('copyright').innerHTML = tahunSaatIni+"© All Rights Reserved";
+     </script>
   </body>
 </html>
 {% else %}

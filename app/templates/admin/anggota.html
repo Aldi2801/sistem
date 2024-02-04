@@ -339,8 +339,6 @@
 
   <script>
     let formData = new FormData();
-    var token = "{{ session['jwt_token'] }}"
-    console.log(token)
     $(document).ready(function () {
       $( "#tambah" ).on( "click", function() {
         var nama = $('#Namalengkapbaru').val()
@@ -383,7 +381,7 @@
             method: 'POST',
             type: 'POST', 
             headers: {
-              'Authorization': 'Bearer ' + token
+              'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
           },
           }).done(function (data) {
             handleResponse(data, "menambah", "/admin/anggota");
@@ -431,9 +429,9 @@
         cache: false,
         contentType: false,
         processData: false,
-        method: 'POST',
+        method: 'PUT',
         headers: {
-          'Authorization': 'Bearer ' + token
+          'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
       },
       }).done(function (data) {
         handleResponse(data, "mengedit", "/admin/anggota");
@@ -447,9 +445,9 @@
 if (result) {
     $.ajax({
       url: '/hapus_anggota',
-      method: 'POST',
+      method: 'DELETE',
       headers: {
-        'Authorization': 'Bearer ' + token
+        'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
     },
       data: { id: id },
       dataType: 'json',
