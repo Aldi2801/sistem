@@ -96,7 +96,10 @@
           {% for i in info_list :%}
           <div class="col-lg-4">
             <div class="card">
+              {% if i.gambar == "default.jpg" %}
+              {% else %}
               <img class="card-img-top img-responsive" src="../../static/image/{{i.gambar}}" alt="Card image cap" />
+              {% endif %}
               <div class="card-body">
                 <div class="d-flex no-block align-items-center mb-3">
                   <span class="d-flex align-items-center"><i data-feather="calendar"

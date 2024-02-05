@@ -7,3 +7,4 @@ Flask-Bcrypt
 pillow
 pandas
 datetime
+openpyxl

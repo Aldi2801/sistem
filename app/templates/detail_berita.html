@@ -62,8 +62,12 @@
 
             </div>
             <div class="image-container">
+              {% if info_list[0]['gambar'] == "default.jpg" %}
+              {% else %}
               <img src="../static/image/{{info_list[0]['gambar']}}" class="responsive-image"
                 alt="Deskripsi gambar Anda">
+              {% endif %}
+              
             </div><br>
             {{info_list[0]['deskripsifull']|safe}}
           </div>

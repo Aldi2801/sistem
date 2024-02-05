@@ -1,4 +1,4 @@
-from . import app,mysql,db
+from . import app,mysql,db,allowed_file
 from flask import render_template, request, jsonify, redirect, url_for,session,g
 import os,textwrap, locale, json, uuid, time
 import pandas as pd
@@ -30,6 +30,8 @@ def do_image(do, table, id):
             return resize_and_save_image(file, table, id)
     except KeyError:
         if do == "edit":
+            if table =="galeri":
+                return True
             reset = request.form['reset']
             print(reset)
             if reset=="true":
@@ -85,7 +87,9 @@ def fetch_years(query):
 def insert_data_from_dataframe(df, table):
     for index, row in df.iterrows():
         sql = f"INSERT INTO {table} (no, uraian, anggaran, realisasi, `lebih/(kurang)`, tahun) VALUES (%s, %s, %s, %s, %s, %s)"
-        g.con.execute(sql, (row[0], row[1], row[2], row[3], row[4], row[5]))
+        # Ubah row[0], row[1], ..., row[5] sesuai dengan nama kolom di DataFrame Anda
+        print(row['lebih/(kurang)'])
+        g.con.execute(sql, (row['no'], row['uraian'], row['anggaran'], row['realisasi'], row['lebih/(kurang)'], row['thn']))
     mysql.connection.commit()
 
 #halaman admin
@@ -131,7 +135,7 @@ def infoedit():
         return jsonify({"error": str(e)})
 @app.route('/admin/edit_sejarah', methods=['GET','PUT'])
 def sejarahedit():
-    if request.method == 'POST':
+    if request.method == 'PUT':
         jwt_required()
         sejarah = request.form['sejarah']
         try:
@@ -151,7 +155,7 @@ def adminvisimisi():
     info_list = fetch_data_and_format("SELECT * FROM sejarah_desa")
     return render_template("admin/visimisi.html", info_list = info_list)
 
-@app.route('/admin/visiedit', methods=['POST'])
+@app.route('/admin/visiedit', methods=['PUT'])
 @jwt_required()
 def adminvisiedit():
     visi = request.form['visi']
@@ -164,7 +168,7 @@ def adminvisiedit():
         print(str(e))
         return jsonify({"error": str(e)})
 
-@app.route('/admin/misiedit', methods=['POST'])
+@app.route('/admin/misiedit', methods=['PUT'])
 @jwt_required()
 def adminmisiedit():
     misi = request.form['misi']
@@ -197,7 +201,7 @@ def tambah_berita():
     except Exception as e:
         str(e)
         return jsonify({"error": str(e)})
-@app.route('/admin/edit_berita', methods=['POST'])
+@app.route('/admin/edit_berita', methods=['PUT'])
 @jwt_required()
 def berita_edit():
     id = request.form['id']
@@ -212,7 +216,7 @@ def berita_edit():
         print(str(e))
         return jsonify({"error": str(e)})
 
-@app.route('/hapus_berita', methods=['POST'])
+@app.route('/hapus_berita', methods=['DELETE'])
 @jwt_required()
 def hapus_berita():
     id = request.form['id']
@@ -226,7 +230,7 @@ def hapus_berita():
         return jsonify({"error": str(e)})
 
 #hapus anggota
-@app.route('/hapus_anggota', methods=['POST'])
+@app.route('/hapus_anggota', methods=['DELETE'])
 @jwt_required()
 def hapus_anggota():
     id = request.form['id']
@@ -251,7 +255,7 @@ def admindana():
     info_list3 = fetch_data_and_format("SELECT * FROM realisasi_pembiayaan ORDER BY id")
     thn = fetch_years("SELECT * FROM realisasi_pendapatan GROUP BY tahun")
     return render_template("admin/dana.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn)
-@app.route('/admin/edit_dana', methods=['POST'])
+@app.route('/admin/edit_dana', methods=['PUT'])
 @jwt_required()
 def edit_dana():
     id = request.form['id']
@@ -268,7 +272,7 @@ def edit_dana():
         return jsonify({"error": str(e)})
 
 #hapus
-@app.route('/admin/hapus_dana', methods=['POST'])
+@app.route('/admin/hapus_dana', methods=['DELETE'])
 @jwt_required()
 def hapus_dana():
     id = request.form['id']
@@ -286,18 +290,26 @@ def tambah_dana():
     filependapatan = request.files['excellpendapatan']
     filebelanja = request.files['excellbelanja']
     filepembiayaan = request.files['excellpembiayaan']
-    if filependapatan:
+    
+    if filependapatan and allowed_file(filependapatan.filename):
         df_pendapatan = pd.read_excel(filependapatan)
         insert_data_from_dataframe(df_pendapatan, "realisasi_pendapatan")
+    else:
+        return jsonify({"error_pendapatan": "File 'excellpendapatan' bukan berkas Excel (.xlsx)"})
 
-    if filebelanja:
+    if filebelanja and allowed_file(filebelanja.filename):
         df_belanja = pd.read_excel(filebelanja)
         insert_data_from_dataframe(df_belanja, "realisasi_belanja")
+    else:
+        return jsonify({"error_belanja": "File 'excellbelanja' bukan berkas Excel (.xlsx)"})
 
-    if filepembiayaan:
-        df_pembiayaan = pd.read_csv(filepembiayaan, delimiter=';')
+    if filepembiayaan and allowed_file(filepembiayaan.filename):
+        df_pembiayaan = pd.read_excel(filepembiayaan)
         insert_data_from_dataframe(df_pembiayaan, "realisasi_pembiayaan")
-    return redirect(url_for("admindana"))
+    else:
+        return jsonify({"error_pembiayaan": "File 'excellpembiayaan' bukan berkas Excel (.xlsx)"})
+
+    return jsonify({"msg":"SUKSES"})
 
 #geografi
 @app.route('/admin/geografi')
@@ -305,36 +317,43 @@ def admingeo():
     info_list=fetch_data_and_format("SELECT * FROM wilayah")
     return render_template("admin/geografi.html", info_list=info_list)
 
-@app.route('/admin/wilayah', methods=['POST'])
+@app.route('/admin/tambah_wilayah', methods=['POST'])
+@jwt_required()
+def adminwilayahtambah():
+    form_data = request.form
+    fields = ['utara','selatan','timur','barat','luas','sawahteri','sawahhu','pemukiman']
+    query = f"INSERT INTO wilayah ({', '.join(fields+['tahun'])}) VALUES ({', '.join(['%s'] * (len(fields)+1))})"
+    try: 
+        g.con.execute(query, tuple(form_data[field] for field in fields)+(form_data['selected_tahun'],))
+        mysql.connection.commit()
+        return jsonify({"msg":"SUKSES"})
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)})
+@app.route('/admin/edit_wilayah', methods=['PUT'])
 @jwt_required()
 def adminwilayahedit():
-    utara = request.form['utara']
-    selatan = request.form['selatan']
-    timur= request.form['timur']
-    barat = request.form['barat']
-    try:
-        g.con.execute("UPDATE wilayah SET utara = %s, selatan = %s, timur = %s, barat = %s WHERE id = 1",(str(utara),str(selatan),str(timur),str(barat)))
+    form_data = request.form
+    fields = ['utara','selatan','timur','barat','luas','sawahteri','sawahhu','pemukiman']
+    query = f"UPDATE wilayah SET {' = %s, '.join(fields)} = %s WHERE id=%s"
+    try: 
+        g.con.execute(query, tuple(form_data[field] for field in fields) + (form_data['id'],))
         mysql.connection.commit()
         return jsonify({"msg":"SUKSES"})
     except Exception as e:
         print(str(e))
-        return jsonify({"error": str(e)})
-    
-@app.route('/admin/tanah', methods=['POST'])
+        return jsonify({"error": str(e)})  
+@app.route('/admin/hapus_wilayah', methods=['DELETE'])
 @jwt_required()
-def admintanahedit():
-    luas = request.form['luas']
-    sawahteri = request.form['sawahteri']
-    sawahhu= request.form['sawahhu']
-    pemukiman = request.form['pemukiman']
+def adminwilayahhapus():
+    id = request.form['id']
     try:
-        g.con.execute("UPDATE tanah SET luas = %s, sawahteri = %s, sawahhu = %s, pemukiman = %s WHERE id = 1",(str(luas),str(sawahteri),str(sawahhu),str(pemukiman)))
+        g.con.execute("DELETE FROM wilayah WHERE id = %s", (id,))
         mysql.connection.commit()
-        return jsonify({"msg":"SUKSES"})
+        return jsonify({"msg": "SUKSES"})
     except Exception as e:
         print(str(e))
         return jsonify({"error": str(e)})
-
 #monografi
 @app.route('/admin/monografi')
 def adminmono():
@@ -348,8 +367,7 @@ def adminmonotambah():
     fields = ['jpenduduk', 'jkk', 'laki', 'perempuan', 'jkkprese', 'jkkseja', 'jkkkaya', 'jkksedang', 'jkkmiskin',
             'petani','peternak','pedagang','tukangkayu','tukangbatu','penjahit','asn','pensiunan','perangkatdesa','jasa_wiraswasta',
             'pengrajinbatik','dll', 'islam', 'kristen', 'protestan', 'katolik', 'hindu', 'budha']
-    query = f"INSERT INTO monografi ({', '.join(fields)},'tahun') VALUES ({', %s' * len(fields)},%s)"
-    tahun = form_data['selected_tahun']
+    query = f"INSERT INTO monografi ({', '.join(fields + ['tahun'])}) VALUES ({', '.join(['%s'] * (len(fields) + 1))})"
     try: 
         g.con.execute(query, tuple(form_data[field] for field in fields) + (form_data['selected_tahun'],))
         mysql.connection.commit()
@@ -373,7 +391,18 @@ def adminmonoedit():
     except Exception as e:
         print(str(e))
         return jsonify({"error": str(e)})
-
+    
+@app.route('/admin/hapus_mono', methods=['DELETE'])
+@jwt_required()
+def adminmonohapus():
+    id = request.form['id']
+    try:
+        g.con.execute("DELETE FROM monografi WHERE id = %s", (id,))
+        mysql.connection.commit()
+        return jsonify({"msg": "SUKSES"})
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)})
 #anggota
 @app.route('/admin/anggota')
 def adminanggota():
@@ -395,7 +424,7 @@ def tambah_anggota():
         print(str(e))
         return jsonify({"error": str(e)})
 ##edit_anggota
-@app.route('/admin/edit_anggota', methods=['POST'])
+@app.route('/admin/edit_anggota', methods=['PUT'])
 def anggota_edit():
     id = request.form['id']
     nama_lengkap = request.form['nama_lengkap']

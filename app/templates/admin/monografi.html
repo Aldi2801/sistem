@@ -85,7 +85,7 @@
           <div class="form-horizontal">
             <div class="card-body">
               <input type="hidden" name="Authorization" value="Bearer {{ session['jwt_token'] }}">
-              <input type="hidden" class="form-control" name="hidden" value="" />
+              <input type="hidden" class="form-control" name="id" value="{{info_list[0]['id']}}" />
               <h4 class="card-title">Kependudukan</h4>
               <div class="mb-3 row">
                 <label for="cono" class="col-sm-3 text-end control-label col-form-label">Jumlah Penduduk</label>
@@ -272,7 +272,7 @@
             <div class="p-3 border-top">
               <div class="text-end">
                 <button id="kirim" type="button" name="submit" class=" btn btn-info rounded-pill px-4 waves-effect waves-light "> Save edit </button>
-                <button type="submit" class=" btn btn-dark rounded-pill px-4 waves-effect waves-light "> Cancel </button>
+                <button type="button" onclick="hapusMono()" class=" btn btn-danger rounded-pill px-4 waves-effect waves-light "> Hapus Data </button>
               </div>
             </div>
           </div>
@@ -288,7 +288,7 @@
       
     var cb = $('#tahun').prop('selected');
     console.log(cb)
-    var fields = ['id', 'tahun','jpenduduk', 'jkk', 'laki', 'perempuan', 'jkkprese', 'jkkseja', 'jkkkaya',
+    var fields = ['id', 'jpenduduk', 'jkk', 'laki', 'perempuan', 'jkkprese', 'jkkseja', 'jkkkaya',
     'jkksedang', 'jkkmiskin', 'petani','peternak','pedagang','tukangkayu','tukangbatu','penjahit','asn','pensiunan','perangkatdesa','jasa_wiraswasta',
     'pengrajinbatik','dll', 'islam', 'kristen', 'protestan', 'katolik', 'hindu', 'budha'
   ];
@@ -297,7 +297,7 @@
       console.log(info_list);
       let found = 0
       for (const info of info_list) {
-        let value = $('#tahun').val()
+        var value = $('#tahun').val()
         if (info.tahun == value) {
           fields.forEach(field => {
             $(`[name=${field}]`).val(info[field]);
@@ -329,6 +329,7 @@
         optionsArray.forEach(function (option) {
           selectElement.appendChild(option);
         });
+        change();
       }
       $('#tambah_tahun').on('click', function (){
         var selectElement = document.getElementById('tahun');
@@ -339,13 +340,14 @@
         selectElement.add(Option);
         sort_tahun()
     });
+    sort_tahun()
     $('#kirim').on('click', function (){
       let formData = new FormData();
       fields.forEach(function (field) {
-        let value = $(`[name=${field}]`).val();
+        var value = $(`[name=${field}]`).val();
         formData.append(field, value);
       });
-      let value = $('#tahun').val()
+      var value = $('#tahun').val()
       formData.append('selected_tahun', value);
       var submit = $(`[name='submit']`).val();
       if (submit == "edit"){
@@ -390,4 +392,25 @@
     });
   });
   </script>
+  <script>
+    function hapusMono() {
+      var result = confirm("Apakah Anda yakin?");
+      if (result) {
+        var value = $('[name=id]').val()
+          $.ajax({
+            url: '/admin/hapus_mono',
+            method: 'DELETE',
+            headers: {
+              'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
+          },
+            data: { id: value },
+            dataType: 'json',
+          }).done(function(response) {
+            handleResponse(response, "menghapus", "/admin/monografi");
+          }).fail(function(error) {
+            console.error(error);
+          });
+        }
+      }
+   </script>
   {% endblock %}

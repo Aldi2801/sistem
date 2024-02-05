@@ -81,18 +81,19 @@
                 <th >Tahun</th>
               </tr>
           </thead>
-              {% for i in info_list :%}
-              {% if h.tahun == i.tahun %}
-              <tr id="{{i.tahun}}">
-                  <td>{{i.no}}</td>
-                  <td>{{i.uraian}}</td>
-                  <td>{{i.anggaran}}</td>
-                  <td>{{i.realisasi}}</td>
-                  <td>{{i.lebih_kurang}}</td>
-                  <td>{{i.tahun}}</td>
+          {% for i in info_list %}
+          {% if h.tahun == i.tahun %}
+              <tr id="{{ i.tahun }}">
+                  <td>{{ i.no }}</td>
+                  <td>{{ i.uraian }}</td>
+                  <td>{{ i.anggaran }}</td>
+                  <td>{{ i.realisasi }}</td>
+                  <td>{{ i['lebih/(kurang)'] }}</td>
+                  <td>{{ i.tahun }}</td>
               </tr>
-              {%endif%}
-              {% endfor %}
+          {% endif %}
+      {% endfor %}
+      
 
 
             </table>
@@ -112,18 +113,19 @@
                   <th >Tahun</th>
                 </tr>
             </thead>
-                {% for i in info_list2 :%}
-                {% if h.tahun == i.tahun %}
-                <tr id="{{i.tahun}}">
-                    <td>{{i.no}}</td>
-                    <td>{{i.uraian}}</td>
-                    <td>{{i.anggaran}}</td>
-                    <td>{{i.realisasi}}</td>
-                    <td>{{i.lebih_kurang}}</td>
-                    <td>{{i.tahun}}</td>
+            {% for i in info_list2 %}
+            {% if h.tahun == i.tahun %}
+                <tr id="{{ i.tahun }}">
+                    <td>{{ i.no }}</td>
+                    <td>{{ i.uraian }}</td>
+                    <td>{{ i.anggaran }}</td>
+                    <td>{{ i.realisasi }}</td>
+                    <td>{{ i['lebih/(kurang)'] }}</td>
+                    <td>{{ i.tahun }}</td>
                 </tr>
-                {%endif%}
-                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        
   
   
               </table>
@@ -144,19 +146,18 @@
                     <th >Tahun</th>
                   </tr>
               </thead>
-                  {% for i in info_list3 :%}
-                  {% if h.tahun == i.tahun %}
-                  <tr id="{{i.tahun}}">
-                      <td>{{i.no}}</td>
-                      <td>{{i.uraian}}</td>
-                      <td>{{i.anggaran}}</td>
-                      <td>{{i.realisasi}}</td>
-                      <td>{{i.lebih_kurang}}</td>
-                      <td>{{i.tahun}}</td>
-                  </tr>
-                  {%endif%}
+                  {% for i in info_list3 %}
+                    {% if h.tahun == i.tahun %}
+                        <tr id="{{ i.tahun }}">
+                          <td>{{ i.no }}</td>
+                          <td>{{ i.uraian }}</td>
+                          <td>{{ i.anggaran }}</td>
+                          <td>{{ i.realisasi }}</td>
+                          <td>{{ i['lebih/(kurang)'] }}</td>
+                          <td>{{ i.tahun }}</td>
+                        </tr>
+                    {% endif %}
                   {% endfor %}
-    
     
                 </table>
                 {% else %}
@@ -192,12 +193,16 @@
           </div>
           <div class="modal-body">
            
+            <span class="mb-2">
+            keterangan: download dan edit 3 file excell .xlsx <a href='https://drive.google.com/drive/folders/1PxN3Lb0oBcfA61zQUto5pxG2IAyuhwSO?usp=sharing'>disini</a> dan upload ke form dibawah 
+            </span>
             <h4>Input excell realisasi pendapatan</h4>
             <form>
               <div class="input-group mb-3">
                 <div class="custom-file">
                   <input class="form-control" type="file" id="formpendapatan" />
-                </div>
+                </div>      
+                {% if error_pendapatan %} <div style="color: red;"> {{ error_pendapatan }} </div> {% endif %}
               </div>
             </form>
             <h4>Input excell realisasi belanja </h4>
@@ -206,6 +211,7 @@
                 <div class="custom-file">
                   <input class="form-control" type="file" id="formbelanja" />
                 </div>
+                {% if error_belanja %} <div style="color: red;"> {{ error_belanja }} </div> {% endif %}
               </div>
             </form>
             <h4>Input excell realisasi pembiayaan </h4>
@@ -214,6 +220,7 @@
                 <div class="custom-file">
                   <input class="form-control" type="file" id="formpembiayaan" />
                 </div>
+                {% if error_pembiayaan %} <div style="color: red;"> {{ error_pembiayaan }} </div> {% endif %}
               </div>
             </form>
            
@@ -253,7 +260,6 @@
         var data_thn =  JSON.parse('{{ tahun | tojson | safe }}');
         var thn = $('#tahun').val();
         for (var key in data_thn ) {
-          
                 console.log(key);
                 console.log(data_thn[key].tahun);
                 console.log(thn);
@@ -267,9 +273,7 @@
                 else{
                   $('#table_'+table_thn).hide();
                 }
-            
         }
-
       });
     
       $( "#tambah" ).on( "click", function() {
@@ -296,7 +300,7 @@
             'Authorization': 'Bearer ' + token
         },
           success: function(data) {
-            handleResponse(data,"tambah","admin/dana");
+            handleResponse(data,"tambah","/admin/dana");
           }
         });
         event.preventDefault();

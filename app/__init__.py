@@ -24,6 +24,11 @@ app.config['JWT_SECRET_KEY'] = 'qwdu92y17dqsu81'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=1)
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
 
+ALLOWED_EXTENSIONS = {'xlsx'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 

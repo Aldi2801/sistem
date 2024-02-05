@@ -14,16 +14,46 @@
         </nav>
         <h1 class="mb-0 fw-bold">Geografi</h1>
       </div>
-      <div
-        class="col-lg-4 col-md-6 d-none d-md-flex align-items-center justify-content-end"
-      >
-        <a
-          href="javascript:void(0)"
-          class="btn btn-info d-flex align-items-center ms-2"
-        >
-        <i data-feather="edit" style="width: 18px; height: 18px; margin-right: 10px"></i>
-          tambah
+      <div class="col-lg-4 col-md-6 d-none d-md-flex align-items-center justify-content-end">
+        <a href="javascript:void(0)" class="btn btn-info d-flex align-items-center ms-2"
+        data-bs-toggle="modal"
+        data-bs-target="#bs-example-modal-xlg">
+          <i data-feather="edit" style="width: 18px; height: 18px; margin-right: 10px"></i>
+          Tambah Tahun
         </a>
+      </div>
+      <div class="modal fade" id="bs-example-modal-xlg" tabindex="-1" aria-labelledby="bs-example-modal-lg"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header d-flex align-items-center">
+              <h4 class="modal-title" id="myLargeModalLabel">
+                Tambah Tahun
+              </h4>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <h4>Input Tahun</h4>
+              <form>
+                <div class="form-group">
+                  <input type="number" id="tahun_baru" class="form-control" />
+                </div>
+              </form>
+              <div class="modal-footer">
+                <button type="button" class="
+                    btn btn-light-danger
+                    text-danger
+                    font-weight-medium
+                  " data-bs-dismiss="modal">
+                  Close
+                </button>
+                <button type="button" id="tambah_tahun"class="btn btn-success" data-bs-dismiss="modal">
+                  Simpan
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -40,14 +70,14 @@
             <h4 class="card-title">Kondisi Geografi</h4>
             <div class="col-sm-3">
               <div class="mb-3">
-                <select
-                  class="form-select"
-                  id="tahun"
-                  name="educationDate"
-                >
-                  <option>Tahun</option>
+                <input type="hidden" name="tahun">
+                <select class="form-select" id="tahun" name="selected_tahun" >
                   {% for i in info_list :%}
-                  <option value="{{i.tahun}}">{{i.tahun}}</option>
+                  {% if loop.first%}
+                    <option value="{{i.tahun}}" clicked>{{i.tahun}}</option>
+                  {% else %}
+                    <option value="{{i.tahun}}">{{i.tahun}}</option>
+                  {% endif %}
                   {% endfor %}
                 </select>
               </div>
@@ -57,6 +87,12 @@
             <div class="card-body">
               <h4 class="card-title">Berbatasan Wilayah</h4>
               <div class="mb-3 row">
+                <input
+                type="hidden"
+                class="form-control"
+                name="id"
+                value=" {{info_list[0]['id']}}"
+              />
                 <label
                   for="com1"
                   class="col-sm-3 text-end control-label col-form-label"
@@ -118,35 +154,10 @@
               </div>
             </div>
             <div class="p-3 border-top">
-              <div class="text-end">
-                <button
-                  type="button"
-                  id="edit-wilayah"
-                  class="
-                    btn btn-info
-                    rounded-pill
-                    px-4
-                    waves-effect waves-light
-                  "
-                  
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  class="
-                    btn btn-dark
-                    rounded-pill
-                    px-4
-                    waves-effect waves-light
-                  "
-                >
-                  Cancel
-                </button>
-              </div>
+             
             </div>
           </form>
-          <form class="form-horizontal"  >
+          <form class="form-horizontal">
             <div class="card-body">
               <h4 class="card-title">Luas Desa</h4>
               <div class="mb-3 row">
@@ -211,29 +222,8 @@
               </div>
               <div class="p-3 border-top">
                 <div class="text-end">
-                  <button
-                    type="button"
-                    id="edit-tanah"
-                    class="
-                      btn btn-info
-                      rounded-pill
-                      px-4
-                      waves-effect waves-light
-                    "
-                  >
-                    Save
-                  </button>
-                  <button
-                    type="button"
-                    class="
-                      btn btn-dark
-                      rounded-pill
-                      px-4
-                      waves-effect waves-light
-                    "
-                  >
-                    Cancel
-                  </button>
+                  <button type="button" id="edit-wilayah" name="submit_wilayah" class=" btn btn-info rounded-pill px-4 waves-effect waves-light " > Save </button>
+                  <button type="button" class=" btn btn-danger rounded-pill px-4 waves-effect waves-light " onclick="hapusGeo()" > Hapus Data </button>
                 </div>
               </div>
             </div>
@@ -241,49 +231,139 @@
         </div>
       </div>
     </div>
-
     {% endblock %}
-    {% block js %}
+    {% block js%}
     <script>
-    $(document).ready(function () {
-      $( "#edit-tanah" ).on( "click", function() {
-        let formData = new FormData();
-        formData.append('status',status)
-          console.log(formData)
-          $.ajax({
-            url: "/admin/tanah",
-            data: formData,
-            cache: false,
-            contentType: false,
-            processData: false,
-            method: 'PUT',
-            type: 'PUT', 
-            headers: {
-              'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
-          },
-          }).done(function (data) {
-            handleResponse(data, "menambah", "/admin/geografi");
+      $(document).ready(function(){
+      var cb = $('#tahun').prop('selected');
+      console.log(cb)
+      var fields = ['id','utara','selatan','timur','barat','luas','sawahteri','sawahhu','pemukiman'];
+      function change(){
+        var info_list = JSON.parse('{{info_list|tojson}}');
+        console.log(info_list);
+        let found = 0
+        for (const info of info_list) {
+          var value = $('#tahun').val()
+          if (info.tahun == value) {
+            fields.forEach(field => {
+              $(`[name=${field}]`).val(info[field]);
+            });
+            found = 1
+          }
+          $(`[name='submit_wilayah']`).html("Save Edit");
+          $(`[name='submit_wilayah']`).val("edit");
+        }
+        if (found == 0){
+          fields.forEach(field => {
+            $(`[name=${field}]`).val("");
           });
+          $(`[name='submit_wilayah']`).html("Save Tambah");
+          $(`[name='submit_wilayah']`).val("tambah");
+        }
+      }
+      change()
+      $('#tahun').on('change', function () {
+        change();
       });
-      $( "#edit-wilayah" ).on( "click", function() {
-        let formData = new FormData();
-        formData.append('status',status)
-          console.log(formData)
-          $.ajax({
-            url: "/admin/wilayah",
-            data: formData,
-            cache: false,
-            contentType: false,
-            processData: false,
-            method: 'PUT',
-            type: 'PUT', 
-            headers: {
-              'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
-          },
-          }).done(function (data) {
-            handleResponse(data, "menambah", "/admin/geografi");
+        function sort_tahun() {
+          var selectElement = document.getElementById('tahun');
+          var optionsArray = Array.from(selectElement.options);
+          optionsArray.sort(function (a, b) {
+            return a.value - b.value;
           });
+          selectElement.innerHTML = '';
+          optionsArray.forEach(function (option) {
+            selectElement.appendChild(option);
+          });
+          change();
+        }
+        $('#tambah_tahun').on('click', function (){
+          var selectElement = document.getElementById('tahun');
+          var Option = document.createElement('option');
+          var tahun_baru = $('#tahun_baru').val()
+          Option.value = tahun_baru;
+          Option.text = tahun_baru;
+          selectElement.add(Option);
+          sort_tahun()
       });
+      sort_tahun();
+      $('#edit-wilayah').on('click', function (){
+        let formData = new FormData();
+        fields.forEach(function (field) {
+          var value = $(`[name=${field}]`).val();
+          formData.append(field, value);
+        });
+        var value = $('#tahun').val()
+        formData.append('selected_tahun', value);
+        var submit = $(`[name='submit_wilayah']`).val();
+        if (submit == "edit"){
+          var value = $('[name=id]').val()
+          formData.append('id', value);
+        $.ajax({
+          url: "/admin/edit_wilayah",
+          data: formData,
+          cache: false,
+          contentType: false,
+          processData: false,
+          method: 'PUT',
+          type: 'PUT',           
+          headers: {
+            'Authorization': 'Bearer ' +  "{{ session['jwt_token'] }}"
+        },
+        }).done(function(response) {
+          handleResponse(response,"edit","/admin/geografi");
+        }).fail(function(error) {
+          console.error(error);
+        });
+      }
+      else if(submit=="tambah"){
+        $.ajax({
+          url: "/admin/tambah_wilayah",
+          data: formData,
+          cache: false,
+          contentType: false,
+          processData: false,
+          method: 'POST',
+          type: 'POST', 
+          headers: {
+            'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
+        },
+        }).done(function(response) {
+          handleResponse(response,"tambah","/admin/geografi");
+        }).fail(function(error) {
+          console.error(error);
+        });
+      }
+      else{
+        alert("error");
+      }
+      });
+     
     });
     </script>
+   <script>
+    function hapusGeo() {
+      // Menampilkan dialog konfirmasi
+      var result = confirm("Apakah Anda yakin?");
+ 
+ // Memeriksa hasil konfirmasi
+ if (result) {
+  var value = $('[name=id]').val()
+     $.ajax({
+       url: '/admin/hapus_wilayah',
+       method: 'DELETE',
+       headers: {
+         'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
+     },
+       data: { id: value },
+       dataType: 'json',
+     }).done(function(response) {
+       handleResponse(response, "menghapus", "/admin/geografi");
+     }).fail(function(error) {
+       console.error(error);
+       // Handle the error case
+     });
+   }
+ }
+   </script>
     {% endblock %}

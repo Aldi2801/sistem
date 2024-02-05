@@ -1,5 +1,5 @@
 from . import app,db,bcrypt,user_datastore,security,jwt,Role,User
-from flask import request,render_template,redirect,url_for,jsonify,session
+from flask import request,render_template,redirect,url_for,jsonify,session,flash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity,unset_jwt_cookies
     
 @app.route('/masuk')
@@ -34,7 +34,8 @@ def keluar():
     unset_jwt_cookies(response)
     session.pop('jwt_token', None)
     session.pop('username', None)
-    return redirect(url_for('masuk', msg='logout sukses'))
+    flash('Sukses Logout')
+    return redirect(url_for('masuk'))
 
 @jwt.expired_token_loader
 def expired_token_callback():
