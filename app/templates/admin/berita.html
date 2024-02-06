@@ -1,9 +1,19 @@
-{% extends 'include/include.html' %} {% block content %}
+{% extends 'include/include.html' %} 
 
-<head>
-  <link rel="stylesheet" type="text/css" href="../../static/assets/libs/quill/dist/quill.snow.css" />
-</head>
+{% block head %}
+<link rel="stylesheet" type="text/css" href="../../static/assets/libs/quill/dist/quill.snow.css" />
+<style>
+  .ql-toolbar .ql-formats svg {
+    width: 20px; /* Lebar ikon */
+    height: 20px; /* Tinggi ikon */
+}
+  .ql-toolbar .ql-formats ql-align svg{
+    padding-bottom:5px;
+}
+</style>
+{% endblock %}
 
+{% block content %}
 <div class="page-titles">
   <div class="row">
     <div class="col-lg-8 col-md-6 col-12 align-self-center">
@@ -51,24 +61,13 @@
                 </div>
               </div>
             </form>
-            <div class="container-fluid">
-              <div class="row">
-                <div class="col-12">
-                  <div class="card">
-                    <div class="border-bottom title-part-padding">
+            <form>
                       <h4 class="mb-0">Deskripsi Berita</h4>
-                    </div>
-                    <div class="card-body">
-                      <!-- Create the editor container -->
                       <div id="editor">
-                        <p id="val" value="Deskripsi Berita"></p>
+                        <p id="val" value="DeskripsiBerita"></p>
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                    </form>
             </div>
-          </div>
           <div class="modal-footer">
 
             <a id="tambah" href="javascript:void(0)" class="btn btn-info d-fFlex align-items-center ms-2">
@@ -136,35 +135,26 @@
                         <h4>Judul Berita</h4>
                         <form>
                           <div class="form-group">
-                            <input type="text" class="form-control" id="editjudulberitabaru" value="{{i.judul}}" />
+                            <input type="text" class="form-control" id="editjudulberita-{{i.id}}" value="{{i.judul}}" />
                           </div>
                         </form>
                         <h4>Input Gambar Baru</h4>
                         <form>
                           <div class="input-group mb-3">
                             <div class="custom-file">
-                              <input class="form-control" type="file" hint="{{i.gambar}}" id="editformFilebaru" />
+                              <input class="form-control" type="file" hint="{{i.gambar}}" id="editformFilebaru-{{i.id}}" />
                             </div>
                           </div>
                         </form>                    
                         <label class="form-check-label" for="inlineCheckbox1">Hapus Gambar?</label>
                         <input class="form-check-input" type="checkbox" id="reset-{{i.id}}">
-                        <div class="container-fluid">
-                          <div class="row">
-                            <div class="col-12">
-                              <div class="card">
-                                <div class="border-bottom title-part-padding">
+                        <form>
                                   <h4 class="mb-0">Deskripsi Berita</h4>
-                                </div>
                                 <!-- Create the editor container -->
                                 <div id="editor-{{i.id}}">
                                   {{i.deskripsifull|safe}}
-                                  <p value="Deskripsi Berita"></p>
                                 </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                              </form>
                       </div>
                       <div class="modal-footer">
                         <button type="submit" onclick="edit('{{i.id}}')"
@@ -193,6 +183,15 @@
             $(document).ready(function () {
               new Quill("#editor-{{i.id}}", {
                 theme: "snow",
+                modules: {
+                  toolbar: [
+                      [{ 'header': [1, 2, 3, false] }],  
+                      ['bold', 'italic', 'underline'],  // Menentukan toolbar yang ingin ditampilkan
+                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Menambahkan tombol untuk daftar terurut dan tidak terurut
+                      [{ 'align': [] }],
+                      ['link', 'image']  // Menambahkan tombol untuk menyisipkan link dan gambar
+                  ]
+              },
               });
             });
           </script>
@@ -210,25 +209,31 @@
 
   <script>
     var token = "{{ session['jwt_token'] }}"
-    console.log(token)
     $(document).ready(function () {
       var tambah = new Quill("#editor", {
         theme: "snow",
+                modules: {
+                  toolbar: [
+                      [{ 'header': [1, 2, 3, false] }],  
+                      ['bold', 'italic', 'underline'],  // Menentukan toolbar yang ingin ditampilkan
+                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Menambahkan tombol untuk daftar terurut dan tidak terurut
+                      [{ 'align': [] }],
+                      ['link', 'image']  // Menambahkan tombol untuk menyisipkan link dan gambar
+                  ]
+              },
       });
       $("#tambah").on("click", function () {
-        var value = tambah.getText();
+        var deskripsi = tambah.getText();
+        var deskripsifull = tambah.root.innerHTML
         var jdl = $('#judulberitabaru').val()
         var formFilebaru = $('#formFilebaru')
-        console.log(String(value))
-
         let formData = new FormData();
         formData.append('judul', jdl)
         jQuery.each(jQuery('#formFilebaru')[0].files, function (i, file) {
           formData.append('gambar', file);
         });
-        formData.append('deskripsi', String(value))
-
-        console.log(formData)
+        formData.append('deskripsi', String(deskripsi))
+        formData.append('deskripsifull', deskripsifull)
         $.ajax({
           url: "/admin/tambah_berita",
           data: formData,
@@ -245,27 +250,23 @@
         });
         event.preventDefault();
       });
-
-
-
     });
   </script>
   <script>
     function edit(id) {
-      var quilli = new Quill("#editor-" + id, {
-        theme: "snow",
-      });
-      var editvalue = quilli.getText();
-      var editjdl = $('#editjudulberitabaru').val()
-      var editformFilebaru = $('#editjudulberitabaru').val()
+      var quilli = new Quill("#editor-" + id);
+      var deskripsi = quilli.getText();
+      var deskripsifull = quilli.root.innerHTML
+      var editjdl = $('#editjudulberita-' + id,).val()
       var reset = $('#reset-'+id).prop('checked');
       let formData = new FormData();
       formData.append('id', id);
       formData.append('judul', editjdl);
-      jQuery.each(jQuery('#formFilebaru')[0].files, function (i, file) {
+      jQuery.each(jQuery('#editformFilebaru-' + id)[0].files, function (i, file) {
         formData.append('gambar', file);
       });
-      formData.append('deskripsi', String(editvalue))
+      formData.append('deskripsi', String(deskripsi))
+      formData.append('deskripsifull', deskripsifull)
       formData.append("reset", reset);
       $.ajax({
         url: "/admin/edit_berita",
@@ -294,8 +295,7 @@
       }).done(function (response) {
         handleResponse(response,"hapus","/admin/berita")
       }).fail(function (error) {
-        console.error(error);
-        // Handle the error case
+        
       });
     }
   </script>

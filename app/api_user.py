@@ -26,46 +26,16 @@ def homepahe():
     thn_dana_list =fetch_data_and_format("SELECT tahun FROM realisasi_pendapatan group by tahun")
     session['list_thn_dana']= thn_dana_list 
     return render_template('index.html')
-
 @app.route('/news')
 def userberita():
-    g.con.execute("SELECT * FROM berita order by id DESC")
-    berita = g.con.fetchall()
-    info_list = []
-    for sistem in berita:
-        des = str(sistem[3])
-        des = textwrap.shorten(des,width=75, placeholder="...")
-        list_data = {
-            'id': str(sistem[0]),
-            'judul': str(sistem[1]),
-            'gambar': str(sistem[2]),
-            'deskripsi': des,
-            'deskripsifull': str(sistem[3]),
-            'tanggal': str(sistem[4]),
-            'link': str(sistem[5]),
-        }
-        info_list.append(list_data)
-  
-    return render_template('homepage.html',info_list = info_list)
+    berita = fetch_data_and_format("SELECT * FROM berita order by id DESC")
+    return render_template('homepage.html',info_list = berita)
 #halaman berita
 @app.route('/berita/<link>')
 def detail_berita(link):
-    g.con.execute("SELECT * FROM berita where link = %s order by id DESC " , (link,))
-    berita = g.con.fetchall()
-    info_list = []
-    for sistem in berita:
-        des = str(sistem[3])
-        des = textwrap.shorten(des,width=75, placeholder="...")
-        list_data = {
-            'id': str(sistem[0]),
-            'judul': str(sistem[1]),
-            'gambar': str(sistem[2]),
-            'deskripsi': des,
-            'deskripsifull': str(sistem[3]),
-            'tanggal': str(sistem[4])
-        }
-        info_list.append(list_data)
-    return render_template('detail_berita.html',info_list = info_list)
+    query = "SELECT * FROM berita where link = '"+ str(link) +"' order by id DESC "
+    berita = fetch_data_and_format(query)
+    return render_template('detail_berita.html',info_list = berita)
 #halaman sejarah
 @app.route('/sejarah')
 def sejarah():
@@ -231,7 +201,7 @@ def tambah_surat():
     keterangan = request.form['keterangan']
     g.con.execute("INSERT INTO surat (nama , hp, keterangan) VALUES (%s,%s,%s)",(nama,hp,keterangan))
     mysql.connection.commit()
-    return jsonify("msg : SUKSES")
+    return jsonify({"msg":"SUKSES"})
 
 @app.route('/edit_surat', methods=['POST'])
 def edit_surat():
@@ -241,11 +211,11 @@ def edit_surat():
     keterangan = request.form['keterangan']
     g.con.execute("UPDATE surat SET nama = %s, hp = %s, keterangan = %s WHERE id = %s",(nama,hp,keterangan,id))
     mysql.connection.commit()
-    return jsonify("msg : SUKSES")
+    return jsonify({"msg":"SUKSES"})
 
 @app.route('/hapus_surat', methods=['POST'])
 def hapus_surat():
     id = request.form['id']
     g.con.execute("DELETE FROM surat WHERE id = %s",(id))
     mysql.connection.commit()
-    return jsonify("msg : SUKSES")
+    return jsonify({"msg":"SUKSES"})

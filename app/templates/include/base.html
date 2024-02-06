@@ -13,7 +13,22 @@
 
     <link rel="icon" type="image/png" sizes="16x16" href="../static/image/logo_ico.png" />   
     <link href="../static/dist/css/style.min.css" rel="stylesheet" />
-    
+    <link rel="stylesheet" type="text/css" href="../static/assets/libs/quill/dist/quill.snow.css" />
+    <!-- fix ck editor -->
+    <style>
+      .ql-align-right{
+        text-align:right;
+      }
+      .ql-align-left{
+        text-align:left;
+      }
+      .ql-align-center{
+        text-align:center
+      }
+      .ql-align-justify{
+        text-align:justify
+      }
+    </style>    
   <!-- Table -->
   <link
   href="../static/assets/extra-libs/datatables.net-bs4/css/dataTables.bootstrap4.css"
@@ -34,7 +49,6 @@
         color: #ffff00 !important;
       }
     </style>
-    <style type="text/css" id="operaUserStyle"></style>
     <style type="text/css">
       .jqstooltip {
         position: absolute;
@@ -127,6 +141,10 @@
       .dropdown-item:active {
         background-color: #fff;
         color:#6c757d;
+      }
+      /*fix style agenda*/
+      .fc-event{
+      color: #67757c ;
       }
     </style>
     {% block head %}{% endblock %}

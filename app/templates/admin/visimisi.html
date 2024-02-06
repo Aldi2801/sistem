@@ -1,12 +1,17 @@
-{% extends 'include/include.html' %} {% block content %}
-<head>
-  <link
-    rel="stylesheet"
-    type="text/css"
-    href="../../static/assets/libs/quill/dist/quill.snow.css"
-  />
-</head>
-
+{% extends 'include/include.html' %} 
+{% block head %}
+<link rel="stylesheet" type="text/css" href="../../static/assets/libs/quill/dist/quill.snow.css" />
+<style>
+  .ql-toolbar .ql-formats svg {
+    width: 20px; /* Lebar ikon */
+    height: 20px; /* Tinggi ikon */
+}
+  .ql-toolbar .ql-formats ql-align svg{
+    padding-bottom:5px;
+}
+</style>
+{% endblock %}
+{% block content %}
 <div class="page-titles">
   <div class="row">
     <div class="col-lg-8 col-md-6 col-12 align-self-center">
@@ -88,30 +93,8 @@
           </div>
           <div class="p-3 border-top">
             <div class="text-end">
-              <button
-              id="submit2"
-                type="submit"
-                class="
-                  btn btn-info
-                  rounded-pill
-                  px-4
-                  waves-effect waves-light
-                "
-                
-              >
-                Save
-              </button>
-              <button
-                type="button"
-                class="
-                  btn btn-dark
-                  rounded-pill
-                  px-4
-                  waves-effect waves-light
-                "
-              >
-                Cancel
-              </button>
+              <button id="submit2" type="submit" class=" btn btn-info rounded-pill px-4 waves-effect waves-light " > Save </button>
+              <button type="button" class=" btn btn-dark rounded-pill px-4 waves-effect waves-light " > Cancel </button>
             </div>
           </div>
         </div>
@@ -119,62 +102,75 @@
   </div>
 </from>
 </div>
+{% endblock %}
+{% block js %}
 <script>
-      var token = "{{ session['jwt_token'] }}"
-    console.log(token)
-    $(document).ready(function () {
-        var quill = new Quill("#editor", {
-            theme: "snow",
-          });
-          $( "#submit" ).on( "click", function() {
-            var value = quill.root.innerHTML
-            console.log(String(value))
-            var formData = {
-                visi: String(value)
-              };
-              console.log(formData)
-              $.ajax({
-                type: "PUT",
-                url: "/admin/visiedit",
-                data: formData,
-                dataType: "json",
-                encode: true,
-                headers: {
-                  'Authorization': 'Bearer ' + token
-              },
-              }).done(function (data) {
-                console.log(data);
-              });
-              event.preventDefault();
-          } );
-        var quilll = new Quill("#edit", {
-            theme: "snow",
-          });
-          $( "#submit2" ).on( "click", function() {
-            var value = quilll.root.innerHTML
-            console.log(String(value))
-            var formData = {
-                misi: String(value)
-              };
-              console.log(formData)
-              $.ajax({
-                type: "PUT",
-                url: "/admin/misiedit",
-                data: formData,
-                dataType: "json",
-                encode: true,
-                headers: {
-                  'Authorization': 'Bearer ' + token
-              },
-              }).done(function (data) {
-                console.log(data);
-              });
-              event.preventDefault();
-          } );
+  var token = "{{ session['jwt_token'] }}"
+console.log(token)
+$(document).ready(function () {
+    var quill = new Quill("#editor", {
+        theme: "snow",
+            modules: {
+              toolbar: [
+                  [{ 'header': [1, 2, 3, false] }],  
+                  ['bold', 'italic', 'underline'],  // Menentukan toolbar yang ingin ditampilkan
+                  [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Menambahkan tombol untuk daftar terurut dan tidak terurut
+                  [{ 'align': [] }],
+                  ['link', 'image']  // Menambahkan tombol untuk menyisipkan link dan gambar
+              ]
+          },
       });
-        
-</script>
-<script>
+      $( "#submit" ).on( "click", function() {
+        var value = quill.root.innerHTML
+        var formData = {
+            visi: String(value)
+          };
+          $.ajax({
+            type: "PUT",
+            url: "/admin/visiedit",
+            data: formData,
+            dataType: "json",
+            encode: true,
+            headers: {
+              'Authorization': 'Bearer ' + token
+          },
+          }).done(function (data) {
+             handleResponse(data,"edit visi", "/admin/visimisi")
+          });
+          event.preventDefault();
+      } );
+    var quilll = new Quill("#edit", {
+        theme: "snow",
+            modules: {
+              toolbar: [
+                  [{ 'header': [1, 2, 3, false] }],  
+                  ['bold', 'italic', 'underline'],  // Menentukan toolbar yang ingin ditampilkan
+                  [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Menambahkan tombol untuk daftar terurut dan tidak terurut
+                  [{ 'align': [] }],
+                  ['link', 'image']  // Menambahkan tombol untuk menyisipkan link dan gambar
+              ]
+          },
+      });
+      $( "#submit2" ).on( "click", function() {
+        var value = quilll.root.innerHTML
+        var formData = {
+            misi: String(value)
+          };
+          $.ajax({
+            type: "PUT",
+            url: "/admin/misiedit",
+            data: formData,
+            dataType: "json",
+            encode: true,
+            headers: {
+              'Authorization': 'Bearer ' + token
+          },
+          }).done(function (data) {
+            handleResponse(data,"edit misi", "/admin/visimisi")
+          });
+          event.preventDefault();
+      } );
+  });
     
 </script>
 {% endblock %}

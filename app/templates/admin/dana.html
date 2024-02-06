@@ -16,18 +16,8 @@
       </nav>
       <h1 class="mb-0 fw-bold">Dana Desa</h1>
     </div>
-    <div
-      class="col-lg-4 col-md-6 d-none d-md-flex align-items-center justify-content-end"
-    >
-      <a
-        href="javascript:void(0)"
-        class="btn btn-info d-flex align-items-center ms-2"
-        data-bs-toggle="modal"
-        data-bs-target="#bs-example-modal-xl"
-      >
-        <i class="ri-add-line me-1"></i>
-        tambah data
-      </a>
+    <div class="col-lg-4 col-md-6 d-none d-md-flex align-items-center justify-content-end" >
+      <a href="javascript:void(0)" class="btn btn-info d-flex align-items-center ms-2" data-bs-toggle="modal" data-bs-target="#bs-example-modal-xl" > <i class="ri-add-line me-1"></i> tambah data </a>
     </div>
   </div>
 </div>
@@ -49,11 +39,7 @@
           <h4>Dana Desa Tahun:</h4>
           <div class="col-sm-3">
             <div class="mb-3">
-              <select
-                class="form-select"
-                id="tahun"
-                name="educationDate"
-              >
+              <select class="form-select" id="tahun" name="educationDate" >
                 <option value="tahun" selected>Semua Tahun</option>
                 {% for i in tahun :%}
                 <option value="{{i.tahun}}">{{i.tahun}}</option>
@@ -67,7 +53,6 @@
             {% for h in tahun :%}
             <div id="table_{{h.tahun}}">
             <h4>Dana Desa Tahun {{h.tahun}} </h4>
-            
           {% if info_list %}
           <h6>realisasi pendapatan </h6>
           <table  class="table table-striped table-bordered display text-nowrap">
@@ -93,9 +78,6 @@
               </tr>
           {% endif %}
       {% endfor %}
-      
-
-
             </table>
             {% else %}
             <p>No data available.</p>
@@ -125,15 +107,11 @@
                 </tr>
             {% endif %}
         {% endfor %}
-        
-  
-  
               </table>
               {% else %}
               <p>No data available.</p>
               {% endif %}
               {% if info_list3 %}
-              
           <h6>realisasi pembiayaan </h6>
               <table  class="table table-striped table-bordered display text-nowrap">
                   <thead>
@@ -158,12 +136,10 @@
                         </tr>
                     {% endif %}
                   {% endfor %}
-    
                 </table>
                 {% else %}
                 <p>No data available.</p>
                 {% endif %}
-      
           </div>
             {% endfor %}
           </div>
@@ -254,7 +230,6 @@
     </div>
     <script>
           var token = "{{ session['jwt_token'] }}"
-    console.log(token)
       $( "#tahun").val("tahun");
       $( "#tahun" ).change( "click", function() {
         var data_thn =  JSON.parse('{{ tahun | tojson | safe }}');
@@ -280,15 +255,10 @@
         var excellpendapatan = $('#formpendapatan')[0].files[0];
         var excellbelanja  = $('#formbelanja')[0].files[0];
         var excellpembiayaan = $('#formpembiayaan')[0].files[0];
-       
-    
         let formData = new FormData();
-       
         formData.append('excellpendapatan', excellpendapatan);
         formData.append('excellbelanja', excellbelanja);
         formData.append('excellpembiayaan', excellpembiayaan);
-    
-        console.log(formData);excellbelanja
         $.ajax({
           url: "/admin/tambah_dana",
           data: formData,

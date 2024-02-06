@@ -1,10 +1,18 @@
-{% extends 'include/include.html' %} {% block content %}
-<head><link
-    rel="stylesheet"
-    type="text/css"
-    href="../../static/assets/libs/quill/dist/quill.snow.css"
-  /></head>
-<div class="page-titles">
+{% extends 'include/include.html' %} 
+{% block head %}
+<link rel="stylesheet" type="text/css" href="../../static/assets/libs/quill/dist/quill.snow.css" />
+<style>
+  .ql-toolbar .ql-formats svg {
+    width: 20px; /* Lebar ikon */
+    height: 20px; /* Tinggi ikon */
+}
+  .ql-toolbar .ql-formats ql-align svg{
+    padding-bottom:5px;
+}
+</style>
+{% endblock %}
+{% block content %}
+  <div class="page-titles">
     <div class="row">
       <div class="col-lg-8 col-md-6 col-12 align-self-center">
         <nav aria-label="breadcrumb">
@@ -14,52 +22,33 @@
                 ><i class="ri-home-3-line fs-5"></i
               ></a>
             </li>
-            <li class="breadcrumb-item active" aria-current="page">
-              Quill Editor
-            </li>
+            <li class="breadcrumb-item active" aria-current="page">/Info Desa/Sejarah</li>
           </ol>
         </nav>
-        <h1 class="mb-0 fw-bold">Quill Editor</h1>
+        <h1 class="mb-0 fw-bold">Sejarah</h1>
       </div>
-      <div
-        class="
-          col-lg-4 col-md-6
-          d-none d-md-flex
-          align-items-center
-          justify-content-end
-        "
-      >
-      <a
-      id="submit"
-      href="javascript:void(0)"
-      class="btn btn-info d-flex align-items-center ms-2"
-    >
-      Submit
-    </a>
-      
+      <div class=" col-lg-4 col-md-6 d-none d-md-flex align-items-center justify-content-end " > 
+        <a id="submit" href="javascript:void(0)" class="btn btn-info d-flex align-items-center ms-2" > Submit </a> 
+      </div>
+    
     </div>
   </div>
-  <!-- ============================================================== -->
-  <!-- End Bread crumb and right sidebar toggle -->
-  <!-- ============================================================== -->
-  <!-- ============================================================= -->
-  <!-- Container fluid  -->
-  <!-- ============================================================= -->
+
   <div class="container-fluid">
     <!-- ============================================================= -->
     <!-- Start Page Content -->
     <!-- ============================================================= -->
+    <!-- Row -->
     <div class="row">
       <div class="col-12">
         <div class="card">
           <div class="border-bottom title-part-padding">
-            <h4 class="mb-0">Quill Editor</h4>
+            <h4 class="mb-0">Edit Sejarah</h4>
           </div>
           <div class="card-body">
             <!-- Create the editor container -->
             <div id="editor" style="height: 300px">
-              <p id="val">{{info[1]}}</p>
-              
+             {{info[0].sejarah|safe}}
             </div>
           </div>
         </div>
@@ -81,6 +70,15 @@
     $(document).ready(function () {
         var quill = new Quill("#editor", {
             theme: "snow",
+                modules: {
+                  toolbar: [
+                      [{ 'header': [1, 2, 3, false] }],  
+                      ['bold', 'italic', 'underline'],  // Menentukan toolbar yang ingin ditampilkan
+                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],  // Menambahkan tombol untuk daftar terurut dan tidak terurut
+                      [{ 'align': [] }],
+                      ['link', 'image']  // Menambahkan tombol untuk menyisipkan link dan gambar
+                  ]
+              },
           });
         $( "#submit" ).on( "click", function() {
             var value = quill.root.innerHTML

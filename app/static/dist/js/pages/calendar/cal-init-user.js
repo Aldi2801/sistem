@@ -99,13 +99,18 @@
               <img src="../static/image/`+reverse_datetime_local(calEvent.foto)+`" class="responsive-image"
                 alt="">
             </div><br>
-            Kategori : `+ calEvent.kategori+`<br>
-            Dari : `+ reverse_datetime_local(calEvent.jam_mulai) +`<br>
-            Sampai : `+ reverse_datetime_local(calEvent.jam_selesai) +`<br>
-            Pelaksana : `+ calEvent.pemimpin_kegiatan +`<br>
-            `+ calEvent.keterangan +`
-        
-      </div>`);
+            `);
+      if (calEvent.gambar == "default.jpg"){}
+               else {
+              form.append(`<img class="card-img img-responsive" src="../../static/image/`+calEvent.gambar+`" alt="Card image cap" />`)
+               }
+               form.append(`Kategori : `+ calEvent.kategori+`<br>
+               Dari : `+ reverse_datetime_local(calEvent.jam_mulai) +`<br>
+               Sampai : `+ reverse_datetime_local(calEvent.jam_selesai) +`<br>
+               Pelaksana : `+ calEvent.pemimpin_kegiatan +`<br>
+               `+ calEvent.keterangan +`
+           
+         </div>`)
        
           $this.$modal.show();
           $(".bckdrop").addClass("show");
@@ -216,6 +221,7 @@
           end: init_date(end),
           jam_mulai: init_datetime_local(start),
           jam_selesai: init_datetime_local(end),
+          gambar:jsonData[i].gambar,
           className: className,
           id: jsonData[i].id,
           keterangan: jsonData[i].keterangan,

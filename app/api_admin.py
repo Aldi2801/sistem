@@ -87,7 +87,6 @@ def fetch_years(query):
 def insert_data_from_dataframe(df, table):
     for index, row in df.iterrows():
         sql = f"INSERT INTO {table} (no, uraian, anggaran, realisasi, `lebih/(kurang)`, tahun) VALUES (%s, %s, %s, %s, %s, %s)"
-        # Ubah row[0], row[1], ..., row[5] sesuai dengan nama kolom di DataFrame Anda
         print(row['lebih/(kurang)'])
         g.con.execute(sql, (row['no'], row['uraian'], row['anggaran'], row['realisasi'], row['lebih/(kurang)'], row['thn']))
     mysql.connection.commit()
@@ -113,7 +112,7 @@ def tambah_info():
     try:
         g.con.execute("INSERT INTO sejarah (sejarah , visi, misi) VALUES (%s,%s,%s)",(sejarah , visi, misi))
         mysql.connection.commit()
-        return jsonify("msg : SUKSES")
+        return jsonify({"msg":"SUKSES"})
     except Exception as e:
         print(str(e))
         return jsonify({"error": str(e)})
@@ -129,7 +128,7 @@ def infoedit():
     try:
         g.con.execute("UPDATE sejarah_desa SET sejarah = %s, visi = %s, misi = %s WHERE id = %s",(sejarah,visi,misi,id))
         mysql.connection.commit()
-        return jsonify("msg : SUKSES")
+        return jsonify({"msg":"SUKSES"})
     except Exception as e:
         print(str(e))
         return jsonify({"error": str(e)})
@@ -141,7 +140,7 @@ def sejarahedit():
         try:
             g.con.execute("UPDATE sejarah_desa SET sejarah = %s WHERE id = 1",(str(sejarah),))
             mysql.connection.commit()
-            return jsonify("msg : SUKSES")
+            return jsonify({"msg":"SUKSES"})
         except Exception as e:
             print(str(e))
             return jsonify({"error": str(e)})
@@ -163,7 +162,7 @@ def adminvisiedit():
     try:
         g.con.execute("UPDATE sejarah_desa SET visi= %s WHERE id = 1",(visi,))
         mysql.connection.commit()
-        return redirect(url_for("adminvisimisi"))
+        return jsonify({"msg":"SUKSES"})
     except Exception as e:
         print(str(e))
         return jsonify({"error": str(e)})
@@ -176,7 +175,7 @@ def adminmisiedit():
     try:
         g.con.execute("UPDATE sejarah_desa SET misi= %s WHERE id = 1",(misi,))
         mysql.connection.commit()
-        return redirect(url_for("adminvisimisi"))
+        return jsonify({"msg":"SUKSES"})
     except Exception as e:
         print(str(e))
         return jsonify({"error": str(e)})
@@ -193,11 +192,13 @@ def tambah_berita():
     judul = request.form['judul']
     link = '_'.join(filter(None, [judul.replace("#", "").replace("?", "").replace("/", "").replace(" ", "_")]))
     deskripsi = request.form['deskripsi']
+    deskripsi = textwrap.shorten(deskripsi, width=75, placeholder="...")
+    deskripsifull = request.form['deskripsifull']
     try: 
         random_name = do_image("tambah","berita","")
-        g.con.execute("INSERT INTO berita (judul, gambar , deskripsi,link ) VALUES (%s,%s,%s,%s)",(judul,random_name,deskripsi,link))
+        g.con.execute("INSERT INTO berita (judul, gambar , deskripsi, deskripsifull, link ) VALUES (%s,%s,%s,%s,%s)",(judul,random_name,deskripsi,deskripsifull,link))
         mysql.connection.commit()
-        return jsonify("msg : SUKSES")
+        return jsonify({"msg":"SUKSES"})
     except Exception as e:
         str(e)
         return jsonify({"error": str(e)})
@@ -206,10 +207,13 @@ def tambah_berita():
 def berita_edit():
     id = request.form['id']
     judul = request.form['judul']
+    link = '_'.join(filter(None, [judul.replace("#", "").replace("?", "").replace("/", "").replace(" ", "_")]))
     deskripsi = request.form['deskripsi']
+    deskripsi = textwrap.shorten(deskripsi, width=75, placeholder="...")
+    deskripsifull = request.form['deskripsifull']
     try:
         status = do_image("edit","berita",id)
-        g.con.execute("UPDATE berita SET judul = %s, deskripsi = %s WHERE id = %s",(judul,deskripsi,id))
+        g.con.execute("UPDATE berita SET judul = %s, deskripsi = %s, deskripsifull = %s, link = %s  WHERE id = %s",(judul,deskripsi,deskripsifull,link,id))
         mysql.connection.commit()
         return jsonify({"msg" : "SUKSES"})
     except Exception as e:
@@ -266,7 +270,7 @@ def edit_dana():
     try:
         g.con.execute("UPDATE dana SET tahun = %s, dana = %s, keterangan = %s, sisah = %s WHERE id = %s",(tahun,dana,digunakan,sisah,id))
         mysql.connection.commit()
-        return jsonify("msg : SUKSES")
+        return jsonify({"msg":"SUKSES"})
     except Exception as e:
         print(str(e))
         return jsonify({"error": str(e)})
@@ -279,7 +283,7 @@ def hapus_dana():
     try:
         g.con.execute("DELETE FROM dana WHERE id = %s",(id))
         mysql.connection.commit()
-        return jsonify("msg : SUKSES")
+        return jsonify({"msg":"SUKSES"})
     except Exception as e:
         print(str(e))
         return jsonify({"error": str(e)})
@@ -463,7 +467,7 @@ def tambah_galeri():
         random_name = do_image("tambah","galeri","")
         g.con.execute("INSERT INTO galeri (judul, gambar , tanggal) VALUES (%s,%s,%s)",(judul,random_name,tanggal))
         mysql.connection.commit()
-        return jsonify("msg : SUKSES")
+        return jsonify({"msg":"SUKSES"})
     except Exception as e:
         print(str(e))
         return jsonify({"error": str(e)})
