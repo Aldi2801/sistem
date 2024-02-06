@@ -66,6 +66,8 @@ def get_image_filename(table, id):
     return result[0] if result else None
 
 def delete_image(filename):
+    if result == "default.jpg":
+        return TRUE
     if filename:
         image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         if os.path.exists(image_path):
