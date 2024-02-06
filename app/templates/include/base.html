@@ -11,7 +11,7 @@
     <meta name="robots" content="noindex,nofollow" />
     <title>sistemdesa</title>
 
-    <link rel="icon" type="image/png" sizes="16x16" href="../static/image/logo.png" />   
+    <link rel="icon" type="image/png" sizes="16x16" href="../static/image/logo_ico.png" />   
     <link href="../static/dist/css/style.min.css" rel="stylesheet" />
     
   <!-- Table -->
@@ -124,6 +124,10 @@
         color: #888;
         margin-top: 5px;
       }
+      .dropdown-item:active {
+        background-color: #fff;
+        color:#6c757d;
+      }
     </style>
     {% block head %}{% endblock %}
   </head>
@@ -200,7 +204,7 @@
                   Pemerintahan ▼
                 </button>
                 <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                  <a class="dropdown-item" href="/visi_misi">VISI DAN MISI</a>
+                  <a class="dropdown-item" style="" href="/visi_misi">VISI DAN MISI</a>
                   <a class="dropdown-item" href="/pemerintahan_desa"
                     >PEMERINTAH DESA</a
                   >
@@ -288,7 +292,12 @@
               data-bs-target="#chatModal"
               onclick="set_time()"
             >
-              Chat Bot
+            <a>
+            <i data-feather="message-square"></i>
+            <div class="notify">
+              <span class="point bg-warning"></span>
+            </div>
+          </a>
             </button>
             <!-- ============================================================== -->
             <!-- End Messages -->
