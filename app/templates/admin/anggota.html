@@ -2,7 +2,7 @@
 
 <div class="page-titles">
   <div class="row">
-    <div class="col-lg-8 col-md-6 col-12 align-self-center">
+    <div class="col-lg-6 col-md-6 col-12 align-self-center">
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb mb-0 d-flex align-items-center">
           <li class="breadcrumb-item">
@@ -17,8 +17,16 @@
     </div>
 
     <div
-      class="col-lg-4 col-md-6 d-none d-md-flex align-items-center justify-content-end"
+      class="col-lg-6 col-md-6 d-none d-md-flex align-items-center justify-content-end"
     >
+    <a
+    class="btn btn-info d-flex align-items-center ms-2"
+    data-bs-toggle="modal"
+    data-bs-target="#bs-jabatan-modal-xlg"
+  >
+    <i class="ri-add-line me-1"></i>
+    Ubah Urutan Jabatan
+  </a>
       <a
         class="btn btn-info d-flex align-items-center ms-2"
         data-bs-toggle="modal"
@@ -148,6 +156,41 @@
       </div>
       <!-- Modal tambah -->
     </div>
+     <!-- Modal ubah urutan jabatan -->
+     <div class="modal fade" id="bs-jabatan-modal-xlg" tabindex="-1" aria-labelledby="bs-jabatan-modal-lg" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header d-flex align-items-center">
+            <h4 class="modal-title" id="myLargeModalLabel">
+               Ubah Urutan Jabatan
+            </h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></button>
+          </div>
+          <div class="modal-body">
+           <div class="col-lg-12 col-md-12">
+                   <div class="myadmin-dd dd text-black col-12" id="nestable">
+                     <ol class="dd-list col-12">
+                       {% for i in urutan_jabatan :%}
+                       <li class="dd-item col-12" data-id="{{i}}">
+                         <div class="dd-handle col-12">{{i}}</div>
+                       </li>
+                       {% endfor %}
+                       
+                         </ol>
+                       </li>
+                     </ol>
+                   </div>
+                 </div>
+               </div>
+          <div class="modal-footer">
+               <button id="ubah_jabatan" href="javascript:void(0)" class="btn btn-info d-fFlex align-items-center ms-2" > Submit </button>
+               <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal" > Close </button>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+      <!-- Modal ubah urutan jabatan -->
   </div>
   <br>
   <div class="container-fluid" >
@@ -327,7 +370,51 @@
 
   <!-- All Jquery -->
   <!-- ============================================================= -->
+  {% endblock %}
+  {% block js %}
+  <script src="../../static/assets/libs/nestable/jquery.nestable.js"></script>
+  <script>
+    $(function () {
+      // Nestable
+      var updateOutput = function (e) {
+        var list = e.length ? e : $(e.target),
+          output = list.data("output");
+        if (window.JSON) {
+          output.val(window.JSON.stringify(list.nestable("serialize"))); //, null, 2));
+        } else {
+          output.val("JSON browser support required for this demo.");
+        }
+      };
 
+      $("#nestable")
+        .nestable({
+          group: 1,
+        })
+        .on("change", updateOutput);
+
+      $("#nestable2")
+        .nestable({
+          group: 1,
+        })
+        .on("change", updateOutput);
+
+      updateOutput($("#nestable").data("output", $("#nestable-output")));
+      updateOutput($("#nestable2").data("output", $("#nestable2-output")));
+
+      $("#nestable-menu").on("click", function (e) {
+        var target = $(e.target),
+          action = target.data("action");
+        if (action === "expand-all") {
+          $(".dd").nestable("expandAll");
+        }
+        if (action === "collapse-all") {
+          $(".dd").nestable("collapseAll");
+        }
+      });
+
+      $("#nestable-menu").nestable();
+    });
+  </script>
   <script>
     let formData = new FormData();
     $(document).ready(function () {
@@ -344,8 +431,6 @@
         var tanggalsk = $('#tanggalskbaru').val()
         var masajabatan = $('#masajabatanbaru').val()
         var status = $('#statusbaru').val()
-        
-
           formData.append('nama_lengkap',nama)
           jQuery.each(jQuery('#formFilebaru')[0].files, function(i, file) {
             formData.append('gambar', file);
@@ -379,9 +464,29 @@
           });
           event.preventDefault();
       } );
-    
-   
-    
+      $("#ubah_jabatan").on("click", function () {
+        var databaru = $('.dd-item').map(function() {
+            return $(this).data('id');
+        }).get();
+        console.log(databaru)
+        formData.append('data_baru', databaru)
+        console.log(formData)
+        $.ajax({
+            url: "/admin/anggota/ubah_jabatan",
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            method: 'POST',
+            type: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
+            },
+        }).done(function (data) {
+            handleResponse(data, "mengubah urutan jabatan", "/admin/anggota");
+        });
+        event.preventDefault();
+    });
 });
   function edit(id){
     

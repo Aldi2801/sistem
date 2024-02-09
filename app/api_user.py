@@ -219,3 +219,12 @@ def hapus_surat():
     g.con.execute("DELETE FROM surat WHERE id = %s",(id))
     mysql.connection.commit()
     return jsonify({"msg":"SUKSES"})
+#halaman bpd
+@app.route('/bpd')
+def bpd():
+    g.con.execute("SELECT nama_jabatan FROM urutan_jabatan")
+    rows = g.con.fetchall()
+    urutan_jabatan = [row[0] for row in rows]
+    list_info = fetch_data_and_format("SELECT * FROM bpd")
+    sorted_list_info = sorted(list_info, key=lambda x: urutan_jabatan.index(x['jabatan']) if x['jabatan'] in urutan_jabatan else len(urutan_jabatan))
+    return render_template('bpd.html', list_info=sorted_list_info)

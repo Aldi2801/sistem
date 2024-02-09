@@ -23,10 +23,10 @@ def do_image(do, table, id):
             return True
         file = request.files['gambar']
         if file is None or file.filename == '':
-            return "default.jpg"                  
+            return "default.jpg"
         else:
             filename = get_image_filename(table, id)
-            delete_image(filename) 
+            delete_image(filename)
             return resize_and_save_image(file, table, id)
     except KeyError:
         if do == "edit":
@@ -66,8 +66,8 @@ def get_image_filename(table, id):
     return result[0] if result else None
 
 def delete_image(filename):
-    if result == "default.jpg":
-        return TRUE
+    if filename == "default.jpg":
+        return True
     if filename:
         image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         if os.path.exists(image_path):
@@ -229,20 +229,6 @@ def hapus_berita():
     try:
         do_image("delete","berita",id)
         g.con.execute("DELETE FROM berita WHERE id = %s", (id,))
-        mysql.connection.commit()
-        return jsonify({"msg": "SUKSES"})
-    except Exception as e:
-        print(str(e))
-        return jsonify({"error": str(e)})
-
-#hapus anggota
-@app.route('/hapus_anggota', methods=['DELETE'])
-@jwt_required()
-def hapus_anggota():
-    id = request.form['id']
-    try:
-        do_image("delete","anggota",id)
-        g.con.execute("DELETE FROM anggota WHERE id = %s", (id,))
         mysql.connection.commit()
         return jsonify({"msg": "SUKSES"})
     except Exception as e:
@@ -412,9 +398,29 @@ def adminmonohapus():
 #anggota
 @app.route('/admin/anggota')
 def adminanggota():
-    info_list=fetch_data_and_format("SELECT * FROM anggota order by id")
-    return render_template("admin/anggota.html", info_list = info_list)
-
+    g.con.execute("SELECT nama_jabatan FROM urutan_jabatan_pemerintahan")
+    rows = g.con.fetchall()
+    urutan_jabatan = [row[0] for row in rows]
+    list_info = fetch_data_and_format("SELECT * FROM anggota order by id")
+    sorted_list_info = sorted(list_info, key=lambda x: urutan_jabatan.index(x['jabatan']) if x['jabatan'] in urutan_jabatan else len(urutan_jabatan))
+    jabatan_unik = set(item['jabatan'] for item in list_info)
+    jabatan_urut = sorted(jabatan_unik, key=lambda x: urutan_jabatan.index(x) if x in urutan_jabatan else len(urutan_jabatan))
+    return render_template("admin/anggota.html", info_list = sorted_list_info, urutan_jabatan = jabatan_urut)
+@app.route('/admin/anggota/ubah_jabatan',methods=["POST"])
+@jwt_required()
+def anggota_ubah_jabatan():
+    try:
+        databaru = request.form['data_baru']
+        databaru = databaru.split(',')
+        g.con.execute("DELETE FROM urutan_jabatan_pemerintahan")
+        # Memasukkan data baru ke dalam tabel
+        for i in databaru:
+            g.con.execute("INSERT INTO urutan_jabatan_pemerintahan(nama_jabatan) VALUES(%s)", (i,))
+            mysql.connection.commit()  # Melakukan commit setiap kali setelah memasukkan data
+        return jsonify({"msg": "SUKSES"})
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)})
 @app.route('/admin/tambah_anggota', methods=['POST'])
 @jwt_required()
 def tambah_anggota():
@@ -453,7 +459,20 @@ def anggota_edit():
     except Exception as e:
         print(str(e))
         return jsonify({"error": str(e)})
-
+#hapus anggota
+@app.route('/hapus_anggota', methods=['DELETE'])
+@jwt_required()
+def hapus_anggota():
+    id = request.form['id']
+    try:
+        do_image("delete","anggota",id)
+        g.con.execute("DELETE FROM anggota WHERE id = %s", (id,))
+        mysql.connection.commit()
+        return jsonify({"msg": "SUKSES"})
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)})
+    
 #Galeri
 @app.route('/admin/galeri')
 def admindgaleri():
@@ -528,6 +547,7 @@ def admin_agenda():
 @jwt_required()
 def agenda_delete(id):
     try:
+        do_image("delete","agenda",id)
         g.con.execute("DELETE FROM agenda WHERE id = %s", (id,))
         mysql.connection.commit()
         return jsonify({"msg" : "SUKSES"})
@@ -564,6 +584,73 @@ def agenda_edit():
     try:
         do_image("edit","agenda",id)
         g.con.execute("UPDATE agenda SET title = %s, start = %s, end = %s, kategori = %s, pemimpin_kegiatan = %s, keterangan = %s WHERE id = %s",(title,jam_mulai,jam_selesai,kategori,pemimpin_kegiatan,keterangan,id))
+        mysql.connection.commit()
+        return jsonify({"msg" : "SUKSES"})
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)})
+#halaman bpd
+@app.route('/admin/bpd')
+def admin_bpd():
+    g.con.execute("SELECT nama_jabatan FROM urutan_jabatan")
+    rows = g.con.fetchall()
+    urutan_jabatan = [row[0] for row in rows]
+    list_info = fetch_data_and_format("SELECT * FROM bpd")
+    sorted_list_info = sorted(list_info, key=lambda x: urutan_jabatan.index(x['jabatan']) if x['jabatan'] in urutan_jabatan else len(urutan_jabatan))
+    jabatan_unik = set(item['jabatan'] for item in list_info)
+    jabatan_urut = sorted(jabatan_unik, key=lambda x: urutan_jabatan.index(x) if x in urutan_jabatan else len(urutan_jabatan))
+    return render_template('admin/bpd.html', list_info=sorted_list_info, urutan_jabatan = jabatan_urut)
+@app.route('/admin/delete-bpd',methods=["DELETE"])
+@jwt_required()
+def bpd_delete():
+    id = request.form['id']
+    try:
+        do_image("delete","bpd",id)
+        g.con.execute("DELETE FROM bpd WHERE id = %s", (id,))
+        mysql.connection.commit()
+        return jsonify({"msg" : "SUKSES"})
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)})
+@app.route('/admin/tambah-bpd',methods=["POST"])
+@jwt_required()
+def bpd_tambah():
+    nama = request.form['nama']
+    jabatan = request.form['jabatan']
+    status = request.form['status']
+    try:
+        random_name = do_image("tambah","bpd","")
+        g.con.execute("INSERT INTO bpd(nama, jabatan,status,gambar) VALUES(%s, %s, %s, %s)", (nama, jabatan, status,random_name))
+        mysql.connection.commit() 
+        return jsonify({"msg": "SUKSES"})
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)})
+@app.route('/admin/bpd/ubah_jabatan',methods=["POST"])
+@jwt_required()
+def bpd_ubah_jabatan():
+    try:
+        databaru = request.form['data_baru']
+        databaru = databaru.split(',')
+        g.con.execute("DELETE FROM urutan_jabatan")
+        # Memasukkan data baru ke dalam tabel
+        for i in databaru:
+            g.con.execute("INSERT INTO urutan_jabatan(nama_jabatan) VALUES(%s)", (i,))
+            mysql.connection.commit()  # Melakukan commit setiap kali setelah memasukkan data
+        return jsonify({"msg": "SUKSES"})
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)})
+@app.route('/admin/edit-bpd',methods=["PUT"])
+@jwt_required()
+def bpd_edit():
+    id = request.form['id']
+    nama = request.form['nama']
+    jabatan = request.form['jabatan']
+    status = request.form['status']
+    try:
+        do_image("edit","bpd",id)
+        g.con.execute("UPDATE bpd SET nama = %s, jabatan = %s, status = %s WHERE id = %s",(nama,jabatan,status,id))
         mysql.connection.commit()
         return jsonify({"msg" : "SUKSES"})
     except Exception as e:
