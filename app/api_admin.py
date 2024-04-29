@@ -346,6 +346,7 @@ def adminwilayahhapus():
     except Exception as e:
         print(str(e))
         return jsonify({"error": str(e)})
+
 #monografi
 @app.route('/admin/monografi')
 def adminmono():
@@ -519,6 +520,7 @@ def hapus_galeri():
     except Exception as e:
         print(str(e))
         return jsonify({"error": str(e)})
+
 #vidio
 @app.route('/admin/vidio')
 def adminvidio():
@@ -633,7 +635,6 @@ def bpd_ubah_jabatan():
         databaru = request.form['data_baru']
         databaru = databaru.split(',')
         g.con.execute("DELETE FROM urutan_jabatan")
-        # Memasukkan data baru ke dalam tabel
         for i in databaru:
             g.con.execute("INSERT INTO urutan_jabatan(nama_jabatan) VALUES(%s)", (i,))
             mysql.connection.commit()  # Melakukan commit setiap kali setelah memasukkan data
