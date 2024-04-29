@@ -61,7 +61,7 @@ jwt = JWTManager(app)
 mysql = MySQL()
 mysql.init_app(app)
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/bikin_akun', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         jwt_required()

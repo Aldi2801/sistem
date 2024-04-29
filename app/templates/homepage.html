@@ -22,11 +22,11 @@
             <div class="card">
                 <a href="/berita/{{i.link}}">
                     <div class="card-body">
-                        <div class="d-flex no-block white-space align-items-center ">
+                        <div class="berita white-space align-items-center ">
                             {% if i.gambar == "default.jpg" %}
                             {% else %}
-                            <img class="card-img img-responsive " src="../../static/image/{{i.gambar}}"
-                                alt="Card image cap" style="width: 300px; height: 200px;" />
+                            <img class="gambar-berita card-img img-responsive " src="../../static/image/{{i.gambar}}"
+                                alt="Card image cap" />
                             {% endif %}
                             <div style="width: 20px;"></div>
                             <div class="align-items-center " style="height: 100%;">

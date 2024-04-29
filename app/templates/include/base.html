@@ -146,7 +146,26 @@
       .fc-event{
       color: #67757c ;
       }
+      .berita {
+        display: flex;
+      }
+      .gambar-berita {
+        width: 300px; 
+        height: 200px;
+      }
+      @media (max-width: 640px) {
+        .berita {
+          display: block;
+        }
+        .gambar-berita{
+          width: 100%;
+          margin-bottom: 20px;
+        }
+      }
+    
+      
     </style>
+   
     {% block head %}{% endblock %}
   </head>
 
@@ -154,186 +173,95 @@
     <!-- ============================================================= -->
     <!-- Topbar header - style you can find in pages.scss -->
     <!-- ============================================================= -->
-    <header class="topbar" data-navbarbg="skin6">
-      <nav class="navbar top-navbar navbar-expand-md navbar-light">
-        <img
-          src="../static/image/logo.png"
-          alt="logo-icon"
-          style="width: 50px; height: 30px"
-        />
-        <p style="margin-top:15px">
-          Desa Pangkah
-        </P>
-        <!-- ============================================================== -->
-        <!-- End Logo -->
-        <!-- ============================================================== -->
-        <div class="navbar-collapse collapse" id="navbarSupportedContent">
-          <!-- ============================================================== -->
-          <!-- toggle and nav items -->
-          <!-- ============================================================== -->
-
-          <!-- ============================================================== -->
-          <!-- Right side toggle and nav items -->
-          <!-- ============================================================== -->
-
-          <ul class="navbar-nav navbar-right">
-            <li class="nav-item">
-              <a
-                href="/news"
-                class="dropdown-item btn text-secondary font-weight-medium dropdown-toggle"
-              >
-                Berita
-              </a>
-            </li>
-            <li class="nav-item">
-              <div class="btn-group" role="group">
-                <button
-                  id="btnGroupVerticalDrop2"
-                  type="button"
-                  class="dropdown-item btn text-secondary font-weight-medium dropdown-toggle"
-                  data-bs-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  Profil Desa ▼
-                </button>
-                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                  <a class="dropdown-item" href="/sejarah"
-                    >SEJARAH & MONOGRAFI DESA</a
-                  >
+    <header class="topbar" data-navbarbg="skin6"style="background-color:#fff">
+      <nav class="navbar navbar-expand-lg navbar-light" style="background-color:#fff">
+        <div class="container" style="">
+          <a class="navbar-brand d-flex " href="#">
+            
+          <img
+            src="../static/image/logo.png"
+            alt="logo-icon"
+            style="max-height: 40px;"
+          />
+          <p style="margin-top:15px">
+            Desa Pangkah
+          </P>
+        </a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+              <!-- Untuk item Berita -->
+              <li class="nav-item">
+                <a href="/news" class="nav-link">Berita</a>
+              </li>
+              <!-- Untuk item Profil Desa -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownProfilDesa" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Profil Desa
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownProfilDesa">
+                  <a class="dropdown-item" href="/sejarah">SEJARAH & MONOGRAFI DESA</a>
                   <a class="dropdown-item" href="/video">VIDEO PROFIL DESA</a>
                 </div>
-              </div>
-              <!-- ============================================================== -->
-              <!-- Messages -->
-              <!-- ============================================================== -->
-            </li>
-
-            <li class="nav-item">
-              <div class="btn-group" role="group">
-                <button
-                  id="btnGroupDrop1"
-                  type="button"
-                  class="dropdown-item btn text-secondary font-weight-medium dropdown-toggle"
-                  data-bs-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  Pemerintahan ▼
-                </button>
-                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                  <a class="dropdown-item" style="" href="/visi_misi">VISI DAN MISI</a>
-                  <a class="dropdown-item" href="/pemerintahan_desa"
-                    >PEMERINTAH DESA</a
-                  >
+              </li>
+              <!-- Untuk item Pemerintahan -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownPemerintahan" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Pemerintahan
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownPemerintahan">
+                  <a class="dropdown-item" href="/visi_misi">VISI DAN MISI</a>
+                  <a class="dropdown-item" href="/pemerintahan_desa">PEMERINTAH DESA</a>
                   <a class="dropdown-item" href="/bpd">BADAN PERMUSYAWARATAN DESA</a>
                 </div>
-              </div>
-            </li>
-
-            <li class="nav-item">
-              <div class="btn-group" role="group">
-                <button
-                  id="btnGroupDrop1"
-                  type="button"
-                  class="dropdown-item btn text-secondary font-weight-medium dropdown-toggle"
-                  data-bs-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  Dana Desa ▼
-                </button>
-                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                  {% for data in session.list_thn_dana %}
-                  <a class="dropdown-item" href="/dana/{{ data.tahun }}"
-                  >TAHUN ANGGARAN {{ data.tahun }} </a>
-                  
-              {% endfor %}
-                
-                </div>
-              </div>
-            </li>
-            <li class="nav-item">
-              <div class="btn-group" role="group">
-                <a
-                  href="https://www.google.com/maps/place/Pangkah,+Tegal+Regency,+Central+Java/@-6.981731,109.15958,15z/data=!4m6!3m5!1s0x2e6fbf7326f79acf:0xb8e2ae524ec7f3c8!8m2!3d-6.9803518!4d109.1627343!16s%2Fg%2F122t1938?entry=ttu"
-                  id="btnGroupDrop1"
-                  type="button"
-                  class="dropdown-item btn text-secondary font-weight-medium dropdown-toggle"
-                >
-                  Peta Desa
+              </li>
+              <!-- Untuk item Dana Desa -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownDanaDesa" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Dana Desa
                 </a>
-              </div>
-            </li>
-            <li class="nav-item">
-              <div class="btn-group" role="group">
-                <button
-                  id="btnGroupDrop1"
-                  type="button"
-                  class="dropdown-item btn text-secondary font-weight-medium dropdown-toggle"
-                  data-bs-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  Data Desa ▼
-                </button>
-                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                  <a class="dropdown-item" href="/monografi"
-                    >DATA MONOGRAFI</a
-                  >
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownDanaDesa">
+                  {% for data in session.list_thn_dana %}
+                    <a class="dropdown-item" href="/dana/{{ data.tahun }}">TAHUN ANGGARAN {{ data.tahun }}</a>
+                  {% endfor %}
+                </div>
+              </li>
+              <!-- Untuk item Peta Desa -->
+              <li class="nav-item">
+                <a href="https://www.google.com/maps/place/Pangkah,+Tegal+Regency,+Central+Java/@-6.981731,109.15958,15z/data=!4m6!3m5!1s0x2e6fbf7326f79acf:0xb8e2ae524ec7f3c8!8m2!3d-6.9803518!4d109.1627343!16s%2Fg%2F122t1938?entry=ttu" class="nav-link">Peta Desa</a>
+              </li>
+              <!-- Untuk item Data Desa -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownDataDesa" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Data Desa
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownDataDesa">
+                  <a class="dropdown-item" href="/monografi">DATA MONOGRAFI</a>
                   <a class="dropdown-item" href="/geografi">DATA GEOGRAFI</a>
                 </div>
+              </li>
+              <!-- Untuk item Galeri Foto -->
+              <li class="nav-item">
+                <a href="/galeri" class="nav-link">Galeri Foto</a>
+              </li>
+              <!-- Untuk item Agenda Kegiatan -->
+              <li class="nav-item">
+                <a href="/agenda" class="nav-link">Agenda Kegiatan</a>
+              </li>
+            </ul>
+            <!-- Tombol Floating Button -->
+            <button type="button" class="btn btn-primary floating-button" data-toggle="modal" data-target="#chatModal" onclick="set_time()">
+              <i data-feather="message-square"></i>
+              <div class="notify">
+                <span class="point bg-warning"></span>
               </div>
-            </li>
-            <li class="nav-item">
-              <div class="btn-group" role="group">
-                <a href="/galeri"
-                  id="btnGroupDrop1"
-                  class="dropdown-item btn text-secondary font-weight-medium dropdown-toggle">
-                  Galeri Foto 
-              </a>
-              </div>
-            </li>
-            <li class="nav-item">
-              <div class="btn-group" role="group">
-                <a href="/agenda"
-                id="btnGroupDrop1"
-                class="dropdown-item btn text-secondary font-weight-medium dropdown-toggle">
-                Agenda Kegiatan 
-                </a>
-              </div>
-            </li>
-            <button
-              type="button"
-              class="btn btn-primary floating-button"
-              data-bs-toggle="modal"
-              data-bs-target="#chatModal"
-              onclick="set_time()"
-            >
-            <a>
-            <i data-feather="message-square"></i>
-            <div class="notify">
-              <span class="point bg-warning"></span>
-            </div>
-          </a>
             </button>
-            <!-- ============================================================== -->
-            <!-- End Messages -->
-            <!-- ============================================================== -->
-            <!-- ============================================================== -->
-            <!-- Comment -->
-            <!-- ============================================================== -->
-
-            <!-- ============================================================== -->
-            <!-- End Comment -->
-            <!-- ============================================================== -->
-
-            <!-- ============================================================== -->
-            <!-- Profile -->
-            <!-- ============================================================== -->
-          </ul>
+          </div>
         </div>
       </nav>
+     
     </header>
 
     {% block content %} {% endblock content %}
@@ -511,6 +439,10 @@
     <!-- page agenda js-->
 
     <script src="../static/assets/libs/moment/min/moment.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
     {% block js %}{% endblock js %}
     <script>
       var tahunSaatIni = new Date().getFullYear();
