@@ -360,10 +360,10 @@
                 
                 <div class="modal-body">
                   <div id="chatMessages" class="pre-scrollable" style="max-height:350px; margin-bottom:20px;">
-                    <div class="bot-message " style="border-bottom-left-radius: 0px;"><strong>Bot:</strong> Welcome to the chat bot. How can I help you?</div>
+                    <div class="bot-message " style="border-bottom-left-radius: 0px;"><strong>Bot:</strong>ada yang bsa saya bantu?</div>
                     <div class="Bot-time chat-time"id="welcome-time"></div>
                   </div>
-                  <input type="text"  id="userMessage"  class="form-control" placeholder="Type a message...">
+                  <input type="text"  id="userMessage"  class="form-control" placeholder="ketik pesan...">
                   <button type="button" class="btn btn-primary mt-2" id="sendMessage">Send</button>
                 </div>
                 
@@ -413,7 +413,7 @@
                 error: function () {
                   appendMessage(
                     "Bot",
-                    "An error occurred while processing your request."
+                    "Server Error."
                   );
                 },
               });
