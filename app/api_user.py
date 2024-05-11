@@ -20,6 +20,11 @@ def fetch_data_and_format(query):
     column_names = [desc[0] for desc in g.con.description]
     info_list = [dict(zip(column_names, row)) for row in data]
     return info_list
+def fetch_years(query):
+    g.con.execute(query)
+    data_thn = g.con.fetchall()
+    thn = [{'tahun': str(sistem[0])} for sistem in data_thn]
+    return thn
 #halaman homepage
 @app.route('/')
 def homepahe():
@@ -96,20 +101,10 @@ def badan_desa():
 #halaman dana
 @app.route('/dana/<thn>')
 def dana_desa(thn):
-    g.con.execute("SELECT * FROM realisasi_pendapatan where tahun = %s order by id",(thn,))
-    dana = g.con.fetchall()
-    column_names = [desc[0] for desc in g.con.description]
-    info_list = [dict(zip(column_names, row)) for row in dana]
-    g.con.execute("SELECT * FROM realisasi_belanja where tahun = %s order by id",(thn,))
-    dana = g.con.fetchall()
-    column_names = [desc[0] for desc in g.con.description]
-    info_list2 = [dict(zip(column_names, row)) for row in dana]
-    g.con.execute("SELECT * FROM realisasi_pembiayaan where tahun = %s order by id",(thn,))
-    dana = g.con.fetchall()
-    column_names = [desc[0] for desc in g.con.description]
-    info_list3 = [dict(zip(column_names, row)) for row in dana]
-    return render_template("dana.html", info_list = info_list,info_list2 = info_list2,info_list3 = info_list3, tahun = thn)
-
+    info_list = fetch_data_and_format("SELECT * FROM realisasi_pendapatan ORDER BY id")
+    info_list2 = fetch_data_and_format("SELECT * FROM realisasi_belanja ORDER BY id")
+    info_list3 = fetch_data_and_format("SELECT * FROM realisasi_pembiayaan ORDER BY id")
+    return render_template("dana.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn)
 #halaman monografi
 @app.route('/monografi')
 def mono():

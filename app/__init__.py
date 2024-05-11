@@ -61,6 +61,8 @@ jwt = JWTManager(app)
 mysql = MySQL()
 mysql.init_app(app)
 
-
+# allow CORS biar api yang dibuat bisa dipake website lain
+from flask_cors import CORS
+CORS(app, resources={r"/chatbot/*":  {"origins": ["https://desapangkah.com","https://www.desapangkah.com"]}})
 # Import rute dari modul-modul Anda
 from . import api_user, api_admin, login

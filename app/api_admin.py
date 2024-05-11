@@ -83,14 +83,14 @@ def fetch_data_and_format(query):
 def fetch_years(query):
     g.con.execute(query)
     data_thn = g.con.fetchall()
-    thn = [{'tahun': str(sistem[6])} for sistem in data_thn]
+    thn = [{'tahun': str(sistem[0])} for sistem in data_thn]
     return thn
 
 def insert_data_from_dataframe(df, table):
     for index, row in df.iterrows():
         sql = f"INSERT INTO {table} (no, uraian, anggaran, realisasi, `lebih/(kurang)`, tahun) VALUES (%s, %s, %s, %s, %s, %s)"
         print(row['lebih/(kurang)'])
-        g.con.execute(sql, (row['no'], row['uraian'], row['anggaran'], row['realisasi'], row['lebih/(kurang)'], row['thn']))
+        g.con.execute(sql, (row['no'], row['uraian'], str(format_currency(row['anggaran'])), str(format_currency(row['realisasi'])), str(format_currency(row['lebih/(kurang)'])), row['thn']))
     mysql.connection.commit()
 
 #halaman admin
@@ -238,14 +238,14 @@ def hapus_berita():
 @app.template_filter('format_currency')
 def format_currency(value):
     locale.setlocale(locale.LC_ALL, 'id_ID.UTF-8')
-    return locale.currency(value, grouping=True, symbol='')
+    return locale.currency(value, grouping=True, symbol='Rp')
 
 @app.route('/admin/dana')
 def admindana():
     info_list = fetch_data_and_format("SELECT * FROM realisasi_pendapatan ORDER BY id")
     info_list2 = fetch_data_and_format("SELECT * FROM realisasi_belanja ORDER BY id")
     info_list3 = fetch_data_and_format("SELECT * FROM realisasi_pembiayaan ORDER BY id")
-    thn = fetch_years("SELECT * FROM realisasi_pendapatan GROUP BY tahun")
+    thn = fetch_years("SELECT tahun FROM realisasi_pendapatan GROUP BY tahun")
     return render_template("admin/dana.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn)
 @app.route('/admin/edit_dana', methods=['PUT'])
 @jwt_required()
@@ -267,14 +267,30 @@ def edit_dana():
 @app.route('/admin/hapus_dana', methods=['DELETE'])
 @jwt_required()
 def hapus_dana():
-    id = request.form['id']
-    try:
-        g.con.execute("DELETE FROM dana WHERE id = %s",(id))
-        mysql.connection.commit()
-        return jsonify({"msg":"SUKSES"})
-    except Exception as e:
-        print(str(e))
-        return jsonify({"error": str(e)})
+    tahun = request.form['tahun']
+    print(tahun)
+    tahun = str(tahun)
+    print(tahun)
+    if tahun == "semua_tahun":
+        try:
+            g.con.execute("TRUNCATE `realisasi_belanja`")
+            g.con.execute("TRUNCATE `realisasi_pembiayaan`")
+            g.con.execute("TRUNCATE `realisasi_pendapatan`")
+            mysql.connection.commit()
+            return jsonify({"msg":"SUKSES"})
+        except Exception as e:
+            print(str(e))
+            return jsonify({"error": str(e)})
+    else:
+        try:
+            g.con.execute("DELETE FROM realisasi_pendapatan WHERE tahun = %s", (tahun,))
+            g.con.execute("DELETE FROM realisasi_belanja WHERE tahun = %s", (tahun,))
+            g.con.execute("DELETE FROM realisasi_pembiayaan WHERE tahun = %s", (tahun,))
+            mysql.connection.commit()
+            return jsonify({"msg":"SUKSES"})
+        except Exception as e:
+            print(str(e))
+            return jsonify({"error": str(e)})
 
 @app.route('/admin/tambah_dana', methods=['POST'])
 @jwt_required()

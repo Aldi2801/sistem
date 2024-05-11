@@ -17,6 +17,7 @@
       <h1 class="mb-0 fw-bold">Dana Desa</h1>
     </div>
     <div class="col-lg-4 col-md-6 d-md-flex align-items-center justify-content-end" >
+      <a href="javascript:void(0)" class="btn btn-danger d-flex align-items-center ms-2" data-bs-toggle="modal" data-bs-target="#bs-example-modal-x2" > hapus tahun </a>
       <a href="javascript:void(0)" class="btn btn-info d-flex align-items-center ms-2" data-bs-toggle="modal" data-bs-target="#bs-example-modal-xl" > <i class="ri-add-line me-1"></i> tambah data </a>
     </div>
   </div>
@@ -150,6 +151,61 @@
 </div>
 <div
       class="modal fade"
+      id="bs-example-modal-x2"
+      tabindex="-1"
+      aria-labelledby="bs-example-modal-lg"
+      aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header d-flex align-items-center">
+            <h4 class="modal-title" id="myLargeModalLabel">
+              Hapus Dana Desa berdasarkan tahun
+            </h4>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <span class="mb-2">
+            keterangan: pilih data tahun berapa yang mau dihapus </span>
+            <select class="form-select" id="tahun_hps" name="educationDate" >
+              <option value="semua_tahun" selected>Semua Tahun</option>
+              {% for i in tahun :%}
+              <option value="{{i.tahun}}">{{i.tahun}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="modal-footer">
+            <div class="col-lg-4 col-md-6 d-md-flex align-items-center justify-content-end"
+            >
+              <a
+                id="delete"
+                href="javascript:void(0)"
+                class="btn btn-info d-flex align-items-center ms-2"
+              >
+                Submit
+              </a>
+            </div>
+              <button
+                type="button"
+                class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+      <!-- Modal Delete -->
+    </div>
+<div
+      class="modal fade"
       id="bs-example-modal-xl"
       tabindex="-1"
       aria-labelledby="bs-example-modal-lg"
@@ -259,6 +315,7 @@
         formData.append('excellpendapatan', excellpendapatan);
         formData.append('excellbelanja', excellbelanja);
         formData.append('excellpembiayaan', excellpembiayaan);
+        $("#tambah").html("Loading ...");
         $.ajax({
           url: "/admin/tambah_dana",
           data: formData,
@@ -271,6 +328,23 @@
         },
           success: function(data) {
             handleResponse(data,"tambah","/admin/dana");
+          }
+        });
+        event.preventDefault();
+      });
+      $( "#delete" ).on( "click", function() {
+        var tahun = $("#tahun_hps").val()
+        $("#delete").html("Loading ...");
+        $.ajax({
+          url: "/admin/hapus_dana",
+          method: 'DELETE',
+          headers: {'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"},
+          data: {
+              tahun: tahun
+          },
+          dataType: 'json',
+          success: function(data) {
+            handleResponse(data,"hapus","/admin/dana");
           }
         });
         event.preventDefault();
