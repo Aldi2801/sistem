@@ -101,9 +101,9 @@ def badan_desa():
 #halaman dana
 @app.route('/dana/<thn>')
 def dana_desa(thn):
-    info_list = fetch_data_and_format("SELECT * FROM realisasi_pendapatan ORDER BY id")
-    info_list2 = fetch_data_and_format("SELECT * FROM realisasi_belanja ORDER BY id")
-    info_list3 = fetch_data_and_format("SELECT * FROM realisasi_pembiayaan ORDER BY id")
+    info_list = fetch_data_and_format("SELECT * FROM realisasi_pendapatan where tahun = "+thn+" ORDER BY id")
+    info_list2 = fetch_data_and_format("SELECT * FROM realisasi_belanja where tahun = "+thn+" ORDER BY id")
+    info_list3 = fetch_data_and_format("SELECT * FROM realisasi_pembiayaan where tahun = "+thn+" ORDER BY id")
     return render_template("dana.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn)
 #halaman monografi
 @app.route('/monografi')
