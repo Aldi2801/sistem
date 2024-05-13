@@ -1,4 +1,4 @@
-from flask import Flask,jsonify,request,session,render_template,g
+from flask import Flask,jsonify,request,session,render_template,g,send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_mysqldb import MySQL
 from flask_jwt_extended import JWTManager
@@ -65,4 +65,39 @@ mysql.init_app(app)
 from flask_cors import CORS
 CORS(app, resources={r"/chatbot/*":  {"origins": ["https://desapangkah.com","https://www.desapangkah.com"]}})
 # Import rute dari modul-modul Anda
+
+@app.route('/sitemap.xml')
+def sitemap():
+    # Logika untuk menghasilkan sitemap.xml
+    # Misalnya, jika sitemap.xml adalah file statis, Anda bisa mengembalikan file secara langsung
+    return send_from_directory(app.static_folder, 'sitemap.xml')
+
+@app.route('/robots.txt')
+def robots():
+    # Logika untuk menghasilkan robots.txt
+    return """
+    User-agent: *
+    Disallow: /private/
+    Disallow: /cgi-bin/
+    Disallow: /images/
+    Disallow: /pages/thankyou.html
+    """
+# Fungsi untuk menangani kesalahan 404
+@app.errorhandler(404)
+def page_not_found(error):
+    # Cek apakah klien meminta JSON
+    if request.accept_mimetypes.accept_json and not request.accept_mimetypes.accept_html:
+        # Jika klien meminta JSON, kirim respons dalam format JSON
+        response = jsonify({'error': 'Not found'})
+        response.status_code = 404
+        return response
+    # Jika tidak, kirim respons dalam format HTML
+    return render_template('404.html'), 404
+
+# Route untuk halaman yang tidak ada
+@app.route('/invalid')
+def invalid():
+    # Menggunakan abort untuk memicu kesalahan 404
+    abort(404)
+
 from . import api_user, api_admin, login

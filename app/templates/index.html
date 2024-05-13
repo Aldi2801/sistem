@@ -1,65 +1,64 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Selamat Datnag Di sistem Desa Pangkah</title>
+    <title>Selamat Datang Di sistem Desa Pangkah</title>
     <!-- Tautan ke Bootstrap CSS -->
-    <link
+    <!-- <link
       rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-    />
+    /> -->
 
-    <link rel="icon" type="image/png" sizes="16x16" href="../static/image/logo_ico.png" />
     <link href="/static/dist/css/style.min.css" rel="stylesheet" />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="/static/assets/extra-libs/prism/prism.css"
-    />
+    <link rel="icon" type="image/png" sizes="16x16" href="../static/image/logo_ico.png" />
     <style>
       body {
-        background-image: url("static/image/pg_pangkah_infotegal.jpg");
-        background-size: cover; /* Mengisi seluruh latar belakang */
-        background-repeat: no-repeat; /* Tanpa pengulangan gambar */
+          background-image: url("static/image/pg_pangkah_infotegal.jpg");
+              background-size: cover; /* Mengisi seluruh latar belakang */
+              background-repeat: no-repeat; /* Tanpa pengulangan gambar */
+      }
+      .kolom {
+          display: flex
+      }
+      @media (max-width: 600px) {
+          .kolom{
+              display: block;
+          }
       }
     </style>
-    <!--  <style>
-.parent:hover .child, .parent:focus .child {
-    -ms-transform: scale(1.2);
-    -moz-transform: scale(1.2);
-    -webkit-transform: scale(1.2);
-    -o-transform: scale(1.2);
-    transform: scale(1.2);
+   <!-- seo -->
+   <?xml version="1.0" encoding="UTF-8"?>
+<meta name="description" content="Tentang Desa Pangkah: Desa Pangkah merupakan desa yang memberi pelayanan publik secara cepat dan efisien. Dengan mengedepankan pelayanan dan pengolahan data berbasis IT, Desa Pangkah diharapkan dapat berkembang menjadi yang lebih maju dalam berbagai aspek baik itu SDM, Kesehatan, Kesejahteraan dan Ekonomi. Dengan Portal Desa Digital semua pelayanan menjadi lebih baik.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:title" content="Sistem Informasi Desa Pangkah">
+<meta property="og:description" content="Tentang Desa Pangkah: Desa Pangkah merupakan desa yang memberi pelayanan publik secara cepat dan efisien. Dengan mengedepankan pelayanan dan pengolahan data berbasis IT, Desa Pangkah diharapkan dapat berkembang menjadi yang lebih maju dalam berbagai aspek baik itu SDM, Kesehatan, Kesejahteraan dan Ekonomi. Dengan Portal Desa Digital semua pelayanan menjadi lebih baik.">
+<meta property="og:image" content="https://desapangkah.com/static/image/logo_ico.png">
+<meta property="og:url" content="https://desapangkah.com">
+<script type="application/ld+json">
+   {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Sistem Informasi Desa Pangkah",
+    "url": "http://www.desapangkah.com",
+    "logo": "http://www.desapangkah.com/static/image/logo_ico.png",
+    "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "pemdespangkah@gmail.com",
+        "contactType": "customer service"
+    }
 }
+</script>
 
-.parent:hover .child:before, .parent:focus .child:before {
-    display: block;
-}
-
-.parent:hover a, .parent:focus a {
-    display: block;
-}
-
-.child:before {
-    content: "";
-    display: none;
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-   </style> -->
   </head>
   <body>
     <div class="container-fluid mt-3">
       <h1 class="text-center">Selamat Datang di Landing Page</h1>
       <h1 class="text-center">Desa Pangkah</h1>
-      <div class="d-flex flex-row justify-content-center">
+      <div class="flex-row justify-content-center kolom" >
         <div class="p-2">
-          <center>
-            <div class="card text-white bg-primary rounded h-100">
+          
+            <div class="card text-white bg-primary rounded">
               <a href="/news">
-                <div class="card-body h-100">
+                <div class="card-body text-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     x="0px"
@@ -96,39 +95,47 @@
                 </div>
               </a>
             </div>
-          </center>
+          
         </div>
         <div class="p-2">
-          <center>
+          
             <div class="card text-white bg-success rounded">
               <a href="/sejarah">
-                <div class="card-body">
-                  <img
+                <div class="card-body text-center">
+                  
+                  <picture>
+	<source type="image/webp" srcset="https://img.icons8.com/external-vitaliy-gorbachev-lineal-vitaly-gorbachev/60/external-village-landscape-vitaliy-gorbachev-lineal-vitaly-gorbachev.png">
+	<img
                     width="40"
                     height="40"
                     style="filter: invert(1)"
                     src="https://img.icons8.com/external-vitaliy-gorbachev-lineal-vitaly-gorbachev/60/external-village-landscape-vitaliy-gorbachev-lineal-vitaly-gorbachev.png"
                     alt="external-village-landscape-vitaliy-gorbachev-lineal-vitaly-gorbachev"
                   />
+                  
+</picture>
                   <h3 class="card-title mt-3 mb-0 text-white">Profile Desa</h3>
                   <p class="card-text text-white-50 fs-3 fw-normal"></p>
                 </div>
               </a>
             </div>
-          </center>
+          
         </div>
         <div class="p-2">
-          <center>
+          
             <div class="card text-white bg-warning rounded">
               <a href="/pemerintahan_desa">
-                <div class="card-body">
-                  <img
+                <div class="card-body text-center">
+                  <picture>
+	<source type="image/webp" srcset="https://img.icons8.com/ios/50/conference-call--v1.png">
+	<img
                     width="40"
                     height="40"
                     style="filter: invert(1)"
                     src="https://img.icons8.com/ios/50/conference-call--v1.png"
                     alt="conference-call--v1"
-                  />
+                  />        
+</picture>
                   <h6
                     class="card-title mt-4 mb-0 text-white"
                     style="font-size: 17px"
@@ -140,60 +147,67 @@
                 </div>
               </a>
             </div>
-          </center>
+          
         </div>
         <div class="p-2">
-          <center>
+          
             <div class="card text-white rounded" style="background-color:#006400">
               {% for data in session.list_thn_dana %}
                 {% if loop.last %}
                   <a  href="/dana/{{ data.tahun }}">
                 {% endif %}
               {% endfor %}
-                <div class="card-body">
-                  <img
+                <div class="card-body text-center">
+                  <picture>
+	<source type="image/webp" srcset="/static/image/save-money.png">
+	<img
                     width="45"
                     height="45"
                     style="filter: invert(1)"
                     src="/static/image/save-money.png"
                     alt="external-galery-navigation-others-iconmarket-3"
                   />
+                  
+</picture>
                   <h3 class="card-title mt-3 mb-0 text-white">Dana Desa</h3>
                   <p class="card-text text-white-50 fs-3 fw-normal"></p>
                 </div>
               </a>
             </div>
-          </center>
+          
         </div>
       </div>
-      <div class="d-flex flex-row justify-content-center">
+      <div class="flex-row justify-content-center kolom">
         <div class="p-2">
-          <center>
+          
             <div class="card text-white bg-secondary rounded">
               <a
                 href="https://www.google.com/maps/place/Pangkah,+Tegal+Regency,+Central+Java/@-6.981731,109.15958,15z/data=!4m6!3m5!1s0x2e6fbf7326f79acf:0xb8e2ae524ec7f3c8!8m2!3d-6.9803518!4d109.1627343!16s%2Fg%2F122t1938?entry=ttu"
               >
-                <div class="card-body">
-                  <img
+                <div class="card-body text-center">
+                  <picture>
+	<source type="image/webp" srcset="https://img.icons8.com/ios/50/worldwide-location--v1.png">
+	<img
                     width="40"
                     height="40"
                     style="filter: invert(1)"
                     src="https://img.icons8.com/ios/50/worldwide-location--v1.png"
                     alt="worldwide-location--v1"
                   />
+                </picture>
                   <h3 class="card-title mt-3 mb-0 text-white">peta desa</h3>
                   <p class="card-text text-white-50 fs-3 fw-normal"></p>
                 </div>
               </a>
             </div>
-          </center>
+          
         </div>
         <div class="p-2">
-          <center>
+          
             <div class="card text-white bg-purple rounded">
               <a href="/data">
-                <div class="card-body">
-                  <img
+                <div class="card-body text-center">
+	<img
                     width="40"
                     height="40"
                     style="filter: invert(1)"
@@ -205,59 +219,54 @@
                 </div>
               </a>
             </div>
-          </center>
+          
         </div>
         <div class="p-2">
-          <center>
+          
             <div class="card text-white bg-danger rounded">
               <a href="/galeri">
-                <div class="card-body">
-                  <img
+                <div class="card-body text-center">
+                  <picture>
+	<source type="image/webp" srcset="https://img.icons8.com/external-others-iconmarket/64/external-galery-navigation-others-iconmarket-3.png">
+	<img
                     width="45"
                     height="45"
                     style="filter: invert(1)"
                     src="https://img.icons8.com/external-others-iconmarket/64/external-galery-navigation-others-iconmarket-3.png"
                     alt="external-galery-navigation-others-iconmarket-3"
                   />
+                </picture>
                   <h3 class="card-title mt-3 mb-0 text-white">Galeri foto</h3>
                   <p class="card-text text-white-50 fs-3 fw-normal"></p>
                 </div>
               </a>
             </div>
-          </center>
+          
         </div>
         <div class="p-2">
-          <center>
+          
             <div class="card text-white bg-dark-success rounded">
               <a href="/agenda">
-                <div class="card-body">
-                  <img
+                <div class="card-body text-center">
+                  <picture>
+	<source type="image/webp" srcset="https://img.icons8.com/ios/50/timeline-week.png">
+	<img
                     width="40"
                     height="40"
                     style="filter: invert(1)"
                     src="https://img.icons8.com/ios/50/timeline-week.png"
                     alt="timeline-week"
                   />
+                </picture>
                   <h3 class="card-title mt-3 mb-0 text-white">Agenda desa</h3>
                   <p class="card-text text-white-50 fs-3 fw-normal"></p>
                 </div>
               </a>
             </div>
-          </center>
+          
         </div>
       </div>
     </div>
 
-    <!-- Tautan ke Bootstrap JavaScript dan jQuery (ditempatkan sebelum </body>) -->
-    <script src="/static/assets/libs/jquery/dist/jquery.min.js"></script>
-    <!-- Bootstrap tether Core JavaScript -->
-    <script src="/static/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- apps -->
-    <script src="/static/dist/js/app.min.js"></script>
-    <script src="/static/dist/js/app.init.stylish.js"></script>
-    <script src="/static/dist/js/app-style-switcher.js"></script>
-    <!--Custom JavaScript -->
-    <script src="/static/dist/js/feather.min.js"></script>
-    <script src="/static/dist/js/custom.min.js"></script>
   </body>
 </html>

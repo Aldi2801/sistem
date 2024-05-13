@@ -1,4 +1,5 @@
 flask
+flask_cors
 flask_mysqldb
 flask_security_too
 flask_sqlalchemy
