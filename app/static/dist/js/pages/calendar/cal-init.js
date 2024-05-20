@@ -83,25 +83,7 @@
     }
     return className;
   }
-  /* on drop */
-  (CalendarApp.prototype.onDrop = function (eventObj, date) {
-    var $this = this;
-    // retrieve the dropped element's stored Event Object
-    var originalEventObject = eventObj.data("eventObject");
-    var $categoryClass = eventObj.attr("data-class");
-    // we need to copy it, so that multiple events don't have a reference to the same object
-    var copiedEventObject = $.extend({}, originalEventObject);
-    // assign it the date that was reported
-    copiedEventObject.start = date;
-    if ($categoryClass) copiedEventObject["className"] = [$categoryClass];
-    // render the event on the calendar
-    $this.$calendar.fullCalendar("renderEvent", copiedEventObject, true);
-    // is the "remove after drop" checkbox checked?
-    if ($("#drop-remove").is(":checked")) {
-      // if so, remove the element from the "Draggable Events" list
-      eventObj.remove();
-    }
-  }),
+
     /* on click on event */
     (CalendarApp.prototype.onEventClick = function (calEvent, jsEvent, view) {
       // edit dan hapus agenda
@@ -467,7 +449,14 @@
       minTime: "08:00:00",
       maxTime: "19:00:00",
       defaultView: "month",
-      handleWindowResize: true,
+      handleWindowResize: true,        
+      currentText: "hari ini",
+      buttonText: {
+        month: "Bulan",
+        week: "Minggu",
+        day: "Hari",
+        list: "Agenda",
+      },
 
       header: {
         left: "prev,next today",
@@ -522,4 +511,29 @@
   //initializing CalendarApp
   $(window).on("load", function () {
     $.CalendarApp.init();
+    //fix today button
+    $(".fc-today-button").html("hari ini");
+    mobilesize("load");
   });
+  function mobilesize(status){
+    var moreEventsLink = $('.fc-day-grid-event');
+    var windowWidth = $(window).width();
+    if (windowWidth < 480) {
+      moreEventsLink.removeClass('fc-h-event')
+      moreEventsLink.removeClass('fc-event')
+      moreEventsLink.removeClass('fc-start')
+      moreEventsLink.removeClass('fc-end')
+      moreEventsLink.removeClass('bg-light-danger')
+      moreEventsLink.removeClass('border-start')
+      moreEventsLink.removeClass('border-2')
+      moreEventsLink.removeClass('border-danger')
+      moreEventsLink.removeClass('fc-draggable');
+      moreEventsLink.html("+1 agenda"); // Change text to "+1 more"
+    }
+  }
+  $(window).on('resize', function() {
+   mobilesize("resize")
+  });
+
+  // Trigger resize event to set initial state
+  $(window).resize();

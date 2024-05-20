@@ -245,7 +245,6 @@
       maxTime: "19:00:00",
       defaultView: "month",
       handleWindowResize: true,
-
       header: {
         left: "prev,next today",
         center: "title",

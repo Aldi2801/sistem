@@ -7,6 +7,16 @@
     .fc-event{
     color: #67757c !important ;
     }
+    @media screen and (max-width: 480px) {
+      #parent{
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      #child{
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+    }
   </style>
 {% endblock %}
 {% block content %}
@@ -29,12 +39,12 @@
 </div>
 <div class="container-fluid">
   <div class="row">
-    <div class="col-lg-8">
+    <div id="parent" class="col-lg-8">
       <div class="card">
         <div class="">
           <div class="row">
             <div class="col-lg-12">
-              <div class="card-body calender-sidebar">
+              <div id="child"  class="card-body calender-sidebar">
                 <div id="calendar"></div>
               </div>
             </div>
@@ -169,6 +179,7 @@
 <div id="data-container" data-db="{{list_agenda | safe }}"></div>
 
 {% endblock %} {% block js %}
+<script src="../static/assets/libs/fullcalendar/dist/locale/id.js"></script>
 <script src="../static/assets/libs/fullcalendar/dist/fullcalendar.min.js"></script>
 <script src="../static/dist/js/pages/calendar/cal-init-user.js"></script>
 {% endblock %}

@@ -9576,8 +9576,8 @@
           "E Premte",
           "E Shtune",
         ],
-        dayNamesShort: ["Di", "Hë", "Ma", "Më", "En", "Pr", "Sh"],
-        dayNamesMin: ["Di", "Hë", "Ma", "Më", "En", "Pr", "Sh"],
+        dayNamesShort: ["Di", "Hë", "Ma", "Më", "Id", "Pr", "Sh"],
+        dayNamesMin: ["Di", "Hë", "Ma", "Më", "Id", "Pr", "Sh"],
         weekHeader: "Ja",
         dateFormat: "dd.mm.yy",
         firstDay: 1,
@@ -11416,8 +11416,8 @@
       Object.defineProperty(a, "__esModule", { value: !0 });
       var n = t(0),
         r = t(1);
-      n.locale("en"),
-        r.locale("en"),
+      n.locale("id"),
+        r.locale("id"),
         window.jQuery.datepicker &&
           window.jQuery.datepicker.setDefaults(
             window.jQuery.datepicker.regional[""]

@@ -2858,12 +2858,12 @@ options:
           exports.locale = locale;
           // Returns moment's internal locale data. If doesn't exist, returns English.
           function getMomentLocaleData(localeCode) {
-            return moment.localeData(localeCode) || moment.localeData("en");
+            return moment.localeData(localeCode) || moment.localeData("id");
           }
           exports.getMomentLocaleData = getMomentLocaleData;
           // Initialize English by forcing computation of moment-derived options.
           // Also, sets it as the default.
-          locale("en", options_1.englishDefaults);
+          locale("id", options_1.englishDefaults);
 
           /***/
         },
@@ -5143,8 +5143,8 @@ Embodies a div that has potential scrollbars
             );
           };
           function englishMoment(mom) {
-            if (mom.locale() !== "en") {
-              return mom.clone().locale("en");
+            if (mom.locale() !== "id") {
+              return mom.clone().locale("id");
             }
             return mom;
           }
