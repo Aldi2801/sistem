@@ -242,7 +242,7 @@
     let formData = new FormData();
     formData.append('id',id);
     formData.append('judul',editjdl);
-    jQuery.each(jQuery('#formFilebaru')[0].files, function(i, file) {
+    jQuery.each(jQuery('#editformFilebaru')[0].files, function(i, file) {
       formData.append('gambar', file);
   });
       $.ajax({
