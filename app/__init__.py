@@ -5,7 +5,6 @@ from flask_jwt_extended import JWTManager
 from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin
 from flask_bcrypt import Bcrypt
 from datetime import timedelta
-from functools import wraps
 import os
 
 app = Flask(__name__)
@@ -20,9 +19,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root@localhost/sistem'
 app.config['SECRET_KEY'] = 'bukan rahasia'
 app.config['SECURITY_PASSWORD_HASH'] = 'bcrypt'
 app.config['SECURITY_PASSWORD_SALT'] = b'asahdjhwquoyo192382qo'
+# Nonaktifkan rute login bawaan
+app.config['SECURITY_LOGIN_URL'] = None
+app.config['SECURITY_LOGOUT_URL'] = '/logout'  
 app.config['JWT_SECRET_KEY'] = 'qwdu92y17dqsu81'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=1)
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                1)
 
 ALLOWED_EXTENSIONS = {'xlsx'}
 
