@@ -47,7 +47,7 @@
 
     return formattedDate;
   }
-  function init_datetime_local(dateStringWithTime) {
+  function init_datetime_local_submit(dateStringWithTime) {
     // Pisahkan tanggal, jam, dan menit dari string
     var dateTimeParts = dateStringWithTime.split(", ");
     var datePart = dateTimeParts[0];
@@ -61,6 +61,27 @@
     var timeParts = timePart.split(".");
     var hours = (parseInt(timeParts[0], 10) + 1).toString().padStart(2, "0");
     var minutes = (parseInt(timeParts[1], 10) + 1).toString().padStart(2, "0");
+
+    // Membuat objek Date dengan tanggal, jam, dan menit yang ditentukan
+    var dateObject =
+      year + "-" + month + "-" + day + "T" + hours + ":" + minutes;
+
+    return dateObject;
+  }
+  function init_datetime_local_read(dateStringWithTime) {
+    // Pisahkan tanggal, jam, dan menit dari string
+    var dateTimeParts = dateStringWithTime.split(", ");
+    var datePart = dateTimeParts[0];
+    var timePart = dateTimeParts[1];
+
+    var dateParts = datePart.split("/");
+    var day = parseInt(dateParts[0], 10).toString().padStart(2, "0");
+    var month = parseInt(dateParts[1], 10).toString().padStart(2, "0"); // Bulan dimulai dari 1 (Januari = 1, Februari = 2, ...)
+    var year = parseInt(dateParts[2], 10);
+
+    var timeParts = timePart.split(".");
+    var hours = (parseInt(timeParts[0], 10)).toString().padStart(2, "0");
+    var minutes = (parseInt(timeParts[1], 10)).toString().padStart(2, "0");
 
     // Membuat objek Date dengan tanggal, jam, dan menit yang ditentukan
     var dateObject =
@@ -107,7 +128,7 @@
         )
         .append(
           "<div class='col-md-6'><div class='form-group'><label class='control-label'>Dari</label><input class='form-control' placeholder='Jam Mulai' value='" +
-            calEvent.jam_mulai +
+             calEvent.jam_mulai +
             "' type='datetime-local' name='start'/></div></div>"
         )
         .append(
@@ -279,7 +300,7 @@
           "<div class='col-md-12'><div class='form-group'><label class='control-label'>Category</label><select class='form-select' name='category'></select></div></div>"
         )
         .append(
-          "<div class='col-md-6'><div class='form-group'><label class='control-label'>Jam Mulai</label><input class='form-control' placeholder='Jam Mulai' type='datetime-local' name='start' value='"+init_datetime_local(reverse_datetime_local(start))+"'/></div></div>"
+          "<div class='col-md-6'><div class='form-group'><label class='control-label'>Jam Mulai</label><input class='form-control' placeholder='Jam Mulai' type='datetime-local' name='start' value='"+init_datetime_local_submit(reverse_datetime_local(start))+"'/></div></div>"
         )
         .append(
           "<div class='col-md-6'><div class='form-group'><label class='control-label'>Jam Selesai</label><input class='form-control' placeholder='Jam Selesai' type='datetime-local' name='end'/></div></div>"
@@ -431,8 +452,8 @@
         title: title,
         start: init_date(start),
         end: init_date(end),
-        jam_mulai: init_datetime_local(start),
-        jam_selesai: init_datetime_local(end),
+        jam_mulai: init_datetime_local_read(start),
+        jam_selesai: init_datetime_local_read(end),
         className: className,
         id: jsonData[i].id,
         keterangan: jsonData[i].keterangan,

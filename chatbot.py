@@ -1,65 +1,88 @@
-import nltk
-from nltk.stem import WordNetLemmatizer
-lemmatizer = WordNetLemmatizer()
-import pickle
-import numpy as np
-nltk.download('punkt')
-nltk.download('wordnet')
-nltk.download('omw-1.4')
-nltk.download('popular')
-from keras.models import load_model
-chatbot_model = load_model('chatbot/model.h5')
+import os
 import json
 import random
-chatbot_intens = json.loads(open('chatbot/content.json').read())
-chatbot_words = pickle.load(open('chatbot/texts.pkl','rb'))
-chatbot_classes = pickle.load(open('chatbot/labels.pkl','rb'))
+import string
+import numpy as np
+import pickle
+import nltk
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.preprocessing.text import Tokenizer
+from keras.models import load_model
+from nltk.stem import WordNetLemmatizer
 
-def clean_up_sentence(sentence):
-    # tokenize the pattern - split words into array
-    sentence_words = nltk.word_tokenize(sentence)
-    # stem each word - create short form for word
-    sentence_words = [lemmatizer.lemmatize(word.lower()) for word in sentence_words]
-    return sentence_words
+# Initialize global variables
+responses = {}
+lemmatizer = None
+tokenizer = None
+le = None
+model = None
+input_shape = 11
+project_directory = os.path.abspath(os.path.dirname(__file__))
+# Load response dataset
+def load_response():
+    global responses
+    responses = {}
+    file_path = os.path.join(project_directory, 'model_chatbot', 'dataset.json')
+    with open(file_path, encoding='utf-8') as file:
+        data = json.load(file)
+    for intent in data['intents']:
+        responses[intent['tag']] = intent['responses']
 
-# return bag of words array: 0 or 1 for each word in the bag that exists in the sentence
+# Preparation function
+def preparation():
+    global lemmatizer, tokenizer, le, model
+    load_response()
 
-def bow(sentence, words, show_details=True):
-    # tokenize the pattern
-    sentence_words = clean_up_sentence(sentence)
-    # bag of words - matrix of N words, vocabulary matrix
-    bag = [0]*len(words)  
-    for s in sentence_words:
-        for i,w in enumerate(words):
-            if w == s: 
-                # assign 1 if current word is in the vocabulary position
-                bag[i] = 1
-                if show_details:
-                    print ("found in bag: %s" % w)
-    return(np.array(bag))
+    # Load tokenizer and lemmatizer
+    file_path = os.path.join(project_directory, 'model_chatbot', 'tokenizers.pkl')
+    with open(file_path, 'rb') as f:
+        tokenizer = pickle.load(f)
 
-def predict_class(sentence, model):
-    # filter out predictions below a threshold
-    p = bow(sentence, chatbot_words,show_details=False)
-    res = model.predict(np.array([p]))[0]
-    ERROR_THRESHOLD = 0.25
-    results = [[i,r] for i,r in enumerate(res) if r>ERROR_THRESHOLD]
-    # sort by strength of probability
-    results.sort(key=lambda x: x[1], reverse=True)
-    return_list = []
-    for r in results:
-        return_list.append({"intent": chatbot_classes[r[0]], "probability": str(r[1])})
-    return return_list
+    le_path = os.path.join(project_directory, 'model_chatbot', 'le.pkl')
+    with open(le_path, 'rb') as f:
+        le = pickle.load(f)
+    model_path = os.path.join(project_directory, 'model_chatbot', 'chat_model_new.h5')
+    model = load_model(model_path)
 
-def getResponse(ints, intents_json):
-    tag = ints[0]['intent']
-    for intent in intents_json['intents']:
-        if intent['tag'] == tag:
-            return random.choice(intent['responses'])
-    return "Sorry, I didn't understand that."
+    lemmatizer = WordNetLemmatizer()
+    nltk.download('punkt', quiet=True)
+    nltk.download('wordnet', quiet=True)
+    nltk.download('omw-1.4', quiet=True)
 
-def chatbot_response(msg):
-    ints = predict_class(msg, chatbot_model)
-    res = getResponse(ints, chatbot_intens)
-    print(res)
-    return res
+# Function to remove punctuation
+def remove_punctuation(text):
+    return ''.join([char.lower() for char in text if char not in string.punctuation])
+
+# Function to convert text to vector
+def vectorization(text):
+    if tokenizer is None:
+        raise ValueError("Tokenizer is not initialized. Call preparation() first.")
+    
+    text = remove_punctuation(text)
+    vector = tokenizer.texts_to_sequences([text])
+    vector = np.array(vector).reshape(-1)
+    vector = pad_sequences([vector], maxlen=input_shape)
+    return vector
+
+# Function to predict response tag
+def predict(vector):
+    if model is None:
+        raise ValueError("Model is not initialized. Call preparation() first.")
+    
+    output = model.predict(vector)
+    output = output.argmax()
+    response_tag = le.inverse_transform([output])[0]
+    return response_tag
+
+# Function to generate response
+def generate_response(text):
+    if not all(v is not None for v in [tokenizer, model, le]):
+        raise ValueError("Tokenizer, model, or label encoder is not initialized. Call preparation() first.")
+    
+    vector = vectorization(text)
+    response_tag = predict(vector)
+    answer = random.choice(responses[response_tag])
+    return answer
+
+# Call preparation to initialize all global variables
+preparation()

@@ -1,0 +1,15 @@
+click
+Flask
+gunicorn
+itsdangerous
+Jinja2
+MarkupSafe
+Werkzeug
+numpy
+nltk
+tensorflow
+scikit-learn
+Keras-Preprocessing
+pandas
+torch
+APScheduler

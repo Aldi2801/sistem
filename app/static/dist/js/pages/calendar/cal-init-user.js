@@ -39,11 +39,13 @@
       var day = date.getDate();
       var month = date.getMonth() + 1; // bulan dimulai dari 1
       var year = date.getFullYear();
-      var hours = date.getHours();
-      var minutes = date.getMinutes();
+      var hours = date.getHours()-1;
+      var minutes = date.getMinutes()-1;
+      hours = hours.toString().padStart(2, "0");
+      minutes = minutes.toString().padStart(2, "0");
   
       // Mengatur format sesuai keinginan
-      var formattedDate = `${day}/${month}/${year}, ${hours}.${minutes}`;
+      var formattedDate = `${day}/${month}/${year}, ${hours}:${minutes}`;
   
       return formattedDate;
     }
@@ -75,11 +77,6 @@
         $this.$modal.find(".modal-title").empty().append("Agenda");
         var form = $(`<div style="margin: 0px">
             <h4 class="card-title text-center"> `+calEvent.title+`</h4>
-
-            <div class="image-container">
-              <img src="../static/image/`+reverse_datetime_local(calEvent.foto)+`" class="responsive-image"
-                alt="">
-            </div><br>
             `);
       if (calEvent.gambar == "default.jpg"){}
                else {
