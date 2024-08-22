@@ -2,6 +2,7 @@ import json
 import numpy as np
 import random
 import nltk
+import pickle
 from nltk.stem import WordNetLemmatizer
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout
@@ -36,11 +37,14 @@ words = sorted(set(words))
 
 classes = sorted(set(classes))
 
-print(f'Words: {len(words)}')  # Tambahkan ini untuk melihat panjang words
-print(f'Classes: {classes}')
+print(f'Words: {len(words)}')  # Output jumlah words
+print(f'Classes: {classes}')   # Output classes
 
 training = []
 output_empty = [0] * len(classes)
+
+le = LabelEncoder()
+le.fit(classes)  # Fit LabelEncoder dengan classes
 
 for document in documents:
     bag = []
@@ -59,8 +63,15 @@ training = np.array(training, dtype=object)
 train_x = np.array(list(training[:, 0]))
 train_y = np.array(list(training[:, 1]))
 
-print(f'Train_x shape: {train_x.shape}')  # Tambahkan ini untuk melihat bentuk train_x
-print(f'Train_y shape: {train_y.shape}')  # Tambahkan ini untuk melihat bentuk train_y
+print(f'Train_x shape: {train_x.shape}')  # Output shape train_x
+print(f'Train_y shape: {train_y.shape}')  # Output shape train_y
+
+# Simpan Tokenizer dan LabelEncoder
+with open('model_chatbot/tokenizer.pkl', 'wb') as f:
+    pickle.dump(words, f)
+
+with open('model_chatbot/le.pkl', 'wb') as f:
+    pickle.dump(le, f)  # Simpan objek LabelEncoder
 
 # Building the model
 model = Sequential()
@@ -77,4 +88,6 @@ model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy
 hist = model.fit(x=train_x, y=train_y, epochs=200, batch_size=5, verbose=1)
 model.save('model_chatbot/chat_model_new.h5', hist)
 
-print("Model trained and saved as 'chat_model.h5'")
+print("Model trained and saved as 'chat_model_new.h5'")
+print("Tokenizer saved as 'tokenizer.pkl'")
+print("LabelEncoder saved as 'le.pkl'")

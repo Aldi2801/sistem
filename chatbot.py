@@ -6,7 +6,6 @@ import numpy as np
 import pickle
 import nltk
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.preprocessing.text import Tokenizer
 from keras.models import load_model
 from nltk.stem import WordNetLemmatizer
 
@@ -16,8 +15,9 @@ lemmatizer = None
 tokenizer = None
 le = None
 model = None
-input_shape = 11
+input_shape = None
 project_directory = os.path.abspath(os.path.dirname(__file__))
+
 # Load response dataset
 def load_response():
     global responses
@@ -30,21 +30,23 @@ def load_response():
 
 # Preparation function
 def preparation():
-    global lemmatizer, tokenizer, le, model
+    global lemmatizer, tokenizer, le, model, input_shape
     load_response()
 
     # Load tokenizer and lemmatizer
-    file_path = os.path.join(project_directory, 'model_chatbot', 'tokenizers.pkl')
+    file_path = os.path.join(project_directory, 'model_chatbot', 'tokenizer.pkl')
     with open(file_path, 'rb') as f:
         tokenizer = pickle.load(f)
 
     le_path = os.path.join(project_directory, 'model_chatbot', 'le.pkl')
     with open(le_path, 'rb') as f:
-        le = pickle.load(f)
+        le = pickle.load(f)  # Memuat objek LabelEncoder yang telah disimpan
     model_path = os.path.join(project_directory, 'model_chatbot', 'chat_model_new.h5')
     model = load_model(model_path)
 
     lemmatizer = WordNetLemmatizer()
+    input_shape = len(tokenizer)  # Set input shape sesuai dengan jumlah kata yang digunakan
+
     nltk.download('punkt', quiet=True)
     nltk.download('wordnet', quiet=True)
     nltk.download('omw-1.4', quiet=True)
@@ -59,8 +61,12 @@ def vectorization(text):
         raise ValueError("Tokenizer is not initialized. Call preparation() first.")
     
     text = remove_punctuation(text)
-    vector = tokenizer.texts_to_sequences([text])
-    vector = np.array(vector).reshape(-1)
+    word_patterns = nltk.word_tokenize(text)
+    word_patterns = [lemmatizer.lemmatize(word.lower()) for word in word_patterns]
+    
+    vector = [1 if word in word_patterns else 0 for word in tokenizer]
+    
+    # Sesuaikan panjang vektor menjadi sesuai dengan panjang yang diharapkan oleh model
     vector = pad_sequences([vector], maxlen=input_shape)
     return vector
 

@@ -435,7 +435,7 @@
               // Kirim pesan pengguna ke server melalui AJAX
               $.ajax({
                   type: "GET",
-                  url: "https://desapangkah.com/chatbot/get?msg=" + userMessage,
+                  url: "/chatbot/get?msg=" + userMessage,
                   success: function (response) {
                       // Sembunyikan efek loading
                       $("#sendMessage").html('Send');

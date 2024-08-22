@@ -8,7 +8,7 @@ def chatbot():
   tanggal = datetime.datetime.now()
   tanggal_baru = tanggal.strftime('%Y-%m-%d %H:%M:%S')
   import chatbot
-  result = chatbot.generate_response(userText)
+  respon = chatbot.generate_response(userText)
   print(respon)
   return respon
 

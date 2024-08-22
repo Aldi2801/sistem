@@ -55,9 +55,6 @@ class User(db.Model, UserMixin):
                             backref=db.backref('users', lazy='dynamic'))
     fs_uniquifier = db.Column(db.String(64), unique=True)
     
-# Setup Flask-Security
-user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-security = Security(datastore=user_datastore, app=app)
 
 jwt = JWTManager(app)
 mysql = MySQL()
@@ -65,7 +62,7 @@ mysql.init_app(app)
 
 # allow CORS biar api yang dibuat bisa dipake website lain
 from flask_cors import CORS
-CORS(app, resources={r"/chatbot/*":  {"origins": ["https://desapangkah.com","https://www.desapangkah.com"]}})
+CORS(app)
 # Import rute dari modul-modul Anda
 
 @app.route('/sitemap.xml')
