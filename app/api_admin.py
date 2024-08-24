@@ -246,7 +246,10 @@ def admindana():
     info_list2 = fetch_data_and_format("SELECT * FROM realisasi_belanja ORDER BY id")
     info_list3 = fetch_data_and_format("SELECT * FROM realisasi_pembiayaan ORDER BY id")
     thn = fetch_years("SELECT tahun FROM realisasi_pendapatan GROUP BY tahun")
-    return render_template("admin/dana.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn)
+    g.con.execute("SELECT nama_jabatan FROM urutan_jabatan_pemerintahan")
+    rows = g.con.fetchall()
+    urutan_jabatan = [row[0] for row in rows]
+    return render_template("admin/dana_new.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn, urutan_jabatan=urutan_jabatan)
 @app.route('/admin/edit_dana', methods=['PUT'])
 @jwt_required()
 def edit_dana():
@@ -431,9 +434,14 @@ def anggota_ubah_jabatan():
         databaru = databaru.split(',')
         g.con.execute("DELETE FROM urutan_jabatan_pemerintahan")
         # Memasukkan data baru ke dalam tabel
-        for i in databaru:
-            g.con.execute("INSERT INTO urutan_jabatan_pemerintahan(nama_jabatan) VALUES(%s)", (i,))
+        for index, i in enumerate(databaru, start=1):
+            g.con.execute("INSERT INTO urutan_jabatan_pemerintahan(id, nama_jabatan) VALUES(%s, %s)", (index, i))
             mysql.connection.commit()  # Melakukan commit setiap kali setelah memasukkan data
+            
+        #for index, i in enumerate(databaru, start=1):
+        #    g.con.execute("UPDATE urutan_jabatan_pemerintahan SET nama_jabatan=%s WHERE id=%s", (i, index))
+        #    mysql.connection.commit()  # Melakukan commit setiap kali setelah memperbarui data
+
         return jsonify({"msg": "SUKSES"})
     except Exception as e:
         print(str(e))
@@ -651,9 +659,14 @@ def bpd_ubah_jabatan():
         databaru = request.form['data_baru']
         databaru = databaru.split(',')
         g.con.execute("DELETE FROM urutan_jabatan")
-        for i in databaru:
-            g.con.execute("INSERT INTO urutan_jabatan(nama_jabatan) VALUES(%s)", (i,))
+        for index, i in enumerate(databaru, start=1):
+            g.con.execute("INSERT INTO urutan_jabatan_pemerintahan(id, nama_jabatan) VALUES(%s, %s)", (index, i))
             mysql.connection.commit()  # Melakukan commit setiap kali setelah memasukkan data
+            
+        #for index, i in enumerate(databaru, start=1):
+        #    g.con.execute("UPDATE urutan_jabatan_pemerintahan SET nama_jabatan=%s WHERE id=%s", (i, index))
+        #    mysql.connection.commit()  # Melakukan commit setiap kali setelah memperbarui data
+
         return jsonify({"msg": "SUKSES"})
     except Exception as e:
         print(str(e))

@@ -168,11 +168,11 @@
           </div>
           <div class="modal-body">
            <div class="col-lg-12 col-md-12">
-                   <div class="myadmin-dd dd text-black col-12" id="nestable">
-                     <ol class="dd-list col-12">
+                   <div class="myadmin-dd dd text-black " style="max-width:none;" id="nestable">
+                     <ol class="dd-list ">
                        {% for i in urutan_jabatan :%}
-                       <li class="dd-item col-12" data-id="{{i}}">
-                         <div class="dd-handle col-12">{{i}}</div>
+                       <li class="dd-item " data-id="{{i}}">
+                         <div class="dd-handle ">{{i}}</div>
                        </li>
                        {% endfor %}
                        
