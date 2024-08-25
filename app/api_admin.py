@@ -240,6 +240,12 @@ def format_currency(value):
     locale.setlocale(locale.LC_ALL, 'id_ID.UTF-8')
     return locale.currency(value, grouping=True, symbol='Rp')
 
+# Helper function to find item details by id
+def find_item_details(item_id):
+    for item in item_details:
+        if str(item['id']) == item_id.split('-')[-1]:  # Compare by last part of id
+            return item
+    return None
 @app.route('/admin/dana')
 def admindana():
     info_list = fetch_data_and_format("SELECT * FROM realisasi_pendapatan ORDER BY id")
@@ -249,7 +255,38 @@ def admindana():
     g.con.execute("SELECT nama_jabatan FROM urutan_jabatan_pemerintahan")
     rows = g.con.fetchall()
     urutan_jabatan = [row[0] for row in rows]
-    return render_template("admin/dana_new.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn, urutan_jabatan=urutan_jabatan)
+    print(info_list)
+    urutan_pendapatan = {}
+    for i in info_list:
+        tahun = i["tahun"]
+        if tahun not in urutan_pendapatan:
+            urutan_pendapatan[tahun] = []
+        
+        if i["class"].strip()  == "clickable-row":
+            anak_anak = i["onclick"].replace("toggleDetails(", "").replace(")", "").split(",")
+            children = []
+            for anak in anak_anak:
+                anaksa = {"id": anak}
+                children.append(anaksa)
+            x = {"id": f"{i['tahun']}-pendapatan-{i['id']}", "children": children}
+            urutan_pendapatan[tahun].append(x)
+        elif i["class"] == "hidden-row":
+            continue
+        else:
+            x = {"id": f"{i['tahun']}-pendapatan-{i['id']}"}
+            urutan_pendapatan[tahun].append(x)
+    
+    print(urutan_pendapatan)
+    return render_template("admin/dana_new.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn, urutan_jabatan=urutan_jabatan, urutan_pendapatan=urutan_pendapatan)
+
+@app.route('/admin/dana/ubah_urutan', methods=['PUT'])
+@jwt_required()
+def ubah_urutan_dana():
+    data = request.json.get('nestable', [])
+    processed_data = []
+    print(data)
+    return "sds"
+
 @app.route('/admin/edit_dana', methods=['PUT'])
 @jwt_required()
 def edit_dana():
