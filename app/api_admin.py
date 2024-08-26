@@ -96,7 +96,9 @@ def insert_data_from_dataframe(df, table):
 #halaman admin
 @app.route('/admin/dashboard')
 def dashboard():
-    return render_template('admin/dashboard.html')
+    info_list=fetch_data_and_format("SELECT * FROM monografi")
+    print(info_list)
+    return render_template('admin/dashboard.html',info_list=info_list)
 
 #sejarah
 @app.route('/admin/infodesa')
@@ -240,52 +242,116 @@ def format_currency(value):
     locale.setlocale(locale.LC_ALL, 'id_ID.UTF-8')
     return locale.currency(value, grouping=True, symbol='Rp')
 
-# Helper function to find item details by id
-def find_item_details(item_id):
-    for item in item_details:
-        if str(item['id']) == item_id.split('-')[-1]:  # Compare by last part of id
-            return item
-    return None
+# Helper function 
+def set_urutan(info_list):
+    urutan = {}
+    for i in info_list:
+        tahun = i["tahun"]
+        if tahun not in urutan:
+            urutan[tahun] = []
+        
+        if i["class"].strip() == "clickable-row":
+            anak_anak = i["onclick"].replace("toggleDetails(", "").replace(")", "").split(",")
+            children = []
+            for anak in anak_anak:
+                anaksa = {"id": anak.strip("'")}
+                children.append(anaksa)
+            x = {"id": f"{i['id']}", "children": children}
+            urutan[tahun].append(x)
+        elif i["class"] == "hidden-row":
+            continue
+        else:
+            x = {"id": f"{i['id']}"}
+            urutan[tahun].append(x)
+    print(urutan)
+    return urutan
+
 @app.route('/admin/dana')
 def admindana():
+    
     info_list = fetch_data_and_format("SELECT * FROM realisasi_pendapatan ORDER BY id")
     info_list2 = fetch_data_and_format("SELECT * FROM realisasi_belanja ORDER BY id")
     info_list3 = fetch_data_and_format("SELECT * FROM realisasi_pembiayaan ORDER BY id")
     thn = fetch_years("SELECT tahun FROM realisasi_pendapatan GROUP BY tahun")
-    g.con.execute("SELECT nama_jabatan FROM urutan_jabatan_pemerintahan")
-    rows = g.con.fetchall()
-    urutan_jabatan = [row[0] for row in rows]
-    print(info_list)
-    urutan_pendapatan = {}
-    for i in info_list:
-        tahun = i["tahun"]
-        if tahun not in urutan_pendapatan:
-            urutan_pendapatan[tahun] = []
-        
-        if i["class"].strip()  == "clickable-row":
-            anak_anak = i["onclick"].replace("toggleDetails(", "").replace(")", "").split(",")
-            children = []
-            for anak in anak_anak:
-                anaksa = {"id": anak}
-                children.append(anaksa)
-            x = {"id": f"{i['tahun']}-pendapatan-{i['id']}", "children": children}
-            urutan_pendapatan[tahun].append(x)
-        elif i["class"] == "hidden-row":
-            continue
-        else:
-            x = {"id": f"{i['tahun']}-pendapatan-{i['id']}"}
-            urutan_pendapatan[tahun].append(x)
-    
-    print(urutan_pendapatan)
-    return render_template("admin/dana_new.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn, urutan_jabatan=urutan_jabatan, urutan_pendapatan=urutan_pendapatan)
+    urutan_pendapatan = set_urutan(info_list)
+    urutan_belanja = set_urutan(info_list2)
+    urutan_pembiayaan = set_urutan(info_list3)
+    return render_template("admin/dana_new.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn, 
+                           urutan_pendapatan=urutan_pendapatan,  urutan_belanja = urutan_belanja, urutan_pembiayaan=urutan_pembiayaan)
 
 @app.route('/admin/dana/ubah_urutan', methods=['PUT'])
 @jwt_required()
 def ubah_urutan_dana():
     data = request.json.get('nestable', [])
-    processed_data = []
     print(data)
-    return "sds"
+    try:
+        # Fetch data from database
+        info_list = fetch_data_and_format("SELECT * FROM realisasi_pendapatan ORDER BY id")
+        info_list2 = fetch_data_and_format("SELECT * FROM realisasi_belanja ORDER BY id")
+        info_list3 = fetch_data_and_format("SELECT * FROM realisasi_pembiayaan ORDER BY id")
+        
+        # Clear the existing data in urutan_jabatan_pemerintahan
+        g.con.execute("DELETE FROM urutan_jabatan_pemerintahan")
+        
+        # Process and insert data
+        for index, i in enumerate(data, start=1):
+            tahun, tabel, id_ = str(i['id']).split('-') 
+            if tabel == "pendapatan":
+                # Find corresponding record in info_list
+                data_baru = next((j for j in info_list if j['id'] == id_), None)
+                
+                if data_baru:
+                    # Handle the case with children
+                    if 'children' in i and i['children']:
+                        class_ = "clickable-row"
+                        children = []
+                        ids = []
+                        for k in i['children']:
+                            child_data = next((l for l in info_list if l['id'] == k['id']), None)
+                            if child_data:
+                                children.append(child_data)
+                                ids.append(f"{tahun}-pendapatan-{child_data['id']}")
+                        
+                        onclick = f"toggleDetails({','.join(ids)})"
+                        data_baru['class'] = class_
+                        data_baru['onclick'] = onclick
+                        g.con.execute("INSERT INTO realisasi_pendapatan(id,no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun,nota,class,detail,onclick) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", 
+                                      (data_baru['id'], data_baru['no'], data_baru['uraian'], data_baru['anggaran'], data_baru['realisasi'], data_baru['lebih/(kurang)'], data_baru['tahun'], data_baru['nota'], data_baru['class'], data_baru['detail'], data_baru['onclick']))
+                        
+                        for child in children:
+                            child['class'] = "hidden-row"
+                            child['onclick'] = ""
+                            g.con.execute("INSERT INTO realisasi_pendapatan(id,no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun,nota,class,detail,onclick) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", 
+                                          (child['id'], child['no'], child['uraian'], child['anggaran'], child['realisasi'], child['lebih/(kurang)'], child['tahun'], child['nota'], child['class'], child['detail'], child['onclick']))
+                    
+                    else:
+                        g.con.execute("INSERT INTO realisasi_pendapatan(id,no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun,nota,class,detail,onclick) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", 
+                                      (data_baru['id'], data_baru['no'], data_baru['uraian'], data_baru['anggaran'], data_baru['realisasi'], data_baru['lebih/(kurang)'], data_baru['tahun'], data_baru['nota'], data_baru['class'], data_baru['detail'], data_baru['onclick']))
+                    
+                mysql.connection.commit()  # Commit the transaction
+                
+            elif tabel == "pembiayaan":
+                # Find corresponding record in info_list3
+                data_baru = next((j for j in info_list3 if j['id'] == id_), None)
+                if data_baru:
+                    g.con.execute("INSERT INTO realisasi_pembiayaan(id,no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun,nota,class,detail,onclick) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", 
+                                  (data_baru['id'], data_baru['no'], data_baru['uraian'], data_baru['anggaran'], data_baru['realisasi'], data_baru['lebih/(kurang)'], data_baru['tahun'], data_baru['nota'], data_baru['class'], data_baru['detail'], data_baru['onclick']))
+                    mysql.connection.commit()
+                    
+            elif tabel == "belanja":
+                # Find corresponding record in info_list2
+                data_baru = next((j for j in info_list2 if j['id'] == id_), None)
+                if data_baru:
+                    g.con.execute("INSERT INTO realisasi_belanja(id,no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun,nota,class,detail,onclick) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", 
+                                  (data_baru['id'], data_baru['no'], data_baru['uraian'], data_baru['anggaran'], data_baru['realisasi'], data_baru['lebih/(kurang)'], data_baru['tahun'], data_baru['nota'], data_baru['class'], data_baru['detail'], data_baru['onclick']))
+                    mysql.connection.commit()
+        
+        return jsonify({"msg": "SUKSES"})
+    
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)})
+
 
 @app.route('/admin/edit_dana', methods=['PUT'])
 @jwt_required()

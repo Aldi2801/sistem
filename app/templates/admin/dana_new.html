@@ -88,8 +88,10 @@
                   </tr>
                 </thead>
                 <tbody>
+                  {% for j in urutan_pendapatan[h.tahun] %}
                   {% for i in info_list %}
-                  {% if h.tahun == i.tahun %}
+                    {% if h.tahun == i.tahun %}
+                    {% if j.id|string == i.id|string %}
                   <tr class="{{i.class}}" id="{{i.detail}}" onclick="{{i.onclick}}" >
                     <td>{{ i.no }}</td>
                     <td>{{ i.uraian }}</td>
@@ -98,7 +100,27 @@
                     <td>{{ i['lebih/(kurang)'] }}</td>
                     <td>{{ i.tahun }}</td>
                   </tr>
+                  {% if j.children %}
+                  {% for child in j.children %}
+                  {% for k in info_list %}
+                  {% if h.tahun == i.tahun %}
+                  {% if child.id == k.detail %}
+                  <tr class="{{k.class}}" id="{{k.detail}}" onclick="{{k.onclick}}" >
+                    <td>{{ k.no }}</td>
+                    <td>{{ k.uraian }}</td>
+                    <td>{{ k.anggaran }}</td>
+                    <td>{{ k.realisasi }}</td>
+                    <td>{{ k['lebih/(kurang)'] }}</td>
+                    <td>{{ k.tahun }}</td>
+                  </tr>
                   {% endif %}
+                  {% endif %}
+                  {% endfor %}
+                  {% endfor %}
+                  {% endif %}
+                  {% endif %}
+                  {% endif %}
+                  {% endfor %}
                   {% endfor %}
                 </tbody>
               </table>
@@ -120,8 +142,10 @@
                   </tr>
                 </thead>
                 <tbody>
+                  {% for j in urutan_belanja[h.tahun] %}
                   {% for i in info_list2 %}
-                  {% if h.tahun == i.tahun %}
+                    {% if h.tahun == i.tahun %}
+                    {% if j.id|string == i.id|string %}
                   <tr class="{{i.class}}" id="{{i.detail}}" onclick="{{i.onclick}}">
                     <td>{{ i.no }}</td>
                     <td>{{ i.uraian }}</td>
@@ -129,8 +153,27 @@
                     <td>{{ i.realisasi }}</td>
                     <td>{{ i['lebih/(kurang)'] }}</td>
                     <td>{{ i.tahun }}</td>
+                  </tr>   {% if j.children %}
+                  {% for child in j.children %}
+                  {% for k in info_list2 %}
+                  {% if h.tahun == i.tahun %}
+                  {% if child.id == k.detail %}
+                  <tr class="{{k.class}}" id="{{k.detail}}" onclick="{{k.onclick}}" >
+                    <td>{{ k.no }}</td>
+                    <td>{{ k.uraian }}</td>
+                    <td>{{ k.anggaran }}</td>
+                    <td>{{ k.realisasi }}</td>
+                    <td>{{ k['lebih/(kurang)'] }}</td>
+                    <td>{{ k.tahun }}</td>
                   </tr>
                   {% endif %}
+                  {% endif %}
+                  {% endfor %}
+                  {% endfor %}
+                  {% endif %}
+                  {% endif %}
+                  {% endif %}
+                  {% endfor %}
                   {% endfor %}
                 </tbody>
               </table>
@@ -151,9 +194,11 @@
                     <th>Aksi</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody> 
+                  {% for j in urutan_pembiayaan[h.tahun] %}
                   {% for i in info_list3 %}
-                  {% if h.tahun == i.tahun %}
+                    {% if h.tahun == i.tahun %}
+                    {% if j.id|string == i.id|string %}
                   <tr class="{{i.class}}" id="{{i.detail}}" onclick="{{i.onclick}}">
                     <td>{{ i.no }}</td>
                     <td>{{ i.uraian }}</td>
@@ -161,8 +206,27 @@
                     <td>{{ i.realisasi }}</td>
                     <td>{{ i['lebih/(kurang)'] }}</td>
                     <td>{{ i.tahun }}</td>
+                  </tr>   {% if j.children %}
+                  {% for child in j.children %}
+                  {% for k in info_list3 %}
+                  {% if h.tahun == i.tahun %}
+                  {% if child.id == k.detail %}
+                  <tr class="{{k.class}}" id="{{k.detail}}" onclick="{{k.onclick}}" >
+                    <td>{{ k.no }}</td>
+                    <td>{{ k.uraian }}</td>
+                    <td>{{ k.anggaran }}</td>
+                    <td>{{ k.realisasi }}</td>
+                    <td>{{ k['lebih/(kurang)'] }}</td>
+                    <td>{{ k.tahun }}</td>
                   </tr>
                   {% endif %}
+                  {% endif %}
+                  {% endfor %}
+                  {% endfor %}
+                  {% endif %}
+                  {% endif %}
+                  {% endif %}
+                  {% endfor %}
                   {% endfor %}
                 </tbody>
               </table>
@@ -277,15 +341,22 @@
         <div class="table-responsive">
           {% for h in tahun %}
             <div id="table_{{h.tahun}}">
-              <h4 id="welcome_{{h.tahun}}" class="nestable-container">Dana Desa Tahun {{h.tahun}}</h4>
+              <h4 id="welcome_{{h.tahun}}" class="tonggle-hide">Dana Desa Tahun {{h.tahun}}</h4>
               <div class="all">
                 {% if info_list %}
-                  <h6 id="welcome_{{h.tahun}}_1" class="nestable-container">Realisasi Pendapatan</h6>
-                  <div class="myadmin-dd-empty dd text-black nestable-container" style="max-width:none;" id="nestable_{{h.tahun}}_1">
+                  <h6 id="welcome_{{h.tahun}}_1" class="tonggle-hide">Realisasi Pendapatan</h6>
+                  <div class="myadmin-dd-empty dd text-black tonggle-hide" style="max-width:none;" id="nestable_{{h.tahun}}_1">
                     <ol class="dd-list">
+                      {% for j in urutan_pendapatan[h.tahun] %}
                       {% for i in info_list %}
                         {% if h.tahun == i.tahun %}
+                        {% if j.id|string == i.id|string %}
+                        {% if i.class|string == "hidden-row" %}
+                        {% else %}
                           <li class="dd-item dd3-item col-12" data-id="{{ i.tahun }}-pendapatan-{{i.id}}" style="max-width:none;">
+                            {% if i.class|string == "clickable-row" %}
+                            <button data-action="expand" type="button" style="">Expand</button>
+                            {% endif %}
                             <div class="dd-handle dd3-handle"></div>
                             <div class="dd3-content">
                               <table>
@@ -299,21 +370,57 @@
                                 </tr>
                               </table>
                             </div>
+                            {% if j.children %}
+                            {% for child in j.children %}
+                            {% for k in info_list %}
+                            {% if h.tahun == i.tahun %}
+                            {% if child.id == k.detail %}
+                            <ol class="dd-list" style=""><li class="dd-item dd3-item col-12" data-id="{{ k.tahun }}-pembiayaan-{{k.id}}" style="max-width:none;">
+                                <div class="dd-handle dd3-handle"></div>
+                                <div class="dd3-content">
+                                  <table>
+                                    <tr >
+                                      <td>{{ k.no }}</td>
+                                      <td>{{ k.uraian }}</td>
+                                      <td>{{ k.anggaran }}</td>
+                                      <td>{{ k.realisasi }}</td>
+                                      <td>{{ k['lebih/(kurang)'] }}</td>
+                                      <td>{{ k.tahun }}</td>
+                                    </tr>
+                                  </table>
+                                </div>
+                            </li></ol>
+                            {% endif %}
+                            {% endif %}
+                            {% endfor %}
+                            {% endfor %}
+                            {% endif %}
                           </li>
+                          {% endif %}
                         {% endif %}
+                        {% endif %}
+                      {% endfor %}
                       {% endfor %}
                     </ol>
                   </div>
+                  <textarea class="tonggle-hide"  id="nestable_{{h.tahun}}_1-output"></textarea>
                 {% else %}
                   <p>No data available.</p>
                 {% endif %}
                 {% if info_list2 %}
-                  <h6 id="welcome_{{h.tahun}}_2" class="nestable-container">Realisasi Belanja</h6>
-                  <div class="myadmin-dd-empty dd text-black nestable-container" style="max-width:none;" id="nestable_{{h.tahun}}_2">
+                  <h6 id="welcome_{{h.tahun}}_2" class="tonggle-hide">Realisasi Belanja</h6>
+                  <div class="myadmin-dd-empty dd text-black tonggle-hide" style="max-width:none;" id="nestable_{{h.tahun}}_2">
                     <ol class="dd-list">
+                      {% for j in urutan_belanja[h.tahun] %}
                       {% for i in info_list2 %}
                         {% if h.tahun == i.tahun %}
-                          <li class="dd-item dd3-item col-12" data-id="{{ i.tahun }}-pembiayaan-{{i.id}}" style="max-width:none;">
+                        {% if j.id|string == i.id|string %}
+                        {% if i.class|string == "hidden-row" %}
+                        {% else %}
+                          <li class="dd-item dd3-item col-12" data-id="{{ i.tahun }}-pendapatan-{{i.id}}" style="max-width:none;">
+                            {% if i.class|string == "clickable-row" %}
+                            <button data-action="expand" type="button" style="">Expand</button>
+                            {% endif %}
                             <div class="dd-handle dd3-handle"></div>
                             <div class="dd3-content">
                               <table>
@@ -327,21 +434,57 @@
                                 </tr>
                               </table>
                             </div>
+                            {% if j.children %}
+                            {% for child in j.children %}
+                            {% for k in info_list2 %}
+                            {% if h.tahun == i.tahun %}
+                            {% if child.id == k.detail %}
+                            <ol class="dd-list" style=""><li class="dd-item dd3-item col-12" data-id="{{ k.tahun }}-pembiayaan-{{k.id}}" style="max-width:none;">
+                                <div class="dd-handle dd3-handle"></div>
+                                <div class="dd3-content">
+                                  <table>
+                                    <tr >
+                                      <td>{{ k.no }}</td>
+                                      <td>{{ k.uraian }}</td>
+                                      <td>{{ k.anggaran }}</td>
+                                      <td>{{ k.realisasi }}</td>
+                                      <td>{{ k['lebih/(kurang)'] }}</td>
+                                      <td>{{ k.tahun }}</td>
+                                    </tr>
+                                  </table>
+                                </div>
+                            </li></ol>
+                            {% endif %}
+                            {% endif %}
+                            {% endfor %}
+                            {% endfor %}
+                            {% endif %}
                           </li>
+                          {% endif %}
                         {% endif %}
+                        {% endif %}
+                      {% endfor %}
                       {% endfor %}
                     </ol>
                   </div>
+                  <textarea class="tonggle-hide"  id="nestable_{{h.tahun}}_2-output"></textarea>
                 {% else %}
                   <p>No data available.</p>
                 {% endif %}
                 {% if info_list3 %}
-                  <h6 id="welcome_{{h.tahun}}_3" class="nestable-container">Realisasi Pembiayaan</h6>
-                  <div class="myadmin-dd-empty dd text-black nestable-container" style="max-width:none;" id="nestable_{{h.tahun}}_3">
+                  <h6 id="welcome_{{h.tahun}}_3" class="tonggle-hide">Realisasi Pembiayaan</h6>
+                  <div class="myadmin-dd-empty dd text-black tonggle-hide" style="max-width:none;" id="nestable_{{h.tahun}}_3">
                     <ol class="dd-list">
+                      {% for j in urutan_pembiayaan[h.tahun] %}
                       {% for i in info_list3 %}
                         {% if h.tahun == i.tahun %}
+                        {% if j.id|string == i.id|string %}
+                        {% if i.class|string == "hidden-row" %}
+                        {% else %}
                           <li class="dd-item dd3-item col-12" data-id="{{ i.tahun }}-pendapatan-{{i.id}}" style="max-width:none;">
+                            {% if i.class|string == "clickable-row" %}
+                            <button data-action="expand" type="button" style="">Expand</button>
+                            {% endif %}
                             <div class="dd-handle dd3-handle"></div>
                             <div class="dd3-content">
                               <table>
@@ -355,11 +498,40 @@
                                 </tr>
                               </table>
                             </div>
+                            {% if j.children %}
+                            {% for child in j.children %}
+                            {% for k in info_list3 %}
+                            {% if h.tahun == i.tahun %}
+                            {% if child.id == k.detail %}
+                            <ol class="dd-list" style=""><li class="dd-item dd3-item col-12" data-id="{{ k.tahun }}-pembiayaan-{{k.id}}" style="max-width:none;">
+                                <div class="dd-handle dd3-handle"></div>
+                                <div class="dd3-content">
+                                  <table>
+                                    <tr >
+                                      <td>{{ k.no }}</td>
+                                      <td>{{ k.uraian }}</td>
+                                      <td>{{ k.anggaran }}</td>
+                                      <td>{{ k.realisasi }}</td>
+                                      <td>{{ k['lebih/(kurang)'] }}</td>
+                                      <td>{{ k.tahun }}</td>
+                                    </tr>
+                                  </table>
+                                </div>
+                            </li></ol>
+                            {% endif %}
+                            {% endif %}
+                            {% endfor %}
+                            {% endfor %}
+                            {% endif %}
                           </li>
+                          {% endif %}
                         {% endif %}
+                        {% endif %}
+                      {% endfor %}
                       {% endfor %}
                     </ol>
                   </div>
+                  <textarea class="tonggle-hide" id="nestable_{{h.tahun}}_3-output"></textarea>
                 {% else %}
                   <p>No data available.</p>
                 {% endif %}
@@ -398,7 +570,7 @@
     // Fungsi untuk menampilkan nestable berdasarkan tahun dan nomor
     function filterNestable(year, number) {
       // Sembunyikan semua nestable
-      $('.nestable-container').hide();
+      $('.tonggle-hide').hide();
 
       // Tampilkan nestable yang sesuai dengan filter
       $('#welcome_' + year).show();
@@ -415,8 +587,6 @@
 
     // Set default view
     filterNestable('2022', '1'); // Tampilkan hanya nestable_2022_1 sebagai default
-
- 
 
     var updateOutput = function (e) {
       var list = e.length ? e : $(e.target),
@@ -457,43 +627,18 @@
       for (var i = 1; i <= 3; i++) {
         var id = "#nestable_" + item.tahun + "_" + i;
         var output = id + "-output";
-        var jsonnestable = "{{ urutan_pendapatan  | safe }}";
-        
-        // Replace single quotes with double quotes
-        jsonnestable = jsonnestable.replace(/"/g, '');
-        jsonnestable = jsonnestable.replace(/'/g, '"');
-        
-        try {
-          // Parse JSON
-          jsonnestable = JSON.parse(jsonnestable);
-          console.log("Parsed JSON: ", jsonnestable);
-    
-          // Check if item.tahun exists in jsonnestable
-          if (jsonnestable[item.tahun]) {
-            // Initialize nestable with the correct data
+            let group = parseInt(item.tahun.toString() + i.toString(), 10);
             $(id).nestable({
-              group: 1,
-              json: jsonnestable[item.tahun],
-              contentCallback: function(item) {
-                return item.id;
-              }
+              group: group,
             }).on("change", updateOutput);
             
             // Update output
             updateOutput($(id).data("output", $(output)));
-          } else {
-            console.log("No data for year: ", item.tahun);
-          }
-        } catch (e) {
-          console.error("Error parsing JSON: ", e);
-        }
-    
+        
         console.log(item.tahun + "." + i);
-      }
-    });
-    
-
-    $("#nestable-menu").on("click", function (e) {
+          }
+          });
+  $("#nestable-menu").on("click", function (e) {
       var target = $(e.target),
           action = target.data("action");
       if (action === "expand-all") {

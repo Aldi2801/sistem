@@ -1,4 +1,16 @@
 {% extends 'include/include.html' %} {% block content %}
+<head>
+  <style>
+  .table-responsive {
+    overflow-x: auto; /* Menambahkan scroll horizontal jika diperlukan */
+  }
+  
+  #sales-overview {
+    max-width: 100%; /* Membatasi lebar maksimum sesuai dengan ukuran container */
+    height: 300px; /* Sesuaikan tinggi grafik sesuai kebutuhan */
+  }
+</style>
+</head>
 <div class="page-titles">
     <div class="row">
       <div class="col-lg-8 col-md-6 col-12 align-self-center">
@@ -37,5 +49,179 @@
          
         </div>
       </div>
-  
+      <div class="col-12">
+        <h1> Grafik Monografi</h1>
+      </div> 
+      <div class="col-lg-12">
+        <div class="card w-100">
+          <div class="card-body">
+            <div class="d-md-flex align-items-center">
+              <div>
+                <h3 class="card-title">Sales Overview</h3>
+                <h6 class="card-subtitle">Ample admin Vs Pixel admin</h6>
+              </div>
+              <div class="ms-auto">
+                <ul class="list-style-none">
+                 
+                </ul>
+              </div>
+            </div>
+            <div class="table-responsive">
+            <div id="sales-overview" class="mt-4"></div>
+          </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="card w-100">
+          <div class="card-body">
+            <div class="d-md-flex align-items-center">
+              <div>
+                <h3 class="card-title">Sales Overview</h3>
+                <h6 class="card-subtitle">Ample admin Vs Pixel admin</h6>
+              </div>
+              <div class="ms-auto">
+                <ul class="list-style-none">
+                  <li class="list-inline-item text-primary">
+                    <i
+                      class="ri-checkbox-blank-circle-fill fs-1 me-1"
+                    ></i>
+                    Ample
+                  </li>
+                  <li class="list-inline-item text-info">
+                    <i class="ri-checkbox-blank-circle-fill fs-1 me-1"></i
+                    >Pixel Admin
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="table-responsive">
+            <div id="sales-overview2" class="mt-4"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="card w-100">
+          <div class="card-body">
+            <div class="d-md-flex align-items-center">
+              <div>
+                <h3 class="card-title">Sales Overview</h3>
+                <h6 class="card-subtitle">Ample admin Vs Pixel admin</h6>
+              </div>
+              <div class="ms-auto">
+                <ul class="list-style-none">
+                  <li class="list-inline-item text-primary">
+                    <i
+                      class="ri-checkbox-blank-circle-fill fs-1 me-1"
+                    ></i>
+                    Ample
+                  </li>
+                  <li class="list-inline-item text-info">
+                    <i class="ri-checkbox-blank-circle-fill fs-1 me-1"></i
+                    >Pixel Admin
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div id="sales-overview3" class="mt-4"></div>
+          </div>
+        </div>
+      </div>
     {% endblock %}
+
+    {% block js %}
+    <script>
+      var fields = ['jpenduduk', 'jkk', 'laki', 'perempuan', 'jkkprese', 'jkkseja', 'jkkkaya',
+      'jkksedang', 'jkkmiskin', 'petani','peternak','pedagang','tukangkayu','tukangbatu','penjahit','asn','pensiunan','perangkatdesa','jasa_wiraswasta',
+      'pengrajinbatik','dll', 'islam', 'kristen', 'protestan', 'katolik', 'hindu', 'budha'];
+    
+// Parsing JSON
+var data = JSON.parse('{{info_list|tojson}}');
+console.log(data)
+
+// Mengambil tahun sebagai kategori dan jumlah penduduk sebagai data
+var categories = data.map(item => item.tahun.toString());
+var jpenduduk = data.map(item => item.jpenduduk);
+var jkk = data.map(item => item.jkk);
+
+// Memisahkan data berdasarkan tahun
+var dataByYear = data.reduce((acc, item) => {
+  if (!acc[item.tahun]) {
+    acc[item.tahun] = {};
+  }
+  fields.forEach(field => {
+    if (!acc[item.tahun][field]) {
+      acc[item.tahun][field] = [];
+    }
+    acc[item.tahun][field].push(item[field]);
+  });
+  return acc;
+}, {});
+
+// Mengambil kategori dari fields
+var categories = fields;
+
+// Menyiapkan data untuk grafik
+var seriesData = [];
+Object.keys(dataByYear).forEach(year => {
+  seriesData.push({
+    name: year,
+    data: fields.map(field => {
+      return dataByYear[year][field] ? dataByYear[year][field][0] : 0; // Ambil nilai pertama dari array data
+    })
+  });
+});
+// Membuat opsi grafik
+var options = {
+    series: seriesData,
+    chart: {
+        type: "bar",
+        height: 260,
+        toolbar: {
+            show: false,
+        },
+    },
+    plotOptions: {
+        bar: {
+            horizontal: false,
+            columnWidth: "42%",
+            endingShape: "rounded",
+            borderRadius: 5,
+        },
+    },
+    colors: ["#1e4db7", "#a7e3f4"],
+    dataLabels: {
+        enabled: false,
+    },
+    xaxis: {
+        categories: categories,
+    },
+    yaxis: {
+        show: true,
+    },
+    stroke: {
+        show: true,
+        width: 5,
+        colors: ["transparent"],
+    },
+    tooltip: {
+        theme: "dark",
+    },
+};
+
+// Membuat dan merender grafik
+var chart = new ApexCharts(document.querySelector("#sales-overview"), options);
+chart.render();
+      var chart_sales_overview2 = new ApexCharts(
+        document.querySelector("#sales-overview2"),
+        option_sales_overview
+      );
+      chart_sales_overview2.render();
+      var chart_sales_overview3 = new ApexCharts(
+        document.querySelector("#sales-overview3"),
+        option_sales_overview
+      );
+      chart_sales_overview3.render();
+    </script>
+{% endblock %}
