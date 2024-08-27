@@ -92,12 +92,7 @@ def insert_data_from_dataframe(df, table):
         print(row['lebih/(kurang)'])
         g.con.execute(sql, (row['no'], row['uraian'], str(format_currency(row['anggaran'])), str(format_currency(row['realisasi'])), str(format_currency(row['lebih/(kurang)'])), row['thn']))
     mysql.connection.commit()
-
-#halaman admin
-@app.route('/admin/dashboard')
-def dashboard():
-    info_mono=fetch_data_and_format("SELECT * FROM monografi")
-    fields_mono = [
+fields_mono = [
     {"name": "Jumlah Penduduk", "value": "jpenduduk"},
     {"name": "Jumlah KK", "value": "jkk"},
     {"name": "Laki-Laki", "value": "laki"},
@@ -121,6 +116,10 @@ def dashboard():
     {"name": "Pengrajin Batik", "value": "pengrajinbatik"},
     {"name": "Dll", "value": "dll"}
 ]
+#halaman admin
+@app.route('/admin/dashboard')
+def dashboard():
+    info_mono=fetch_data_and_format("SELECT * FROM monografi")
     info_geo=fetch_data_and_format("SELECT * FROM wilayah")
     fields_geo=[{"name":"Sawah Teri","value":"sawahteri"},{"name":"Luas Wilayah","value":"luas"},{"name":"Sawah Hutan","value":"sawahhu"},{"name":"Pemukiman","value":"pemukiman"}]	
     return render_template('admin/dashboard.html',info_mono=info_mono,info_geo=info_geo, fields_mono=fields_mono,fields_geo=fields_geo)
@@ -293,7 +292,6 @@ def set_urutan(info_list):
 
 @app.route('/admin/dana')
 def admindana():
-    
     info_list = fetch_data_and_format("SELECT * FROM realisasi_pendapatan ORDER BY id")
     info_list2 = fetch_data_and_format("SELECT * FROM realisasi_belanja ORDER BY id")
     info_list3 = fetch_data_and_format("SELECT * FROM realisasi_pembiayaan ORDER BY id")
@@ -308,75 +306,65 @@ def admindana():
 @jwt_required()
 def ubah_urutan_dana():
     data = request.json.get('nestable', [])
-    print(data)
-    try:
-        # Fetch data from database
-        info_list = fetch_data_and_format("SELECT * FROM realisasi_pendapatan ORDER BY id")
-        info_list2 = fetch_data_and_format("SELECT * FROM realisasi_belanja ORDER BY id")
-        info_list3 = fetch_data_and_format("SELECT * FROM realisasi_pembiayaan ORDER BY id")
-        
-        # Clear the existing data in urutan_jabatan_pemerintahan
-        g.con.execute("DELETE FROM urutan_jabatan_pemerintahan")
-        
-        # Process and insert data
-        for index, i in enumerate(data, start=1):
-            tahun, tabel, id_ = str(i['id']).split('-') 
-            if tabel == "pendapatan":
-                # Find corresponding record in info_list
-                data_baru = next((j for j in info_list if j['id'] == id_), None)
-                
-                if data_baru:
-                    # Handle the case with children
-                    if 'children' in i and i['children']:
-                        class_ = "clickable-row"
-                        children = []
-                        ids = []
-                        for k in i['children']:
-                            child_data = next((l for l in info_list if l['id'] == k['id']), None)
-                            if child_data:
-                                children.append(child_data)
-                                ids.append(f"{tahun}-pendapatan-{child_data['id']}")
-                        
-                        onclick = f"toggleDetails({','.join(ids)})"
-                        data_baru['class'] = class_
-                        data_baru['onclick'] = onclick
-                        g.con.execute("INSERT INTO realisasi_pendapatan(id,no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun,nota,class,detail,onclick) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", 
-                                      (data_baru['id'], data_baru['no'], data_baru['uraian'], data_baru['anggaran'], data_baru['realisasi'], data_baru['lebih/(kurang)'], data_baru['tahun'], data_baru['nota'], data_baru['class'], data_baru['detail'], data_baru['onclick']))
-                        
-                        for child in children:
-                            child['class'] = "hidden-row"
-                            child['onclick'] = ""
-                            g.con.execute("INSERT INTO realisasi_pendapatan(id,no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun,nota,class,detail,onclick) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", 
-                                          (child['id'], child['no'], child['uraian'], child['anggaran'], child['realisasi'], child['lebih/(kurang)'], child['tahun'], child['nota'], child['class'], child['detail'], child['onclick']))
-                    
-                    else:
-                        g.con.execute("INSERT INTO realisasi_pendapatan(id,no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun,nota,class,detail,onclick) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", 
-                                      (data_baru['id'], data_baru['no'], data_baru['uraian'], data_baru['anggaran'], data_baru['realisasi'], data_baru['lebih/(kurang)'], data_baru['tahun'], data_baru['nota'], data_baru['class'], data_baru['detail'], data_baru['onclick']))
-                    
-                mysql.connection.commit()  # Commit the transaction
-                
-            elif tabel == "pembiayaan":
-                # Find corresponding record in info_list3
-                data_baru = next((j for j in info_list3 if j['id'] == id_), None)
-                if data_baru:
-                    g.con.execute("INSERT INTO realisasi_pembiayaan(id,no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun,nota,class,detail,onclick) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", 
-                                  (data_baru['id'], data_baru['no'], data_baru['uraian'], data_baru['anggaran'], data_baru['realisasi'], data_baru['lebih/(kurang)'], data_baru['tahun'], data_baru['nota'], data_baru['class'], data_baru['detail'], data_baru['onclick']))
-                    mysql.connection.commit()
-                    
-            elif tabel == "belanja":
-                # Find corresponding record in info_list2
-                data_baru = next((j for j in info_list2 if j['id'] == id_), None)
-                if data_baru:
-                    g.con.execute("INSERT INTO realisasi_belanja(id,no,uraian,anggaran,realisasi,`lebih/(kurang)`,tahun,nota,class,detail,onclick) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", 
-                                  (data_baru['id'], data_baru['no'], data_baru['uraian'], data_baru['anggaran'], data_baru['realisasi'], data_baru['lebih/(kurang)'], data_baru['tahun'], data_baru['nota'], data_baru['class'], data_baru['detail'], data_baru['onclick']))
-                    mysql.connection.commit()
-        
-        return jsonify({"msg": "SUKSES"})
-    
-    except Exception as e:
-        print(str(e))
-        return jsonify({"error": str(e)})
+    data_json = json.loads(data)
 
+    for index, i in enumerate(data_json, start=1):
+        tahun, tabel, id_ = str(i['id']).split('-') 
+        
+        if tabel == "pendapatan":
+            urutan_pendapatan = fetch_data_and_format("SELECT pendapatan FROM urutan where id = 1")
+            print(urutan_pendapatan)
+            urutan_pendapatan = urutan_pendapatan[0]
+            if tahun not in urutan_pendapatan:
+                urutan_pendapatan[tahun] = []
+            urutan = {"id":id_}
+            children = i.get('children', [])
+            if children:
+                children = []
+                for j in i["chidren"]:
+                    tahun_j, tabel_j, id_j = str(j['id']).split('-') 
+                    children.append({"id":id_j})
+                urutan = {"id":id_,"children":children}
+            urutan_pendapatan[tahun].append(urutan)
+        elif tabel == "belanja":
+            urutan_belanja =  fetch_data_and_format("SELECT belanja FROM urutan where id = 1")
+            print(urutan_belanja)
+            urutan_belanja = urutan_belanja[0]
+            if tahun not in urutan_belanja:
+                urutan_belanja[tahun] = []
+            urutan = {"id":id_}
+            children = i.get('children', [])
+            if children:
+                children_list = []
+                for j in children:
+                    tahun_j, tabel_j, id_j = str(j['id']).split('-') 
+                    children_list.append({"id":id_j})
+                urutan = {"id":id_,"children":children}
+            urutan_belanja[tahun].append(urutan)
+        elif tabel == "pembiayaan":
+            urutan_pembiayaan =  fetch_data_and_format("SELECT pembiayaan FROM urutan where id = 1")
+            urutan_pembiayaan = urutan_pembiayaan[0]
+            if tahun not in urutan_pembiayaan:
+                urutan_pembiayaan[tahun] = []
+            urutan = {"id":id_}
+            children = i.get('children', [])
+            if children:
+                children = []
+                for j in i["chidren"]:
+                    tahun_j, tabel_j, id_j = str(j['id']).split('-') 
+                    children.append({"id":id_j})
+                urutan = {"id":id_,"children":children}
+            urutan_pembiayaan[tahun].append(urutan)
+    if urutan_pendapatan:
+        g.con.execute("UPDATE urutan SET pendapatan = %s WHERE id = 1",(urutan_pendapatan))
+        mysql.connection.commit()
+    elif urutan_belanja:
+        g.con.execute("UPDATE urutan SET belanja = %s WHERE id = 1",(urutan_belanja))
+        mysql.connection.commit()
+    elif urutan_pembiayaan:
+        g.con.execute("UPDATE urutan SET pembiayaan = %s WHERE id = 1",(urutan_pembiayaan))
+        mysql.connection.commit()
+    return jsonify({"msg": "SUKSES"})
 
 @app.route('/admin/edit_dana', methods=['PUT'])
 @jwt_required()
@@ -497,8 +485,8 @@ def adminwilayahhapus():
 #monografi
 @app.route('/admin/monografi')
 def adminmono():
-    info_list=fetch_data_and_format("SELECT * FROM monografi")
-    return render_template("admin/monografi.html", info_list = info_list)
+    info_mono=fetch_data_and_format("SELECT * FROM monografi")
+    return render_template("admin/monografi.html", info_mono = info_mono,fields_mono=fields_mono)
 
 @app.route('/admin/tambah_mono', methods=['POST'])
 @jwt_required()
@@ -560,7 +548,7 @@ def anggota_ubah_jabatan():
     try:
         databaru = request.form['data_baru']
         databaru = databaru.split(',')
-        g.con.execute("DELETE FROM urutan_jabatan_pemerintahan")
+        g.con.execute("TRUNCATE urutan_jabatan_pemerintahan")
         # Memasukkan data baru ke dalam tabel
         for index, i in enumerate(databaru, start=1):
             g.con.execute("INSERT INTO urutan_jabatan_pemerintahan(id, nama_jabatan) VALUES(%s, %s)", (index, i))
@@ -786,7 +774,7 @@ def bpd_ubah_jabatan():
     try:
         databaru = request.form['data_baru']
         databaru = databaru.split(',')
-        g.con.execute("DELETE FROM urutan_jabatan")
+        g.con.execute("TRUNCATE urutan_jabatan")
         for index, i in enumerate(databaru, start=1):
             g.con.execute("INSERT INTO urutan_jabatan_pemerintahan(id, nama_jabatan) VALUES(%s, %s)", (index, i))
             mysql.connection.commit()  # Melakukan commit setiap kali setelah memasukkan data

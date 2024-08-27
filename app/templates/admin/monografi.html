@@ -13,14 +13,18 @@
       <h1 class="mb-0 fw-bold">Monografi</h1>
     </div>
     <div class="col-lg-4 col-md-6 d-md-flex align-items-center justify-content-end">
-      <a href="javascript:void(0)" class="btn btn-info d-flex align-items-center ms-2"
-      data-bs-toggle="modal"
-      data-bs-target="#bs-example-modal-xlg">
+      <a href="javascript:void(0)" class="btn btn-info d-flex align-items-center ms-2" data-bs-toggle="modal"
+        data-bs-target="#bs-edit-modal-xlg">
         <i data-feather="edit" style="width: 18px; height: 18px; margin-right: 10px"></i>
+        Edit
+      </a>
+      <a href="javascript:void(0)" class="btn btn-info d-flex align-items-center ms-2" data-bs-toggle="modal"
+        data-bs-target="#bs-tambah-modal-xlg">
+        <i data-feather="plus" style="width: 18px; height: 18px; margin-right: 10px"></i>
         Tambah Tahun
       </a>
     </div>
-    <div class="modal fade" id="bs-example-modal-xlg" tabindex="-1" aria-labelledby="bs-example-modal-lg"
+    <div class="modal fade" id="bs-tambah-modal-xlg" tabindex="-1" aria-labelledby="bs-example-modal-lg"
       aria-hidden="true">
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -45,9 +49,243 @@
                 " data-bs-dismiss="modal">
                 Close
               </button>
-              <button type="button" id="tambah_tahun"class="btn btn-success" data-bs-dismiss="modal">
+              <button type="button" id="tambah_tahun" class="btn btn-success" data-bs-dismiss="modal">
                 Simpan
               </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="bs-edit-modal-xlg" tabindex="-1" aria-labelledby="bs-example-modal-lg"
+      aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header d-flex align-items-center">
+            <h4 class="modal-title" id="myLargeModalLabel">
+              Edit Data Monografi
+            </h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="col-sm-3">
+              <div class="mb-3">
+                <input type="hidden" name="tahun">
+                <select class="form-select" id="tahun" name="selected_tahun">
+                  {% for i in info_mono :%}
+                  {% if loop.first%}
+                  <option value="{{i.tahun}}" clicked>{{i.tahun}}</option>
+                  {% else %}
+                  <option value="{{i.tahun}}">{{i.tahun}}</option>
+                  {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="form-horizontal">
+              <div class="card-body">
+                <input type="hidden" name="Authorization" value="Bearer {{ session['jwt_token'] }}">
+                <input type="hidden" class="form-control" name="id" value="{{info_mono[0]['id']}}" />
+                <h4 class="card-title">Kependudukan</h4>
+                <div class="mb-3 row">
+                  <label for="cono" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Jumlah
+                    Penduduk</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="jpenduduk" value=" {{info_mono[0]['jpenduduk']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="cono" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Jumlah KK</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="jkk" value="{{info_mono[0]['jkk']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="cono1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Laki-Laki</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="laki" value="{{info_mono[0]['laki']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="cono1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Perempuan</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="perempuan" value="{{info_mono[0]['perempuan']}}" />
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <h4 class="card-title">Kesejahteraan Sosial</h4>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Jumlah KK
+                    Prasejahtera</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="jkkprese" value="{{info_mono[0]['jkkprese']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Jumlah KK
+                    Sejahtera</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="jkkseja" value="{{info_mono[0]['jkkseja']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Jumlah KK
+                    Kaya</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="jkkkaya" value="{{info_mono[0]['jkkkaya']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Jumlah KK
+                    Sedang</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="jkksedang" value="{{info_mono[0]['jkksedang']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Jumlah KK
+                    Miskin</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="jkkmiskin" value="{{info_mono[0]['jkkmiskin']}}" />
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <h4 class="card-title">Pekerjaan</h4>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Buruh</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="jkkprese" value="{{info_mono[0]['buruh']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Petani</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="petani" value="{{info_mono[0]['petani']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Peternak</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="peternak" value="{{info_mono[0]['peternak']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Pedagang</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="pedagang" value="{{info_mono[0]['pedagang']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Tukang Kayu</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="tukangkayu" value="{{info_mono[0]['tukangkayu']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Tukang Batu</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="tukangbatu" value="{{info_mono[0]['tukangbatu']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Penjahit</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="penjahit" value="{{info_mono[0]['penjahit']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Pegawai
+                    Sipil/Polisi/Tentara</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="asn" value="{{info_mono[0]['asn']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Pensiunan</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="pensiunan" value="{{info_mono[0]['pensiunan']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Perangkat
+                    desa</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="perangkatdesa"
+                      value="{{info_mono[0]['perangkatdesa']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Jasa /
+                    Wiraswasta</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="jasa_wiraswasta"
+                      value="{{info_mono[0]['jasa_wiraswasta']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Pengrajin
+                    Batik</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="pengrajinbatik"
+                      value="{{info_mono[0]['pengrajinbatik']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Dll</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="dll" value="{{info_mono[0]['dll']}}" />
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <h4 class="card-title">Agama</h4>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Islam</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="islam" value="{{info_mono[0]['islam']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Kristen</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="kristen" value="{{info_mono[0]['kristen']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Protestan</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="protestan" value="{{info_mono[0]['protestan']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Katolik</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="katolik" value="{{info_mono[0]['katolik']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Hindu</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="hindu" value="{{info_mono[0]['hindu']}}" />
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Budha</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="budha" value="{{info_mono[0]['budha']}}" />
+                  </div>
+                </div>
+              </div>
+              <div class="p-3 border-top">
+                <div class="text-end">
+                  <button id="kirim" type="button" name="submit"
+                    class=" btn btn-info rounded-pill px-4 waves-effect waves-light "> Save edit </button>
+                  <button type="button" onclick="hapusMono()"
+                    class=" btn btn-danger rounded-pill px-4 waves-effect waves-light "> Hapus Data </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -62,241 +300,197 @@
   <!-- ============================================================= -->
   <!-- Row -->
   <div class="row">
+
     <div class="col-12">
       <div class="card">
-       <!-- <form class="form-horizontal" action="/admin/monoedit" method="post"> -->
-          <div class="card-body border-bottom">
-            <h4 class="card-title">Monografi Desa</h4>
-            <div class="col-sm-3">
-              <div class="mb-3">
-                <input type="hidden" name="tahun">
-                <select class="form-select" id="tahun" name="selected_tahun" >
-                  {% for i in info_list :%}
-                  {% if loop.first%}
-                    <option value="{{i.tahun}}" clicked>{{i.tahun}}</option>
-                  {% else %}
-                    <option value="{{i.tahun}}">{{i.tahun}}</option>
-                  {% endif %}
-                  {% endfor %}
-                </select>
-              </div>
+        <div class="card-body">
+          <div class="d-md-flex align-items-center">
+            <div>
+              <h3 class="card-title">Monografi desa</h3>
+              <h6 class="card-subtitle">Grafik perbandingan menografi desa per tahun</h6>
+            </div>
+            <div class="ms-auto">
+              <ul class="list-style-none">
+                <div class="container-fluid">
+                  <div class="row mb-4">
+                    <div class="col-lg-6">
+                      <label for="categoryDropdown">Pilih Kategori:</label>
+                      <select id="categoryDropdownmono" style="min-width: 150px;" class="form-control" multiple>
+                        {% for field in fields_mono %}
+                        <option value="{{ field.value }}">{{ field.name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="col-lg-6">
+                      <label for="yearDropdown">Pilih Tahun:</label>
+                      <select id="yearDropdownmono" class="form-control" multiple>
+                        {% for item in info_mono %}
+                        <option value="{{ item.tahun }}">{{ item.tahun }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </ul>
             </div>
           </div>
-          <div class="form-horizontal">
-            <div class="card-body">
-              <input type="hidden" name="Authorization" value="Bearer {{ session['jwt_token'] }}">
-              <input type="hidden" class="form-control" name="id" value="{{info_list[0]['id']}}" />
-              <h4 class="card-title">Kependudukan</h4>
-              <div class="mb-3 row">
-                <label for="cono" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Jumlah Penduduk</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="jpenduduk" value=" {{info_list[0]['jpenduduk']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="cono" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Jumlah KK</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="jkk" value="{{info_list[0]['jkk']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="cono1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Laki-Laki</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="laki" value="{{info_list[0]['laki']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="cono1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Perempuan</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="perempuan" value="{{info_list[0]['perempuan']}}" />
-                </div>
-              </div>
-            </div>
-            <div class="card-body">
-              <h4 class="card-title">Kesejahteraan Sosial</h4>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Jumlah KK Prasejahtera</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="jkkprese" value="{{info_list[0]['jkkprese']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Jumlah KK Sejahtera</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="jkkseja" value="{{info_list[0]['jkkseja']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Jumlah KK Kaya</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="jkkkaya" value="{{info_list[0]['jkkkaya']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Jumlah KK Sedang</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="jkksedang" value="{{info_list[0]['jkksedang']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Jumlah KK Miskin</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="jkkmiskin" value="{{info_list[0]['jkkmiskin']}}" />
-                </div>
-              </div>
-            </div>
-            <div class="card-body">
-              <h4 class="card-title">Pekerjaan</h4>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Buruh</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="jkkprese" value="{{info_list[0]['buruh']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Petani</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="petani" value="{{info_list[0]['petani']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Peternak</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="peternak" value="{{info_list[0]['peternak']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Pedagang</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="pedagang" value="{{info_list[0]['pedagang']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Tukang Kayu</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="tukangkayu" value="{{info_list[0]['tukangkayu']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Tukang Batu</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="tukangbatu" value="{{info_list[0]['tukangbatu']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Penjahit</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="penjahit" value="{{info_list[0]['penjahit']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Pegawai
-                  Sipil/Polisi/Tentara</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="asn" value="{{info_list[0]['asn']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Pensiunan</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="pensiunan" value="{{info_list[0]['pensiunan']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Perangkat desa</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="perangkatdesa"
-                    value="{{info_list[0]['perangkatdesa']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Jasa / Wiraswasta</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="jasa_wiraswasta"
-                    value="{{info_list[0]['jasa_wiraswasta']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Pengrajin Batik</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="pengrajinbatik"
-                    value="{{info_list[0]['pengrajinbatik']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Dll</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="dll" value="{{info_list[0]['dll']}}" />
-                </div>
-              </div>
-            </div>
-            <div class="card-body">
-              <h4 class="card-title">Agama</h4>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Islam</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="islam" value="{{info_list[0]['islam']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Kristen</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="kristen" value="{{info_list[0]['kristen']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Protestan</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="protestan" value="{{info_list[0]['protestan']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Katolik</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="katolik" value="{{info_list[0]['katolik']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Hindu</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="hindu" value="{{info_list[0]['hindu']}}" />
-                </div>
-              </div>
-              <div class="mb-3 row">
-                <label for="com1" class="rata-kiri-mobile col-sm-3  control-label col-form-label">Budha</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" name="budha" value="{{info_list[0]['budha']}}" />
-                </div>
-              </div>
-            </div>
-            <div class="p-3 border-top">
-              <div class="text-end">
-                <button id="kirim" type="button" name="submit" class=" btn btn-info rounded-pill px-4 waves-effect waves-light "> Save edit </button>
-                <button type="button" onclick="hapusMono()" class=" btn btn-danger rounded-pill px-4 waves-effect waves-light "> Hapus Data </button>
-              </div>
-            </div>
+          <div class="table-responsive">
+            <div id="chart_mono" class="mt-4"></div>
           </div>
-        <!--</form> -->
+        </div>
       </div>
     </div>
   </div>
+</div>
+</div>
 
-  {% endblock %}
-  {% block js%}
-  <script>
-    $(document).ready(function(){
-      
+{% endblock %}
+{% block js%}
+<script>
+  var fields_mono = ['jpenduduk', 'jkk', 'laki', 'perempuan', 'jkkprese', 'jkkseja', 'jkkkaya',
+    'jkksedang', 'jkkmiskin', 'petani', 'peternak', 'pedagang', 'tukangkayu', 'tukangbatu', 'penjahit', 'asn',
+    'pensiunan', 'perangkatdesa', 'jasa_wiraswasta',
+    'pengrajinbatik', 'dll', 'islam', 'kristen', 'protestan', 'katolik', 'hindu', 'budha'
+  ];
+
+  // Parsing JSON
+  var data_mono = JSON.parse('{{info_mono|tojson}}');
+  console.log(data_mono);
+
+  // Memisahkan data_mono berdasarkan tahun
+  var dataByYear_mono = data_mono.reduce(function (acc, item) {
+    if (!acc[item.tahun]) {
+      acc[item.tahun] = {};
+    }
+    $.each(fields_mono, function (index, field) {
+      if (!acc[item.tahun][field]) {
+        acc[item.tahun][field] = [];
+      }
+      acc[item.tahun][field].push(item[field]);
+    });
+    return acc;
+  }, {});
+
+  // Mengambil kategori dari fields_mono
+  var categories_mono = fields_mono;
+
+  // Menyiapkan data untuk grafik
+  var seriesData_mono = [];
+  $.each(Object.keys(dataByYear_mono), function (index, year) {
+    seriesData_mono.push({
+      name: year,
+      data: $.map(fields_mono, function (field) {
+        return dataByYear_mono[year][field] ? dataByYear_mono[year][field][0] :
+        0; // Ambil nilai pertama dari array data
+      }),
+    });
+  });
+
+  // Membuat opsi grafik
+  var options_mono = {
+    series: seriesData_mono,
+    chart: {
+      type: "bar",
+      height: 260,
+      toolbar: {
+        show: false,
+      },
+    },
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: "42%",
+        endingShape: "rounded",
+        borderRadius: 5,
+      },
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    xaxis: {
+      categories: categories_mono,
+    },
+    yaxis: {
+      show: true,
+    },
+    stroke: {
+      show: true,
+      width: 5,
+      colors: ["transparent"],
+    },
+    tooltip: {
+      theme: "dark",
+    },
+  };
+
+  // Membuat dan merender grafik
+  var chart_mono = new ApexCharts($("#chart_mono")[0], options_mono);
+  chart_mono.render();
+
+  function getSelectedValues(selectElement) {
+    var selected = [];
+    $(selectElement).find('option:selected').each(function () {
+      selected.push($(this).val());
+    });
+    return selected;
+  }
+
+  function updateChart() {
+    var yearDropdown = $("#yearDropdownmono");
+    var categoryDropdown = $("#categoryDropdownmono");
+    var selectedYears = getSelectedValues(yearDropdown);
+    console.log(selectedYears);
+    var selectedCategories = getSelectedValues(categoryDropdown);
+    console.log(selectedCategories);
+
+    var newSeriesData = [];
+    var newSeriesData = [];
+    $.each(selectedYears, function (index, year) {
+      var seriesData = [];
+      $.each(selectedCategories, function (index, category) {
+        if (dataByYear_mono[year] && dataByYear_mono[year][category]) {
+          seriesData.push(dataByYear_mono[year][category][0]); // Mengambil data untuk kategori dan tahun
+        } else {
+          seriesData.push(0);
+        }
+      });
+      newSeriesData.push({
+        name: year,
+        data: seriesData
+      });
+    });
+
+    chart_mono.updateOptions({
+      series: newSeriesData,
+      xaxis: {
+        categories: selectedCategories.length > 0 ? selectedCategories : categories_mono
+      }
+    });
+
+  }
+
+  $("#yearDropdownmono").on('change', function () {
+    updateChart();
+  });
+  $("#categoryDropdownmono").on('change', function () {
+    updateChart();
+  });
+
+  $(document).ready(function () {
+
     var cb = $('#tahun').prop('selected');
     console.log(cb)
     var fields = ['id', 'jpenduduk', 'jkk', 'laki', 'perempuan', 'jkkprese', 'jkkseja', 'jkkkaya',
-    'jkksedang', 'jkkmiskin', 'petani','peternak','pedagang','tukangkayu','tukangbatu','penjahit','asn','pensiunan','perangkatdesa','jasa_wiraswasta',
-    'pengrajinbatik','dll', 'islam', 'kristen', 'protestan', 'katolik', 'hindu', 'budha'
-  ];
-    function change(){
-      var info_list = JSON.parse('{{info_list|tojson}}');
-      console.log(info_list);
+      'jkksedang', 'jkkmiskin', 'petani', 'peternak', 'pedagang', 'tukangkayu', 'tukangbatu', 'penjahit', 'asn',
+      'pensiunan', 'perangkatdesa', 'jasa_wiraswasta',
+      'pengrajinbatik', 'dll', 'islam', 'kristen', 'protestan', 'katolik', 'hindu', 'budha'
+    ];
+
+    function change() {
+      var info_mono = JSON.parse('{{info_mono|tojson}}');
+      console.log(info_mono);
       let found = 0
-      for (const info of info_list) {
+      for (const info of info_mono) {
         var value = $('#tahun').val()
         if (info.tahun == value) {
           fields.forEach(field => {
@@ -307,7 +501,7 @@
         $(`[name='submit']`).html("save edit");
         $(`[name='submit']`).val("edit");
       }
-      if (found == 0){
+      if (found == 0) {
         fields.forEach(field => {
           $(`[name=${field}]`).val("");
         });
@@ -319,29 +513,30 @@
     $('#tahun').on('change', function () {
       change();
     });
-      function sort_tahun() {
-        var selectElement = document.getElementById('tahun');
-        var optionsArray = Array.from(selectElement.options);
-        optionsArray.sort(function (a, b) {
-          return a.value - b.value;
-        });
-        selectElement.innerHTML = '';
-        optionsArray.forEach(function (option) {
-          selectElement.appendChild(option);
-        });
-        change();
-      }
-      $('#tambah_tahun').on('click', function (){
-        var selectElement = document.getElementById('tahun');
-        var Option = document.createElement('option');
-        var tahun_baru = $('#tahun_baru').val()
-        Option.value = tahun_baru;
-        Option.text = tahun_baru;
-        selectElement.add(Option);
-        sort_tahun()
+
+    function sort_tahun() {
+      var selectElement = document.getElementById('tahun');
+      var optionsArray = Array.from(selectElement.options);
+      optionsArray.sort(function (a, b) {
+        return a.value - b.value;
+      });
+      selectElement.innerHTML = '';
+      optionsArray.forEach(function (option) {
+        selectElement.appendChild(option);
+      });
+      change();
+    }
+    $('#tambah_tahun').on('click', function () {
+      var selectElement = document.getElementById('tahun');
+      var Option = document.createElement('option');
+      var tahun_baru = $('#tahun_baru').val()
+      Option.value = tahun_baru;
+      Option.text = tahun_baru;
+      selectElement.add(Option);
+      sort_tahun()
     });
     sort_tahun()
-    $('#kirim').on('click', function (){
+    $('#kirim').on('click', function () {
       let formData = new FormData();
       fields.forEach(function (field) {
         var value = $(`[name=${field}]`).val();
@@ -350,67 +545,67 @@
       var value = $('#tahun').val()
       formData.append('selected_tahun', value);
       var submit = $(`[name='submit']`).val();
-      if (submit == "edit"){
-      $.ajax({
-        url: "/admin/edit_mono",
-        data: formData,
-        cache: false,
-        contentType: false,
-        processData: false,
-        method: 'PUT',
-        type: 'PUT',           
-        headers: {
-          'Authorization': 'Bearer ' +  "{{ session['jwt_token'] }}"
-      },
-      }).done(function(response) {
-        handleResponse(response,"edit","/admin/monografi");
-      }).fail(function(error) {
-        console.error(error);
-      });
-    }
-    else if(submit=="tambah"){
-      $.ajax({
-        url: "/admin/tambah_mono",
-        data: formData,
-        cache: false,
-        contentType: false,
-        processData: false,
-        method: 'POST',
-        type: 'POST', 
-        headers: {
-          'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
-      },
-      }).done(function(response) {
-        handleResponse(response,"tambah","/admin/monografi");
-      }).fail(function(error) {
-        console.error(error);
-      });
-    }
-    else{
-      alert("error");
-    }
+      if (submit == "edit") {
+        $.ajax({
+          url: "/admin/edit_mono",
+          data: formData,
+          cache: false,
+          contentType: false,
+          processData: false,
+          method: 'PUT',
+          type: 'PUT',
+          headers: {
+            'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
+          },
+        }).done(function (response) {
+          handleResponse(response, "edit", "/admin/monografi");
+        }).fail(function (error) {
+          console.error(error);
+        });
+      } else if (submit == "tambah") {
+        $.ajax({
+          url: "/admin/tambah_mono",
+          data: formData,
+          cache: false,
+          contentType: false,
+          processData: false,
+          method: 'POST',
+          type: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
+          },
+        }).done(function (response) {
+          handleResponse(response, "tambah", "/admin/monografi");
+        }).fail(function (error) {
+          console.error(error);
+        });
+      } else {
+        alert("error");
+      }
     });
   });
-  </script>
-  <script>
-    function hapusMono() {
-      var result = confirm("Apakah Anda yakin?");
-      if (result) {
-        var value = $('[name=id]').val()
-          $.ajax({
-            url: '/admin/hapus_mono',
-            method: 'DELETE',
-            headers: {
-              'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
-          },
-            data: { id: value },
-            dataType: 'json',
-          }).done(function(response) {
-            handleResponse(response, "menghapus", "/admin/monografi");
-          }).fail(function(error) {
-            console.error(error);
-          });
-        }
-      }
-   </script>
-  {% endblock %}
+</script>
+<script>
+  function hapusMono() {
+    var result = confirm("Apakah Anda yakin?");
+    if (result) {
+      var value = $('[name=id]').val()
+      $.ajax({
+        url: '/admin/hapus_mono',
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
+        },
+        data: {
+          id: value
+        },
+        dataType: 'json',
+      }).done(function (response) {
+        handleResponse(response, "menghapus", "/admin/monografi");
+      }).fail(function (error) {
+        console.error(error);
+      });
+    }
+  }
+</script>
+{% endblock %}

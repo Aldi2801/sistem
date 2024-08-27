@@ -347,7 +347,7 @@
                   <h6 id="welcome_{{h.tahun}}_1" class="tonggle-hide">Realisasi Pendapatan</h6>
                   <div class="myadmin-dd-empty dd text-black tonggle-hide" style="max-width:none;" id="nestable_{{h.tahun}}_1">
                     <ol class="dd-list">
-                      {% for j in urutan_pendapatan[h.tahun] %}
+                      {% for j in urutan_pendapatan %}
                       {% for i in info_list %}
                         {% if h.tahun == i.tahun %}
                         {% if j.id|string == i.id|string %}
@@ -404,6 +404,10 @@
                     </ol>
                   </div>
                   <textarea class="tonggle-hide"  id="nestable_{{h.tahun}}_1-output"></textarea>
+                  <div class="modal-footer tonggle-hide" id="footer_{{h.tahun}}_1" >
+                    <button href="javascript:void(0)"id="submit_{{h.tahun}}_1" class="btn btn-info d-flex align-items-center ms-2">Submit</button>
+                    <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal">Close</button>
+                  </div>
                 {% else %}
                   <p>No data available.</p>
                 {% endif %}
@@ -417,7 +421,7 @@
                         {% if j.id|string == i.id|string %}
                         {% if i.class|string == "hidden-row" %}
                         {% else %}
-                          <li class="dd-item dd3-item col-12" data-id="{{ i.tahun }}-pendapatan-{{i.id}}" style="max-width:none;">
+                          <li class="dd-item dd3-item col-12" data-id="{{ i.tahun }}-belanja-{{i.id}}" style="max-width:none;">
                             {% if i.class|string == "clickable-row" %}
                             <button data-action="expand" type="button" style="">Expand</button>
                             {% endif %}
@@ -434,12 +438,13 @@
                                 </tr>
                               </table>
                             </div>
+                         
                             {% if j.children %}
                             {% for child in j.children %}
                             {% for k in info_list2 %}
                             {% if h.tahun == i.tahun %}
                             {% if child.id == k.detail %}
-                            <ol class="dd-list" style=""><li class="dd-item dd3-item col-12" data-id="{{ k.tahun }}-pembiayaan-{{k.id}}" style="max-width:none;">
+                            <ol class="dd-list" style=""><li class="dd-item dd3-item col-12" data-id="{{ k.tahun }}-belanja-{{k.id}}" style="max-width:none;">
                                 <div class="dd-handle dd3-handle"></div>
                                 <div class="dd3-content">
                                   <table>
@@ -468,6 +473,10 @@
                     </ol>
                   </div>
                   <textarea class="tonggle-hide"  id="nestable_{{h.tahun}}_2-output"></textarea>
+                  <div class="modal-footer tonggle-hide"id="footer_{{h.tahun}}_2" >
+                    <button href="javascript:void(0)"id="submit_{{h.tahun}}_2" class="btn btn-info d-flex align-items-center ms-2">Submit</button>
+                    <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal">Close</button>
+                  </div>
                 {% else %}
                   <p>No data available.</p>
                 {% endif %}
@@ -481,7 +490,7 @@
                         {% if j.id|string == i.id|string %}
                         {% if i.class|string == "hidden-row" %}
                         {% else %}
-                          <li class="dd-item dd3-item col-12" data-id="{{ i.tahun }}-pendapatan-{{i.id}}" style="max-width:none;">
+                          <li class="dd-item dd3-item col-12" data-id="{{ i.tahun }}-pembiayaan-{{i.id}}" style="max-width:none;">
                             {% if i.class|string == "clickable-row" %}
                             <button data-action="expand" type="button" style="">Expand</button>
                             {% endif %}
@@ -531,7 +540,11 @@
                       {% endfor %}
                     </ol>
                   </div>
-                  <textarea class="tonggle-hide" id="nestable_{{h.tahun}}_3-output"></textarea>
+                  <textarea class="tonggle-hide " id="nestable_{{h.tahun}}_3-output"></textarea>
+                  <div class="modal-footer tonggle-hide" id="footer_{{h.tahun}}_3"  >
+                    <button href="javascript:void(0)"id="submit_{{h.tahun}}_3" class="btn btn-info d-flex align-items-center ms-2">Submit</button>
+                    <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal">Close</button>
+                  </div>
                 {% else %}
                   <p>No data available.</p>
                 {% endif %}
@@ -540,10 +553,7 @@
           {% endfor %}
         </div>
       </div>
-      <div class="modal-footer">
-        <button id="ubah_urutan" href="javascript:void(0)" class="btn btn-info d-flex align-items-center ms-2">Submit</button>
-        <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal">Close</button>
-      </div>
+      
     </div>
     <!-- /.modal-content -->
   </div>
@@ -576,6 +586,7 @@
       $('#welcome_' + year).show();
       $('#welcome_' + year + '_' + number).show();
       $('#nestable_' + year + '_' + number).show();
+      $('#footer_' + year + '_' + number).show();
     }
 
     // Ketika dropdown diubah, filter nestable
@@ -595,23 +606,27 @@
         var serializedData = window.JSON.stringify(list.nestable("serialize"));
         output.val(serializedData);
         console.log(serializedData)
-        
         // Kirim data ke server menggunakan AJAX
-        $.ajax({
-          url: '/admin/dana/ubah_urutan',  // Ganti dengan URL endpoint Anda
-          method: 'PUT',
-          contentType: 'application/json',
-          data: JSON.stringify({ nestable: serializedData }), 
-          headers: {
-            'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
-          },
-          success: function(response) {
-            console.log("Data saved successfully:", response);
-          },
-          error: function(xhr, status, error) {
-            console.error("Error saving data:", error);
-          }
-          
+        // Cari elemen modal-footer dengan class tonggle-show
+
+        var selectedYear = $('#yearDropdown').val();
+        var selectedNumber = $('#numberDropdown').val();
+        $('#submit_' + selectedYear + '_' + selectedNumber).click(function() {
+          $.ajax({
+            url: '/admin/dana/ubah_urutan',  // Ganti dengan URL endpoint Anda
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ nestable: serializedData }), 
+            headers: {
+              'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
+            },
+            success: function(response) {
+              console.log("Data saved successfully:", response);
+            },
+            error: function(xhr, status, error) {
+              console.error("Error saving data:", error);
+            }
+          });
         });
       } else {
         output.val("JSON browser support required for this demo.");
