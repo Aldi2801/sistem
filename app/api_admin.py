@@ -96,9 +96,34 @@ def insert_data_from_dataframe(df, table):
 #halaman admin
 @app.route('/admin/dashboard')
 def dashboard():
-    info_list=fetch_data_and_format("SELECT * FROM monografi")
-    print(info_list)
-    return render_template('admin/dashboard.html',info_list=info_list)
+    info_mono=fetch_data_and_format("SELECT * FROM monografi")
+    fields_mono = [
+    {"name": "Jumlah Penduduk", "value": "jpenduduk"},
+    {"name": "Jumlah KK", "value": "jkk"},
+    {"name": "Laki-Laki", "value": "laki"},
+    {"name": "Perempuan", "value": "perempuan"},
+    {"name": "Jumlah KK Prasejahtera", "value": "jkkprese"},
+    {"name": "Jumlah KK Sejahtera", "value": "jkkseja"},
+    {"name": "Jumlah KK Kaya", "value": "jkkkaya"},
+    {"name": "Jumlah KK Sedang", "value": "jkksedang"},
+    {"name": "Jumlah KK Miskin", "value": "jkkmiskin"},
+    {"name": "Buruh", "value": "buruh"},
+    {"name": "Petani", "value": "petani"},
+    {"name": "Peternak", "value": "peternak"},
+    {"name": "Pedagang", "value": "pedagang"},
+    {"name": "Tukang Kayu", "value": "tukangkayu"},
+    {"name": "Tukang Batu", "value": "tukangbatu"},
+    {"name": "Penjahit", "value": "penjahit"},
+    {"name": "Pegawai Sipil/Polisi/Tentara", "value": "asn"},
+    {"name": "Pensiunan", "value": "pensiunan"},
+    {"name": "Perangkat desa", "value": "perangkatdesa"},
+    {"name": "Jasa / Wiraswasta", "value": "jasa_wiraswasta"},
+    {"name": "Pengrajin Batik", "value": "pengrajinbatik"},
+    {"name": "Dll", "value": "dll"}
+]
+    info_geo=fetch_data_and_format("SELECT * FROM wilayah")
+    fields_geo=[{"name":"Sawah Teri","value":"sawahteri"},{"name":"Luas Wilayah","value":"luas"},{"name":"Sawah Hutan","value":"sawahhu"},{"name":"Pemukiman","value":"pemukiman"}]	
+    return render_template('admin/dashboard.html',info_mono=info_mono,info_geo=info_geo, fields_mono=fields_mono,fields_geo=fields_geo)
 
 #sejarah
 @app.route('/admin/infodesa')
