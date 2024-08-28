@@ -99,25 +99,12 @@
                     <td>{{ i.realisasi }}</td>
                     <td>{{ i['lebih/(kurang)'] }}</td>
                     <td>{{ i.tahun }}</td>
+                    <td>
+                      <button id="nota_{{h.tahun}}_pendapatan_{{i.id}}" class="btn btn-success">nota</button>
+                      <button id="edit_{{h.tahun}}_pendapatan_{{i.id}}" class="btn btn-warning">edit</button>
+                      <button onclick="hapus({{h.tahun}},'pendapatan',{{i.id}})" class="btn btn-danger">hapus</button>
+                    </td>
                   </tr>
-                  {% if j.children %}
-                  {% for child in j.children %}
-                  {% for k in info_list %}
-                  {% if h.tahun == i.tahun %}
-                  {% if child.id == k.detail %}
-                  <tr class="{{k.class}}" id="{{k.detail}}" onclick="{{k.onclick}}" >
-                    <td>{{ k.no }}</td>
-                    <td>{{ k.uraian }}</td>
-                    <td>{{ k.anggaran }}</td>
-                    <td>{{ k.realisasi }}</td>
-                    <td>{{ k['lebih/(kurang)'] }}</td>
-                    <td>{{ k.tahun }}</td>
-                  </tr>
-                  {% endif %}
-                  {% endif %}
-                  {% endfor %}
-                  {% endfor %}
-                  {% endif %}
                   {% endif %}
                   {% endif %}
                   {% endfor %}
@@ -153,24 +140,12 @@
                     <td>{{ i.realisasi }}</td>
                     <td>{{ i['lebih/(kurang)'] }}</td>
                     <td>{{ i.tahun }}</td>
-                  </tr>   {% if j.children %}
-                  {% for child in j.children %}
-                  {% for k in info_list2 %}
-                  {% if h.tahun == i.tahun %}
-                  {% if child.id == k.detail %}
-                  <tr class="{{k.class}}" id="{{k.detail}}" onclick="{{k.onclick}}" >
-                    <td>{{ k.no }}</td>
-                    <td>{{ k.uraian }}</td>
-                    <td>{{ k.anggaran }}</td>
-                    <td>{{ k.realisasi }}</td>
-                    <td>{{ k['lebih/(kurang)'] }}</td>
-                    <td>{{ k.tahun }}</td>
-                  </tr>
-                  {% endif %}
-                  {% endif %}
-                  {% endfor %}
-                  {% endfor %}
-                  {% endif %}
+                    <td>
+                      <button id="nota_{{h.tahun}}_belanja_{{i.id}}" class="btn btn-success">nota</button>
+                      <button id="edit_{{h.tahun}}_belanja_{{i.id}}" class="btn btn-warning">edit</button>
+                      <button id="hapus_{{h.tahun}}_belanja_{{i.id}}" class="btn btn-danger">hapus</button>
+                    </td>
+                  </tr>  
                   {% endif %}
                   {% endif %}
                   {% endfor %}
@@ -206,24 +181,12 @@
                     <td>{{ i.realisasi }}</td>
                     <td>{{ i['lebih/(kurang)'] }}</td>
                     <td>{{ i.tahun }}</td>
-                  </tr>   {% if j.children %}
-                  {% for child in j.children %}
-                  {% for k in info_list3 %}
-                  {% if h.tahun == i.tahun %}
-                  {% if child.id == k.detail %}
-                  <tr class="{{k.class}}" id="{{k.detail}}" onclick="{{k.onclick}}" >
-                    <td>{{ k.no }}</td>
-                    <td>{{ k.uraian }}</td>
-                    <td>{{ k.anggaran }}</td>
-                    <td>{{ k.realisasi }}</td>
-                    <td>{{ k['lebih/(kurang)'] }}</td>
-                    <td>{{ k.tahun }}</td>
-                  </tr>
-                  {% endif %}
-                  {% endif %}
-                  {% endfor %}
-                  {% endfor %}
-                  {% endif %}
+                    <td>
+                      <button id="nota_{{h.tahun}}_pembiayaan_{{i.id}}" class="btn btn-success">nota</button>
+                      <button id="edit_{{h.tahun}}_pembiayaan_{{i.id}}" class="btn btn-warning">edit</button>
+                      <button id="hapus_{{h.tahun}}_pembiayaan_{{i.id}}" class="btn btn-danger">hapus</button>
+                    </td>
+                  </tr>   
                   {% endif %}
                   {% endif %}
                   {% endfor %}
@@ -347,13 +310,9 @@
                   <h6 id="welcome_{{h.tahun}}_1" class="tonggle-hide">Realisasi Pendapatan</h6>
                   <div class="myadmin-dd-empty dd text-black tonggle-hide" style="max-width:none;" id="nestable_{{h.tahun}}_1">
                     <ol class="dd-list">
-                      {% for j in urutan_pendapatan %}
                       {% for i in info_list %}
                         {% if h.tahun == i.tahun %}
-                        {% if j.id|string == i.id|string %}
-                        {% if i.class|string == "hidden-row" %}
-                        {% else %}
-                          <li class="dd-item dd3-item col-12" data-id="{{ i.tahun }}-pendapatan-{{i.id}}" style="max-width:none;">
+                          <li class="dd-item dd3-item col-12" data-id="{{ h.tahun }}-pendapatan-{{i.id}}" style="max-width:none;">
                             {% if i.class|string == "clickable-row" %}
                             <button data-action="expand" type="button" style="">Expand</button>
                             {% endif %}
@@ -370,36 +329,8 @@
                                 </tr>
                               </table>
                             </div>
-                            {% if j.children %}
-                            {% for child in j.children %}
-                            {% for k in info_list %}
-                            {% if h.tahun == i.tahun %}
-                            {% if child.id == k.detail %}
-                            <ol class="dd-list" style=""><li class="dd-item dd3-item col-12" data-id="{{ k.tahun }}-pembiayaan-{{k.id}}" style="max-width:none;">
-                                <div class="dd-handle dd3-handle"></div>
-                                <div class="dd3-content">
-                                  <table>
-                                    <tr >
-                                      <td>{{ k.no }}</td>
-                                      <td>{{ k.uraian }}</td>
-                                      <td>{{ k.anggaran }}</td>
-                                      <td>{{ k.realisasi }}</td>
-                                      <td>{{ k['lebih/(kurang)'] }}</td>
-                                      <td>{{ k.tahun }}</td>
-                                    </tr>
-                                  </table>
-                                </div>
-                            </li></ol>
-                            {% endif %}
-                            {% endif %}
-                            {% endfor %}
-                            {% endfor %}
-                            {% endif %}
-                          </li>
+                            </li>
                           {% endif %}
-                        {% endif %}
-                        {% endif %}
-                      {% endfor %}
                       {% endfor %}
                     </ol>
                   </div>
@@ -415,12 +346,8 @@
                   <h6 id="welcome_{{h.tahun}}_2" class="tonggle-hide">Realisasi Belanja</h6>
                   <div class="myadmin-dd-empty dd text-black tonggle-hide" style="max-width:none;" id="nestable_{{h.tahun}}_2">
                     <ol class="dd-list">
-                      {% for j in urutan_belanja[h.tahun] %}
                       {% for i in info_list2 %}
                         {% if h.tahun == i.tahun %}
-                        {% if j.id|string == i.id|string %}
-                        {% if i.class|string == "hidden-row" %}
-                        {% else %}
                           <li class="dd-item dd3-item col-12" data-id="{{ i.tahun }}-belanja-{{i.id}}" style="max-width:none;">
                             {% if i.class|string == "clickable-row" %}
                             <button data-action="expand" type="button" style="">Expand</button>
@@ -439,36 +366,8 @@
                               </table>
                             </div>
                          
-                            {% if j.children %}
-                            {% for child in j.children %}
-                            {% for k in info_list2 %}
-                            {% if h.tahun == i.tahun %}
-                            {% if child.id == k.detail %}
-                            <ol class="dd-list" style=""><li class="dd-item dd3-item col-12" data-id="{{ k.tahun }}-belanja-{{k.id}}" style="max-width:none;">
-                                <div class="dd-handle dd3-handle"></div>
-                                <div class="dd3-content">
-                                  <table>
-                                    <tr >
-                                      <td>{{ k.no }}</td>
-                                      <td>{{ k.uraian }}</td>
-                                      <td>{{ k.anggaran }}</td>
-                                      <td>{{ k.realisasi }}</td>
-                                      <td>{{ k['lebih/(kurang)'] }}</td>
-                                      <td>{{ k.tahun }}</td>
-                                    </tr>
-                                  </table>
-                                </div>
-                            </li></ol>
-                            {% endif %}
-                            {% endif %}
-                            {% endfor %}
-                            {% endfor %}
-                            {% endif %}
-                          </li>
+                           </li>
                           {% endif %}
-                        {% endif %}
-                        {% endif %}
-                      {% endfor %}
                       {% endfor %}
                     </ol>
                   </div>
@@ -484,12 +383,9 @@
                   <h6 id="welcome_{{h.tahun}}_3" class="tonggle-hide">Realisasi Pembiayaan</h6>
                   <div class="myadmin-dd-empty dd text-black tonggle-hide" style="max-width:none;" id="nestable_{{h.tahun}}_3">
                     <ol class="dd-list">
-                      {% for j in urutan_pembiayaan[h.tahun] %}
+                      
                       {% for i in info_list3 %}
                         {% if h.tahun == i.tahun %}
-                        {% if j.id|string == i.id|string %}
-                        {% if i.class|string == "hidden-row" %}
-                        {% else %}
                           <li class="dd-item dd3-item col-12" data-id="{{ i.tahun }}-pembiayaan-{{i.id}}" style="max-width:none;">
                             {% if i.class|string == "clickable-row" %}
                             <button data-action="expand" type="button" style="">Expand</button>
@@ -507,36 +403,8 @@
                                 </tr>
                               </table>
                             </div>
-                            {% if j.children %}
-                            {% for child in j.children %}
-                            {% for k in info_list3 %}
-                            {% if h.tahun == i.tahun %}
-                            {% if child.id == k.detail %}
-                            <ol class="dd-list" style=""><li class="dd-item dd3-item col-12" data-id="{{ k.tahun }}-pembiayaan-{{k.id}}" style="max-width:none;">
-                                <div class="dd-handle dd3-handle"></div>
-                                <div class="dd3-content">
-                                  <table>
-                                    <tr >
-                                      <td>{{ k.no }}</td>
-                                      <td>{{ k.uraian }}</td>
-                                      <td>{{ k.anggaran }}</td>
-                                      <td>{{ k.realisasi }}</td>
-                                      <td>{{ k['lebih/(kurang)'] }}</td>
-                                      <td>{{ k.tahun }}</td>
-                                    </tr>
-                                  </table>
-                                </div>
-                            </li></ol>
-                            {% endif %}
-                            {% endif %}
-                            {% endfor %}
-                            {% endfor %}
-                            {% endif %}
-                          </li>
+                            </li>
                           {% endif %}
-                        {% endif %}
-                        {% endif %}
-                      {% endfor %}
                       {% endfor %}
                     </ol>
                   </div>
@@ -576,12 +444,74 @@
       }
     });
   }
+  function upload_note(id) {
+    event.preventDefault();
+    $.ajax({
+      url: '/admin/dana/upload_file',  // Ganti dengan URL endpoint Anda
+      method: 'PUT',
+      contentType: 'application/json',
+      data: JSON.stringify({ nestable: serializedData }), 
+      headers: {
+        'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
+      },
+      success: function(response) {
+        console.log("Data saved successfully:", response);
+      },
+      error: function(xhr, status, error) {
+        console.error("Error saving data:", error);
+      }
+    });
+  }
+
+  function hapus(year, category, id){
+    event.preventDefault();
+    const confirmAction = confirm(`Apakah Anda yakin ingin menghapus data ${category} dengan ID: ${id} untuk tahun ${year}?`);
+    if (confirmAction) {
+    $.ajax({
+      url: '/admin/dana/hapus/id',  // Ganti dengan URL endpoint Anda
+      method: 'DELETE',
+      contentType: 'application/json',
+      data: JSON.stringify({year:year,category:category, id:id}), 
+      headers: {
+        'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
+      },
+      success: function(response) {
+        console.log("Data deleted successfully:", response);
+        window.location.reload()
+      },
+      error: function(xhr, status, error) {
+        console.error("Error saving data:", error);
+      }
+    });
+    } else {
+      alert('Aksi penghapusan dibatalkan.');
+    }
+  }
+  function edit(){
+    event.preventDefault();
+          $.ajax({
+            url: '/admin/dana/ubah_urutan',  // Ganti dengan URL endpoint Anda
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ nestable: serializedData }), 
+            headers: {
+              'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
+            },
+            success: function(response) {
+              console.log("Data saved successfully:", response);
+            },
+            error: function(xhr, status, error) {
+              console.error("Error saving data:", error);
+            }
+          });
+  }
   $(document).ready(function() {
     // Fungsi untuk menampilkan nestable berdasarkan tahun dan nomor
     function filterNestable(year, number) {
       // Sembunyikan semua nestable
       $('.tonggle-hide').hide();
-
+      console.log(year)
+      console.log(number)
       // Tampilkan nestable yang sesuai dengan filter
       $('#welcome_' + year).show();
       $('#welcome_' + year + '_' + number).show();
@@ -597,6 +527,8 @@
     });
 
     // Set default view
+    var selectedYear = $('#yearDropdown').val('2022');
+    var selectedNumber = $('#numberDropdown').val('1');
     filterNestable('2022', '1'); // Tampilkan hanya nestable_2022_1 sebagai default
 
     var updateOutput = function (e) {
@@ -611,7 +543,14 @@
 
         var selectedYear = $('#yearDropdown').val();
         var selectedNumber = $('#numberDropdown').val();
-        $('#submit_' + selectedYear + '_' + selectedNumber).click(function() {
+        var submitButton = $('#submit_' + selectedYear + '_' + selectedNumber);
+
+        // Menghapus event handler klik sebelumnya agar tidak menumpuk
+        submitButton.off('click');
+    
+        // Menambahkan event handler klik
+        submitButton.on('click', function(event) {
+          event.preventDefault();
           $.ajax({
             url: '/admin/dana/ubah_urutan',  // Ganti dengan URL endpoint Anda
             method: 'PUT',
@@ -665,30 +604,6 @@
     });
 
     $("#nestable-menu").nestable();
-
-    $("#ubah_urutan").on("click", function () {
-      var databaru = $('.dd-item').map(function() {
-        return $(this).data('id');
-      }).get();
-      console.log(databaru);
-      var formData = new FormData();
-      formData.append('data_baru', JSON.stringify(databaru));
-      console.log(formData);
-      $.ajax({
-        url: "/admin/dana/ubah_urutan",
-        data: formData,
-        cache: false,
-        contentType: false,
-        processData: false,
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
-        },
-      }).done(function (data) {
-        handleResponse(data, "mengubah urutan", "/admin/dana");
-      });
-      event.preventDefault();
-    });
 
     var token = "{{ session['jwt_token'] }}";
     $("#tahun").val("tahun");

@@ -80,6 +80,30 @@ def fetch_data_and_format(query):
     info_list = [dict(zip(column_names, row)) for row in data]
     return info_list
 
+def fetch_data_and_format1(query):
+    # Eksekusi query dan ambil hasil
+    g.con.execute(query)
+    data = g.con.fetchall()
+
+    # Menampilkan hasil untuk debug
+    print(data)
+
+    # Asumsikan data adalah list dengan satu elemen yang merupakan string JSON
+    if data:
+        json_string = data[0][0]  # Ambil string JSON dari tuple
+        
+        # Ganti single quotes dengan double quotes
+        json_string = json_string.replace("'", '"').strip()
+        try:
+            # Menggunakan JSON parsing untuk memvalidasi dan memperbaiki format JSON
+            json_data = json.loads(json_string)
+            # Mengembalikan data yang sudah diparse
+            return json_data
+        except json.JSONDecodeError as e:
+            print(f"Error decoding JSON: {e}")
+            return None
+    return None
+
 def fetch_years(query):
     g.con.execute(query)
     data_thn = g.con.fetchall()
@@ -266,27 +290,27 @@ def format_currency(value):
     locale.setlocale(locale.LC_ALL, 'id_ID.UTF-8')
     return locale.currency(value, grouping=True, symbol='Rp')
 
-# Helper function 
-def set_urutan(info_list):
+def set_urutan(column, years):
     urutan = {}
-    for i in info_list:
-        tahun = i["tahun"]
-        if tahun not in urutan:
-            urutan[tahun] = []
+    print(years)
+    for year in years:
+        print(year["tahun"])
+        # Gunakan f-string untuk menghindari injeksi SQL dan tetap aman
+        g.con.execute(f"SELECT {column} FROM urutan WHERE tahun = %s", (year["tahun"],))
+        result = g.con.fetchone()
+        print(result[0])
+        result = str(result[0]).replace("'",'"')
         
-        if i["class"].strip() == "clickable-row":
-            anak_anak = i["onclick"].replace("toggleDetails(", "").replace(")", "").split(",")
-            children = []
-            for anak in anak_anak:
-                anaksa = {"id": anak.strip("'")}
-                children.append(anaksa)
-            x = {"id": f"{i['id']}", "children": children}
-            urutan[tahun].append(x)
-        elif i["class"] == "hidden-row":
-            continue
-        else:
-            x = {"id": f"{i['id']}"}
-            urutan[tahun].append(x)
+        # Pastikan hasil tidak None sebelum menggabungkannya
+        if result:
+            # Jika result[0] adalah string JSON, gunakan json.loads
+            try:
+                data_dict = json.loads(result)  # Mengonversi dari JSON string ke dictionary
+                # Menggabungkan dictionary, asumsi data_dict dalam format dict-like
+                urutan.update(data_dict)
+            except json.JSONDecodeError:
+                print("Error: Hasil bukan JSON yang valid:", result)
+                
     print(urutan)
     return urutan
 
@@ -296,66 +320,67 @@ def admindana():
     info_list2 = fetch_data_and_format("SELECT * FROM realisasi_belanja ORDER BY id")
     info_list3 = fetch_data_and_format("SELECT * FROM realisasi_pembiayaan ORDER BY id")
     thn = fetch_years("SELECT tahun FROM realisasi_pendapatan GROUP BY tahun")
-    urutan_pendapatan = set_urutan(info_list)
-    urutan_belanja = set_urutan(info_list2)
-    urutan_pembiayaan = set_urutan(info_list3)
+    urutan_pendapatan = set_urutan("pendapatan",thn)
+    urutan_belanja = set_urutan("belanja",thn)
+    urutan_pembiayaan = set_urutan("pembiayaan",thn)
+    #urutan_pendapatan = {"2022":[{"id": "9"}, {"id": "10"},{"id": "11"}, {"id": "12"}, {"id": "13"}, {"id": "14"}, {"id": "15"}, {"id": "16"}],"2023":[{"id": "9"}, {"id": "10"},{"id": "11"}, {"id": "12"}, {"id": "13"}, {"id": "14"}, {"id": "15"}, {"id": "16"}]}
+    #urutan_belanja = {'2022': [{'id': '21'}, {'id': '22'}, {'id': '23'}, {'id': '24'}, {'id': '25'}, {'id': '26'}, {'id': '27'}, {'id': '28'}, {'id': '29'}, {'id': '30'}, {'id': '31'}, {'id': '32'}, {'id': '33'}, {'id': '34'}, {'id': '35'}, {'id': '36'}, {'id': '37'}, {'id': '38'}, {'id': '39'}, {'id': '40'}],'2023': [{'id': '41'}, {'id': '42'}, {'id': '43'}, {'id': '44'}, {'id': '45'}, {'id': '46'}, {'id': '47'}, {'id': '48'}, {'id': '49'}, {'id': '50'}, {'id': '51'}, {'id': '52'}, {'id': '53'}, {'id': '54'}, {'id': '55'}, {'id': '56'}, {'id': '57'}, {'id': '58'}, {'id': '59'}, {'id': '60'}]}
+    #urutan_pembiayaan = {'2022': [{'id': '5'}, {'id': '6'}, {'id': '7'}, {'id': '8'}],'2023': [{'id': '9'}, {'id': '10'}, {'id': '11'}, {'id': '12'}]}
     return render_template("admin/dana_new.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn, 
                            urutan_pendapatan=urutan_pendapatan,  urutan_belanja = urutan_belanja, urutan_pembiayaan=urutan_pembiayaan)
 
 @app.route('/admin/dana/ubah_urutan', methods=['PUT'])
 @jwt_required()
 def ubah_urutan_dana():
-    data = request.json.get('nestable', [])
-    data_json = json.loads(data)
+    
+        data = request.json.get('nestable', [])
+        data_json = json.loads(data)
 
-    urutan_pendapatan = fetch_data_and_format("SELECT pendapatan FROM urutan where id = 1")
-    urutan_belanja = fetch_data_and_format("SELECT belanja FROM urutan where id = 1")
-    urutan_pembiayaan = fetch_data_and_format("SELECT pembiayaan FROM urutan where id = 1")
+        def update_children(data):
+            for i in data:
+                year, tabel, child_id = str(i['id']).split('-')
+                g.con.execute(f"UPDATE realisasi_{tabel}  SET class = 'hidden-row', detail = %s, onclick = '' WHERE id = %s AND tahun = %s",
+                            (f"{year}-{tabel}-{child_id}", child_id, year))
+            return [{"id": str(i['id']).split('-')[2]} for i in data]
 
-    def update_urutan(data, urutan):
-        urutan_baru = {}
-        
-        for i in data:
-            tahun, tabel, id_ = str(i['id']).split('-')
-            entry = {"id": id_}
-            
-            if 'children' in i:
-                entry["children"] = update_urutan(i['children'], urutan.get(tahun, []))
+        def update_urutan(data):
+            urutan_baru = {}
+            for i in data:
+                tahun, tabel, id_ = str(i['id']).split('-')
+                entry = {"id": id_}
+                if 'children' in i:
+                    g.con.execute(f"UPDATE realisasi_{tabel} SET class = 'clickable-row', detail = '', onclick = %s WHERE id = %s AND tahun = %s",
+                    (f"toggleDetails('{','.join([str(j['id']) for j in i['children']])}')", id_, tahun))
+                    entry["children"] = update_children(i['children'])
+                urutan_baru.setdefault(tahun, []).append(entry)
+            mysql.connection.commit()
+            return urutan_baru
 
-            if tahun not in urutan_baru:
-                urutan_baru[tahun] = []
+        def get_all_years():
+            g.con.execute("SELECT DISTINCT tahun FROM urutan")
+            return [row[0] for row in g.con.fetchall()]
 
-            urutan_baru[tahun].append(entry)
-
-        # Gabungkan data lama dan data baru
-        for tahun, items in urutan.items():
-            if tahun not in urutan_baru:
-                urutan_baru[tahun] = items
+        def update_database(tabel, urutan, tahun):
+            valid_tables = ["pendapatan", "belanja", "pembiayaan"]
+            if tabel in valid_tables:
+                g.con.execute(f"UPDATE urutan SET {tabel} = %s WHERE tahun = %s", (urutan, tahun))
+                mysql.connection.commit()
             else:
-                # Menggabungkan data lama dengan data baru
-                urutan_baru[tahun] = items + urutan_baru[tahun]
+                raise ValueError("Invalid table name")
 
-        print(f"Urutan Baru : {urutan_baru}")
-        return urutan_baru
+        all_years = get_all_years()
+        init_tahun = str(data_json[0]['id']).split('-')[0] if data_json else ""
 
-    # Memperbarui urutan sesuai dengan tabel yang sesuai
-    for i in data_json:
-        _, tabel, _ = str(i['id']).split('-')
-        if tabel == "pendapatan":
-            urutan_pendapatan = update_urutan(data_json, urutan_pendapatan)
-            g.con.execute("UPDATE urutan SET pendapatan = %s WHERE id = 1", (urutan_pendapatan,))
+        if init_tahun and init_tahun not in all_years:
+            g.con.execute("INSERT INTO urutan (tahun) VALUES (%s)", (init_tahun,))
             mysql.connection.commit()
-        elif tabel == "belanja":
-            urutan_belanja = update_urutan(data_json, urutan_belanja)
-            g.con.execute("UPDATE urutan SET  belanja = %s WHERE id = 1", ( urutan_belanja,))
-            mysql.connection.commit()
-        elif tabel == "pembiayaan":
-            urutan_pembiayaan = update_urutan(data_json, urutan_pembiayaan)
-            g.con.execute("UPDATE urutan SET pembiayaan = %s WHERE id = 1", (urutan_pembiayaan,))
-            mysql.connection.commit()
-   
-    return jsonify({"msg": "SUKSES"})
 
+        for i in data_json:
+            _, tabel, id_ = str(i['id']).split('-')
+            urutan = update_urutan(data_json)
+            update_database(tabel, urutan, init_tahun)
+
+        return jsonify({"msg": "SUKSES"})
 
 @app.route('/admin/edit_dana', methods=['PUT'])
 @jwt_required()
@@ -402,6 +427,20 @@ def hapus_dana():
             print(str(e))
             return jsonify({"error": str(e)})
 
+@app.route('/admin/dana/hapus/id', methods=['DELETE'])
+@jwt_required()
+def ubah_urutadana():
+    tahun = request.json.get("year")
+    category = request.json.get("category")
+    id_ = request.json.get("id")
+    try:
+        g.con.execute(f"DELETE FROM realisasi_{category} WHERE id = %s ", (id_,))
+        mysql.connection.commit()
+        return jsonify({"msg":"SUKSES"})
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)})
+    
 @app.route('/admin/tambah_dana', methods=['POST'])
 @jwt_required()
 def tambah_dana():
