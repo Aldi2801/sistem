@@ -308,63 +308,54 @@ def ubah_urutan_dana():
     data = request.json.get('nestable', [])
     data_json = json.loads(data)
 
-    for index, i in enumerate(data_json, start=1):
-        tahun, tabel, id_ = str(i['id']).split('-') 
+    urutan_pendapatan = fetch_data_and_format("SELECT pendapatan FROM urutan where id = 1")
+    urutan_belanja = fetch_data_and_format("SELECT belanja FROM urutan where id = 1")
+    urutan_pembiayaan = fetch_data_and_format("SELECT pembiayaan FROM urutan where id = 1")
+
+    def update_urutan(data, urutan):
+        urutan_baru = {}
         
+        for i in data:
+            tahun, tabel, id_ = str(i['id']).split('-')
+            entry = {"id": id_}
+            
+            if 'children' in i:
+                entry["children"] = update_urutan(i['children'], urutan.get(tahun, []))
+
+            if tahun not in urutan_baru:
+                urutan_baru[tahun] = []
+
+            urutan_baru[tahun].append(entry)
+
+        # Gabungkan data lama dan data baru
+        for tahun, items in urutan.items():
+            if tahun not in urutan_baru:
+                urutan_baru[tahun] = items
+            else:
+                # Menggabungkan data lama dengan data baru
+                urutan_baru[tahun] = items + urutan_baru[tahun]
+
+        print(f"Urutan Baru : {urutan_baru}")
+        return urutan_baru
+
+    # Memperbarui urutan sesuai dengan tabel yang sesuai
+    for i in data_json:
+        _, tabel, _ = str(i['id']).split('-')
         if tabel == "pendapatan":
-            urutan_pendapatan = fetch_data_and_format("SELECT pendapatan FROM urutan where id = 1")
-            print(urutan_pendapatan)
-            urutan_pendapatan = urutan_pendapatan[0]
-            if tahun not in urutan_pendapatan:
-                urutan_pendapatan[tahun] = []
-            urutan = {"id":id_}
-            children = i.get('children', [])
-            if children:
-                children = []
-                for j in i["chidren"]:
-                    tahun_j, tabel_j, id_j = str(j['id']).split('-') 
-                    children.append({"id":id_j})
-                urutan = {"id":id_,"children":children}
-            urutan_pendapatan[tahun].append(urutan)
+            urutan_pendapatan = update_urutan(data_json, urutan_pendapatan)
+            g.con.execute("UPDATE urutan SET pendapatan = %s WHERE id = 1", (urutan_pendapatan,))
+            mysql.connection.commit()
         elif tabel == "belanja":
-            urutan_belanja =  fetch_data_and_format("SELECT belanja FROM urutan where id = 1")
-            print(urutan_belanja)
-            urutan_belanja = urutan_belanja[0]
-            if tahun not in urutan_belanja:
-                urutan_belanja[tahun] = []
-            urutan = {"id":id_}
-            children = i.get('children', [])
-            if children:
-                children_list = []
-                for j in children:
-                    tahun_j, tabel_j, id_j = str(j['id']).split('-') 
-                    children_list.append({"id":id_j})
-                urutan = {"id":id_,"children":children}
-            urutan_belanja[tahun].append(urutan)
+            urutan_belanja = update_urutan(data_json, urutan_belanja)
+            g.con.execute("UPDATE urutan SET  belanja = %s WHERE id = 1", ( urutan_belanja,))
+            mysql.connection.commit()
         elif tabel == "pembiayaan":
-            urutan_pembiayaan =  fetch_data_and_format("SELECT pembiayaan FROM urutan where id = 1")
-            urutan_pembiayaan = urutan_pembiayaan[0]
-            if tahun not in urutan_pembiayaan:
-                urutan_pembiayaan[tahun] = []
-            urutan = {"id":id_}
-            children = i.get('children', [])
-            if children:
-                children = []
-                for j in i["chidren"]:
-                    tahun_j, tabel_j, id_j = str(j['id']).split('-') 
-                    children.append({"id":id_j})
-                urutan = {"id":id_,"children":children}
-            urutan_pembiayaan[tahun].append(urutan)
-    if urutan_pendapatan:
-        g.con.execute("UPDATE urutan SET pendapatan = %s WHERE id = 1",(urutan_pendapatan))
-        mysql.connection.commit()
-    elif urutan_belanja:
-        g.con.execute("UPDATE urutan SET belanja = %s WHERE id = 1",(urutan_belanja))
-        mysql.connection.commit()
-    elif urutan_pembiayaan:
-        g.con.execute("UPDATE urutan SET pembiayaan = %s WHERE id = 1",(urutan_pembiayaan))
-        mysql.connection.commit()
+            urutan_pembiayaan = update_urutan(data_json, urutan_pembiayaan)
+            g.con.execute("UPDATE urutan SET pembiayaan = %s WHERE id = 1", (urutan_pembiayaan,))
+            mysql.connection.commit()
+   
     return jsonify({"msg": "SUKSES"})
+
 
 @app.route('/admin/edit_dana', methods=['PUT'])
 @jwt_required()
