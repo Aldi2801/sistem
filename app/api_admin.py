@@ -290,29 +290,28 @@ def format_currency(value):
     locale.setlocale(locale.LC_ALL, 'id_ID.UTF-8')
     return locale.currency(value, grouping=True, symbol='Rp')
 
-def set_urutan(column, years):
+def set_urutan_default(info_list):
     urutan = {}
-    print(years)
-    for year in years:
-        print(year["tahun"])
-        # Gunakan f-string untuk menghindari injeksi SQL dan tetap aman
-        g.con.execute(f"SELECT {column} FROM urutan WHERE tahun = %s", (year["tahun"],))
-        result = g.con.fetchone()
-        print(result[0])
-        result = str(result[0]).replace("'",'"')
-        
-        # Pastikan hasil tidak None sebelum menggabungkannya
-        if result:
-            # Jika result[0] adalah string JSON, gunakan json.loads
-            try:
-                data_dict = json.loads(result)  # Mengonversi dari JSON string ke dictionary
-                # Menggabungkan dictionary, asumsi data_dict dalam format dict-like
-                urutan.update(data_dict)
-            except json.JSONDecodeError:
-                print("Error: Hasil bukan JSON yang valid:", result)
-                
+    for i in fetch_data_and_format(f"SELECT * FROM realisasi_{info_list} ORDER BY id"):
+        tahun = i["tahun"]
+        urutan.setdefault(tahun, []).append(
+            {"id": f"{i['id']}", "children": [{"id": anak.strip("'")} for anak in i["onclick"].replace("toggleDetails(", "").replace(")", "").split(",")]} 
+            if i["class"].strip() == "clickable-row" else {"id": f"{i['id']}"}
+        ) if i["class"] != "hidden-row" else None
     print(urutan)
     return urutan
+
+def set_urutan(column, years):
+    urutan = {}
+    for year in years:
+        g.con.execute(f"SELECT {column} FROM urutan WHERE tahun = %s", (year["tahun"],))
+        result= g.con.fetchone()
+        if result:
+            try:
+                urutan.update(json.loads(str(result[0]).replace("'", '"')))
+            except json.JSONDecodeError:
+                print("Error: Hasil bukan JSON yang valid:", result)
+    return urutan if urutan else set_urutan_default(column)
 
 @app.route('/admin/dana')
 def admindana():
@@ -320,14 +319,11 @@ def admindana():
     info_list2 = fetch_data_and_format("SELECT * FROM realisasi_belanja ORDER BY id")
     info_list3 = fetch_data_and_format("SELECT * FROM realisasi_pembiayaan ORDER BY id")
     thn = fetch_years("SELECT tahun FROM realisasi_pendapatan GROUP BY tahun")
-    urutan_pendapatan = set_urutan("pendapatan",thn)
-    urutan_belanja = set_urutan("belanja",thn)
-    urutan_pembiayaan = set_urutan("pembiayaan",thn)
-    # urutan_pendapatan = {"2022":[{"id": "9"}, {"id": "10"},{"id": "11"}, {"id": "12"}, {"id": "13"}, {"id": "14"}, {"id": "15"}, {"id": "16"}],"2023":[{"id": "9"}, {"id": "10"},{"id": "11"}, {"id": "12"}, {"id": "13"}, {"id": "14"}, {"id": "15"}, {"id": "16"}]}
-    # urutan_belanja = {'2022': [{'id': '21'}, {'id': '22'}, {'id': '23'}, {'id': '24'}, {'id': '25'}, {'id': '26'}, {'id': '27'}, {'id': '28'}, {'id': '29'}, {'id': '30'}, {'id': '31'}, {'id': '32'}, {'id': '33'}, {'id': '34'}, {'id': '35'}, {'id': '36'}, {'id': '37'}, {'id': '38'}, {'id': '39'}, {'id': '40'}],'2023': [{'id': '41'}, {'id': '42'}, {'id': '43'}, {'id': '44'}, {'id': '45'}, {'id': '46'}, {'id': '47'}, {'id': '48'}, {'id': '49'}, {'id': '50'}, {'id': '51'}, {'id': '52'}, {'id': '53'}, {'id': '54'}, {'id': '55'}, {'id': '56'}, {'id': '57'}, {'id': '58'}, {'id': '59'}, {'id': '60'}]}
-    # urutan_pembiayaan = {'2022': [{'id': '5'}, {'id': '6'}, {'id': '7'}, {'id': '8'}],'2023': [{'id': '9'}, {'id': '10'}, {'id': '11'}, {'id': '12'}]}
-    return render_template("admin/dana_new.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn, 
-                           urutan_pendapatan=urutan_pendapatan,  urutan_belanja = urutan_belanja, urutan_pembiayaan=urutan_pembiayaan)
+    return render_template("admin/dana_new.html",info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn, 
+                           urutan_pendapatan=set_urutan("pendapatan", thn), 
+                           urutan_belanja=set_urutan("belanja", thn), 
+                           urutan_pembiayaan=set_urutan("pembiayaan", thn))
+
 
 @app.route('/admin/dana/ubah_urutan', methods=['PUT'])
 @jwt_required()
@@ -411,7 +407,7 @@ def upload_file_dana():
         return jsonify({"error": "No file selected for uploading"}), 400
     try:
         random_name = uuid.uuid4().hex + os.path.splitext(file_upload.filename)[1]
-        destination = os.path.join(app.config['UPLOAD_FOLDER'], random_name)
+        destination = os.path.join(app.config['UPLOAD_NOTA'], random_name)
         file_upload.save(destination)
         g.con.execute(f"UPDATE realisasi_{kategori} SET nota = %s WHERE id = %s",(random_name, id))
         mysql.connection.commit()
@@ -422,15 +418,15 @@ def upload_file_dana():
 @app.route('/admin/dana/edit/id', methods=['PUT'])
 @jwt_required()
 def edit_id_dana():
-    tahun = request.form['tahun']
-    kategori = request.form["kategori"]
-    id = request.form["id"]
-    uraian = request.form['Uraian']
-    anggaran = request.form['Anggaran']
-    realisasi = request.form['Realisasi']
-    lebihKurang = request.form['Lebih_kurang']
+    tahun = request.json.get('tahun')
+    kategori = request.json.get("kategori")
+    id = request.json.get("id")
+    uraian = request.json.get('uraian')
+    anggaran = request.json.get('anggaran')
+    realisasi = request.json.get('realisasi')
+    lebih_kurang = request.json.get('Lebih_kurang')
     try:
-        g.con.execute(f"UPDATE realisasi_{kategori} SET uraian = %s , anggaran = %s, realisasi = %s, `lebih/(kurang)` = %s , tahun = %s WHERE id = %s",(uraian,anggaran,realisasi,lebihKurang,tahun,id))
+        g.con.execute(f"UPDATE realisasi_{kategori} SET uraian = %s , anggaran = %s, realisasi = %s, `lebih/(kurang)` = %s , tahun = %s WHERE id = %s",(uraian,anggaran,realisasi,lebih_kurang,tahun,id))
         mysql.connection.commit()
         return jsonify({"msg":"SUKSES"})
     except Exception as e:
