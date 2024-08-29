@@ -402,9 +402,18 @@ def upload_file_dana():
     tahun = request.form['tahun']
     kategori = request.form["kategori"]
     id = request.form["id"]
-    file_upload = request.file["file"] 
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part in the request"}), 400
+    
+    file_upload = request.files['file']
+
+    if file_upload.filename == '':
+        return jsonify({"error": "No file selected for uploading"}), 400
     try:
-        g.con.execute(f"UPDATE realisasi_{kategori} SET nota = %s WHERE id = %s",(id,))
+        random_name = uuid.uuid4().hex + os.path.splitext(file_upload.filename)[1]
+        destination = os.path.join(app.config['UPLOAD_FOLDER'], random_name)
+        file_upload.save(destination)
+        g.con.execute(f"UPDATE realisasi_{kategori} SET nota = %s WHERE id = %s",(random_name, id))
         mysql.connection.commit()
         return jsonify({"msg":"SUKSES"})
     except Exception as e:

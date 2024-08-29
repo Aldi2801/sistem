@@ -21,6 +21,7 @@
     $("#tahun_nota").val(year);
     $("#kategori_nota").val(category);
     $("#id_nota").val(id);
+    console.log(nama_nota)
     if(nama_nota == ""){}
     else{
       var pesan = "file sudah ada bisa dilihat disini <a href='/static/uploads/"+nama_nota+"'>"+nama_nota+"</a>"
@@ -30,6 +31,7 @@
     $("#bs-nota-modal-x2").modal('show'); 
   }
   function edit(year, category, id,uraian,anggaran,realisasi,lebihKurang,tahun_new){
+    console.log(id)
     $("#tahun_edit").val(year);
     $("#kategori_edit").val(category);
     $("#id_edit").val(id);
