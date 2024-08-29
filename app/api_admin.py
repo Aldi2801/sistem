@@ -323,65 +323,110 @@ def admindana():
     urutan_pendapatan = set_urutan("pendapatan",thn)
     urutan_belanja = set_urutan("belanja",thn)
     urutan_pembiayaan = set_urutan("pembiayaan",thn)
-    #urutan_pendapatan = {"2022":[{"id": "9"}, {"id": "10"},{"id": "11"}, {"id": "12"}, {"id": "13"}, {"id": "14"}, {"id": "15"}, {"id": "16"}],"2023":[{"id": "9"}, {"id": "10"},{"id": "11"}, {"id": "12"}, {"id": "13"}, {"id": "14"}, {"id": "15"}, {"id": "16"}]}
-    #urutan_belanja = {'2022': [{'id': '21'}, {'id': '22'}, {'id': '23'}, {'id': '24'}, {'id': '25'}, {'id': '26'}, {'id': '27'}, {'id': '28'}, {'id': '29'}, {'id': '30'}, {'id': '31'}, {'id': '32'}, {'id': '33'}, {'id': '34'}, {'id': '35'}, {'id': '36'}, {'id': '37'}, {'id': '38'}, {'id': '39'}, {'id': '40'}],'2023': [{'id': '41'}, {'id': '42'}, {'id': '43'}, {'id': '44'}, {'id': '45'}, {'id': '46'}, {'id': '47'}, {'id': '48'}, {'id': '49'}, {'id': '50'}, {'id': '51'}, {'id': '52'}, {'id': '53'}, {'id': '54'}, {'id': '55'}, {'id': '56'}, {'id': '57'}, {'id': '58'}, {'id': '59'}, {'id': '60'}]}
-    #urutan_pembiayaan = {'2022': [{'id': '5'}, {'id': '6'}, {'id': '7'}, {'id': '8'}],'2023': [{'id': '9'}, {'id': '10'}, {'id': '11'}, {'id': '12'}]}
+    # urutan_pendapatan = {"2022":[{"id": "9"}, {"id": "10"},{"id": "11"}, {"id": "12"}, {"id": "13"}, {"id": "14"}, {"id": "15"}, {"id": "16"}],"2023":[{"id": "9"}, {"id": "10"},{"id": "11"}, {"id": "12"}, {"id": "13"}, {"id": "14"}, {"id": "15"}, {"id": "16"}]}
+    # urutan_belanja = {'2022': [{'id': '21'}, {'id': '22'}, {'id': '23'}, {'id': '24'}, {'id': '25'}, {'id': '26'}, {'id': '27'}, {'id': '28'}, {'id': '29'}, {'id': '30'}, {'id': '31'}, {'id': '32'}, {'id': '33'}, {'id': '34'}, {'id': '35'}, {'id': '36'}, {'id': '37'}, {'id': '38'}, {'id': '39'}, {'id': '40'}],'2023': [{'id': '41'}, {'id': '42'}, {'id': '43'}, {'id': '44'}, {'id': '45'}, {'id': '46'}, {'id': '47'}, {'id': '48'}, {'id': '49'}, {'id': '50'}, {'id': '51'}, {'id': '52'}, {'id': '53'}, {'id': '54'}, {'id': '55'}, {'id': '56'}, {'id': '57'}, {'id': '58'}, {'id': '59'}, {'id': '60'}]}
+    # urutan_pembiayaan = {'2022': [{'id': '5'}, {'id': '6'}, {'id': '7'}, {'id': '8'}],'2023': [{'id': '9'}, {'id': '10'}, {'id': '11'}, {'id': '12'}]}
     return render_template("admin/dana_new.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn, 
                            urutan_pendapatan=urutan_pendapatan,  urutan_belanja = urutan_belanja, urutan_pembiayaan=urutan_pembiayaan)
 
 @app.route('/admin/dana/ubah_urutan', methods=['PUT'])
 @jwt_required()
 def ubah_urutan_dana():
-    
-        data = request.json.get('nestable', [])
-        data_json = json.loads(data)
+    data = request.json.get('nestable', [])
+    data_json = json.loads(data)
+    print(data_json)
 
-        def update_children(data):
-            for i in data:
-                year, tabel, child_id = str(i['id']).split('-')
-                g.con.execute(f"UPDATE realisasi_{tabel}  SET class = 'hidden-row', detail = %s, onclick = '' WHERE id = %s AND tahun = %s",
-                            (f"{year}-{tabel}-{child_id}", child_id, year))
-            return [{"id": str(i['id']).split('-')[2]} for i in data]
+    def update_children(data):
+        children_list = []
+        for i in data:
+            year, tabel, child_id = str(i['id']).split('-')
+            g.con.execute(f"UPDATE realisasi_{tabel} SET class = 'hidden-row', detail = %s, onclick = '' WHERE id = %s AND tahun = %s",
+                          (f"{year}-{tabel}-{child_id}", child_id, year))
+            children_list.append({"id": child_id})
+        return children_list
 
-        def update_urutan(data):
-            urutan_baru = {}
-            for i in data:
-                tahun, tabel, id_ = str(i['id']).split('-')
-                entry = {"id": id_}
-                if 'children' in i:
-                    g.con.execute(f"UPDATE realisasi_{tabel} SET class = 'clickable-row', detail = '', onclick = %s WHERE id = %s AND tahun = %s",
-                    (f"toggleDetails('{','.join([str(j['id']) for j in i['children']])}')", id_, tahun))
-                    entry["children"] = update_children(i['children'])
-                urutan_baru.setdefault(tahun, []).append(entry)
+    def update_urutan(data):
+        urutan_baru = {}
+        for i in data:
+            tahun, tabel, id_ = str(i['id']).split('-')
+            entry = {"id": id_}
+            
+            # Update untuk parent
+            g.con.execute(f"UPDATE realisasi_{tabel} SET class = '', detail = '', onclick = '' WHERE id = %s AND tahun = %s", (id_, tahun))
+            
+            # Tambahkan entry parent ke dalam urutan_baru
+            urutan_baru.setdefault(tahun, []).append(entry)
+            
+            # Tambahkan children jika ada
+            if 'children' in i:
+                g.con.execute(f"UPDATE realisasi_{tabel} SET class = 'clickable-row', detail = '', onclick = %s WHERE id = %s AND tahun = %s",
+                              (f"toggleDetails('{','.join([str(j['id']) for j in i['children']])}')", id_, tahun))
+                
+                # Dapatkan daftar children dan tambahkan mereka ke dalam urutan_baru setelah parent
+                children_data = update_children(i['children'])
+                urutan_baru.setdefault(tahun, []).extend(children_data)
+        
+        print(urutan_baru)
+        mysql.connection.commit()
+        return urutan_baru
+
+    def get_all_years():
+        g.con.execute("SELECT DISTINCT tahun FROM urutan")
+        return [row[0] for row in g.con.fetchall()]
+
+    def update_database(tabel, urutan, tahun):
+        valid_tables = ["pendapatan", "belanja", "pembiayaan"]
+        if tabel in valid_tables:
+            g.con.execute(f"UPDATE urutan SET {tabel} = %s WHERE tahun = %s", (urutan, tahun))
             mysql.connection.commit()
-            return urutan_baru
+        else:
+            raise ValueError("Invalid table name")
 
-        def get_all_years():
-            g.con.execute("SELECT DISTINCT tahun FROM urutan")
-            return [row[0] for row in g.con.fetchall()]
+    all_years = get_all_years()
+    init_tahun = str(data_json[0]['id']).split('-')[0] if data_json else ""
 
-        def update_database(tabel, urutan, tahun):
-            valid_tables = ["pendapatan", "belanja", "pembiayaan"]
-            if tabel in valid_tables:
-                g.con.execute(f"UPDATE urutan SET {tabel} = %s WHERE tahun = %s", (urutan, tahun))
-                mysql.connection.commit()
-            else:
-                raise ValueError("Invalid table name")
+    if init_tahun and init_tahun not in all_years:
+        g.con.execute("INSERT INTO urutan (tahun) VALUES (%s)", (init_tahun,))
+        mysql.connection.commit()
 
-        all_years = get_all_years()
-        init_tahun = str(data_json[0]['id']).split('-')[0] if data_json else ""
+    for i in data_json:
+        _, tabel, id_ = str(i['id']).split('-')
+        urutan = update_urutan(data_json)
+        update_database(tabel, urutan, init_tahun)
 
-        if init_tahun and init_tahun not in all_years:
-            g.con.execute("INSERT INTO urutan (tahun) VALUES (%s)", (init_tahun,))
-            mysql.connection.commit()
+    return jsonify({"msg": "SUKSES"})
 
-        for i in data_json:
-            _, tabel, id_ = str(i['id']).split('-')
-            urutan = update_urutan(data_json)
-            update_database(tabel, urutan, init_tahun)
-
-        return jsonify({"msg": "SUKSES"})
-
+@app.route('/admin/dana/upload_file', methods=['POST'])
+@jwt_required()
+def upload_file_dana():
+    tahun = request.form['tahun']
+    kategori = request.form["kategori"]
+    id = request.form["id"]
+    file_upload = request.file["file"] 
+    try:
+        g.con.execute(f"UPDATE realisasi_{kategori} SET nota = %s WHERE id = %s",(id,))
+        mysql.connection.commit()
+        return jsonify({"msg":"SUKSES"})
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)})
+@app.route('/admin/dana/edit/id', methods=['PUT'])
+@jwt_required()
+def edit_id_dana():
+    tahun = request.form['tahun']
+    kategori = request.form["kategori"]
+    id = request.form["id"]
+    uraian = request.form['Uraian']
+    anggaran = request.form['Anggaran']
+    realisasi = request.form['Realisasi']
+    lebihKurang = request.form['Lebih_kurang']
+    try:
+        g.con.execute(f"UPDATE realisasi_{kategori} SET uraian = %s , anggaran = %s, realisasi = %s, `lebih/(kurang)` = %s , tahun = %s WHERE id = %s",(uraian,anggaran,realisasi,lebihKurang,tahun,id))
+        mysql.connection.commit()
+        return jsonify({"msg":"SUKSES"})
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)})
 @app.route('/admin/edit_dana', methods=['PUT'])
 @jwt_required()
 def edit_dana():

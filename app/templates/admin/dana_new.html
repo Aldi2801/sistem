@@ -16,6 +16,54 @@
   background-color: #b0b0b0!important; /* Warna sedikit lebih gelap saat di-hover */
 }
 </style>
+<script>
+  function upload_nota(year, category, id,nama_nota){
+    $("#tahun_nota").val(year);
+    $("#kategori_nota").val(category);
+    $("#id_nota").val(id);
+    if(nama_nota == ""){}
+    else{
+      var pesan = "file sudah ada bisa dilihat disini <a href='/static/uploads/"+nama_nota+"'>"+nama_nota+"</a>"
+      $("#nama_nota").html(pesan);
+      $("#nama_nota").show();
+    }
+    $("#bs-nota-modal-x2").modal('show'); 
+  }
+  function edit(year, category, id,uraian,anggaran,realisasi,lebihKurang,tahun_new){
+    $("#tahun_edit").val(year);
+    $("#kategori_edit").val(category);
+    $("#id_edit").val(id);
+    $('#Uraian').val(uraian);
+    $('#Anggaran').val(anggaran);
+    $('#Realisasi').val(realisasi);
+    $('#Lebih_kurang').val(lebihKurang);
+    $('#tahun_new').val(tahun_new);
+    $("#bs-edit-modal-x2").modal('show');
+  }
+  function hapus(year, category, id){
+    const confirmAction = confirm(`Apakah Anda yakin ingin menghapus data ${category} dengan ID: ${id} untuk tahun ${year}?`);
+    if (confirmAction) {
+    $.ajax({
+      url: '/admin/dana/hapus/id',  // Ganti dengan URL endpoint Anda
+      method: 'DELETE',
+      contentType: 'application/json',
+      data: JSON.stringify({year:year,category:category, id:id}), 
+      headers: {
+        'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
+      },
+      success: function(response) {
+        console.log("Data deleted successfully:", response);
+        window.location.reload()
+      },
+      error: function(xhr, status, error) {
+        console.error("Error saving data:", error);
+      }
+    });
+    } else {
+      alert('Aksi penghapusan dibatalkan.');
+    }
+  }
+</script>
 {% endblock %}
 {% block content %}
 <div class="page-titles">
@@ -92,7 +140,8 @@
                   {% for i in info_list %}
                     {% if h.tahun == i.tahun %}
                     {% if j.id|string == i.id|string %}
-                  <tr class="{{i.class}}" id="{{i.detail}}" onclick="{{i.onclick}}" >
+                  <tr class="{{i.class}}" id="{{i.detail}}" onclick="{{i.onclick}}" 
+                  {% if i.class|string == "clickable-row" %} title="klik untuk melihat detail" {% endif %}>
                     <td>{{ i.no }}</td>
                     <td>{{ i.uraian }}</td>
                     <td>{{ i.anggaran }}</td>
@@ -100,8 +149,8 @@
                     <td>{{ i['lebih/(kurang)'] }}</td>
                     <td>{{ i.tahun }}</td>
                     <td>
-                      <button id="nota_{{h.tahun}}_pendapatan_{{i.id}}" class="btn btn-success">nota</button>
-                      <button id="edit_{{h.tahun}}_pendapatan_{{i.id}}" class="btn btn-warning">edit</button>
+                      <button onclick="upload_nota({{h.tahun}},'pendapatan',{{i.id}},'{{i.nota}}')" class="btn btn-success">nota</button>
+                      <button onclick="edit({{h.tahun}},'pendapatan',{{i.id}})" class="btn btn-warning">edit</button>
                       <button onclick="hapus({{h.tahun}},'pendapatan',{{i.id}})" class="btn btn-danger">hapus</button>
                     </td>
                   </tr>
@@ -133,7 +182,8 @@
                   {% for i in info_list2 %}
                     {% if h.tahun == i.tahun %}
                     {% if j.id|string == i.id|string %}
-                  <tr class="{{i.class}}" id="{{i.detail}}" onclick="{{i.onclick}}">
+                  <tr class="{{i.class}}" id="{{i.detail}}" onclick="{{i.onclick}}"
+                  {% if i.class|string == "clickable-row" %}title="klik untuk melihat detail" {% endif %}>
                     <td>{{ i.no }}</td>
                     <td>{{ i.uraian }}</td>
                     <td>{{ i.anggaran }}</td>
@@ -141,9 +191,9 @@
                     <td>{{ i['lebih/(kurang)'] }}</td>
                     <td>{{ i.tahun }}</td>
                     <td>
-                      <button id="nota_{{h.tahun}}_belanja_{{i.id}}" class="btn btn-success">nota</button>
-                      <button id="edit_{{h.tahun}}_belanja_{{i.id}}" class="btn btn-warning">edit</button>
-                      <button id="hapus_{{h.tahun}}_belanja_{{i.id}}" class="btn btn-danger">hapus</button>
+                      <button onclick="upload_nota({{h.tahun}},'belanja',{{i.id}},'{{i.nota}}')" class="btn btn-success">nota</button>
+                      <button onclick="edit({{h.tahun}},'belanja',{{i.id}})" class="btn btn-warning">edit</button>
+                      <button onclick="hapus({{h.tahun}},'belanja',{{i.id}})" class="btn btn-danger">hapus</button>
                     </td>
                   </tr>  
                   {% endif %}
@@ -174,7 +224,8 @@
                   {% for i in info_list3 %}
                     {% if h.tahun == i.tahun %}
                     {% if j.id|string == i.id|string %}
-                  <tr class="{{i.class}}" id="{{i.detail}}" onclick="{{i.onclick}}">
+                  <tr class="{{i.class}}" id="{{i.detail}}" onclick="{{i.onclick}}"
+                  {% if i.class|string == "clickable-row" %}title="klik untuk melihat detail" {% endif %}>
                     <td>{{ i.no }}</td>
                     <td>{{ i.uraian }}</td>
                     <td>{{ i.anggaran }}</td>
@@ -182,9 +233,9 @@
                     <td>{{ i['lebih/(kurang)'] }}</td>
                     <td>{{ i.tahun }}</td>
                     <td>
-                      <button id="nota_{{h.tahun}}_pembiayaan_{{i.id}}" class="btn btn-success">nota</button>
-                      <button id="edit_{{h.tahun}}_pembiayaan_{{i.id}}" class="btn btn-warning">edit</button>
-                      <button id="hapus_{{h.tahun}}_pembiayaan_{{i.id}}" class="btn btn-danger">hapus</button>
+                      <button onclick="upload_nota({{h.tahun}},'pembiayaan',{{i.id}},'{{i.nota}}')" class="btn btn-success">nota</button>
+                      <button onclick="edit({{h.tahun}},'pembiayaan',{{i.id}})" class="btn btn-warning">edit</button>
+                      <button onclick="hapus({{h.tahun}},'pembiayaan',{{i.id}})" class="btn btn-danger">hapus</button>
                     </td>
                   </tr>   
                   {% endif %}
@@ -232,6 +283,77 @@
   </div>
 </div>
 
+<!-- Modal upload nota  -->
+<div class="modal fade" id="bs-nota-modal-x2" tabindex="-1" aria-labelledby="bs-nota-modal-lg" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header d-flex align-items-center">
+        <h4 class="modal-title" id="myLargeModalLabel">Upload Nota</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <span class="mb-2">Keterangan: Upload Nota atau keterangan bukti lainnya formatnya bisa gambar atau pdf </span><br>
+        <span id="nama_nota"></span>
+        <input type="hidden" id="tahun_nota">
+        <input type="hidden" id="kategori_nota">
+        <input type="hidden" id="id_nota">
+        <input type="file" id="file_nota" class="form-control" >
+      </div>
+      <div class="modal-footer">
+        <div class="col-lg-4 col-md-6 d-md-flex align-items-center justify-content-end">
+          <a id="upload_nota" href="javascript:void(0)" class="btn btn-info d-flex align-items-center ms-2">Submit</a>
+        </div>
+        <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal edit data -->
+<div class="modal fade" id="bs-edit-modal-x2" tabindex="-1" aria-labelledby="bs-edit-modal-lg" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header d-flex align-items-center">
+        <h4 class="modal-title" id="myLargeModalLabel">Edit Data</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <input type="hidden" id="tahun_edit">
+          <input type="hidden" id="kategori_edit">
+          <input type="hidden" id="id_edit">
+          <div class="form-group">
+            <label for="Uraian">Uraian</label>
+            <input type="text" id="Uraian" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label for="Anggaran">Anggaran</label>
+            <input type="text" id="Anggaran" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label for="Realisasi">Realisasi</label>
+            <input type="text" id="Realisasi" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label for="Lebih_kurang">Lebih/(Kurang)</label>
+            <input type="text" id="Lebih_kurang" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label for="Lebih_kurang">Tahun</label>
+            <input type="text" id="tahun_new" class="form-control" />
+          </div>
+        </form>
+
+      </div>
+      <div class="modal-footer">
+        <div class="col-lg-4 col-md-6 d-md-flex align-items-center justify-content-end">
+          <a id="edit" href="javascript:void(0)" class="btn btn-info d-flex align-items-center ms-2">Submit</a>
+        </div>
+        <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- Modal Tambah Data -->
 <div class="modal fade" id="bs-example-modal-xl" tabindex="-1" aria-labelledby="bs-example-modal-lg" aria-hidden="true">
   <div class="modal-dialog modal-xl">
@@ -312,10 +434,9 @@
                     <ol class="dd-list">
                       {% for i in info_list %}
                         {% if h.tahun == i.tahun %}
+                        {% if i.class|string == "clickable-row" %}
                           <li class="dd-item dd3-item col-12" data-id="{{ h.tahun }}-pendapatan-{{i.id}}" style="max-width:none;">
-                            {% if i.class|string == "clickable-row" %}
                             <button data-action="expand" type="button" style="">Expand</button>
-                            {% endif %}
                             <div class="dd-handle dd3-handle"></div>
                             <div class="dd3-content">
                               <table>
@@ -329,7 +450,42 @@
                                 </tr>
                               </table>
                             </div>
-                            </li>
+                            {% elif i.class == "hidden-row" %}
+                            <ol class="dd-list">
+                              <li class="dd-item dd3-item col-12" data-id="{{ h.tahun }}-pendapatan-{{i.id}}" style="max-width:none;">
+                                <div class="dd-handle dd3-handle"></div>
+                                <div class="dd3-content">
+                                  <table>
+                                    <tr >
+                                      <td>{{ i.no }}</td>
+                                      <td>{{ i.uraian }}</td>
+                                      <td>{{ i.anggaran }}</td>
+                                      <td>{{ i.realisasi }}</td>
+                                      <td>{{ i['lebih/(kurang)'] }}</td>
+                                      <td>{{ i.tahun }}</td>
+                                    </tr>
+                                  </table>
+                                </div>
+                                </li>
+                            </ol>
+                            {% else %}
+                            <li class="dd-item dd3-item col-12" data-id="{{ h.tahun }}-pendapatan-{{i.id}}" style="max-width:none;">
+                              <div class="dd-handle dd3-handle"></div>
+                              <div class="dd3-content">
+                                <table>
+                                  <tr >
+                                    <td>{{ i.no }}</td>
+                                    <td>{{ i.uraian }}</td>
+                                    <td>{{ i.anggaran }}</td>
+                                    <td>{{ i.realisasi }}</td>
+                                    <td>{{ i['lebih/(kurang)'] }}</td>
+                                    <td>{{ i.tahun }}</td>
+                                  </tr>
+                                </table>
+                              </div>
+                              </li>
+                              {% endif %}
+                              {% if i.class|string == "clickable-row" %}</li>{% endif %}
                           {% endif %}
                       {% endfor %}
                     </ol>
@@ -348,10 +504,43 @@
                     <ol class="dd-list">
                       {% for i in info_list2 %}
                         {% if h.tahun == i.tahun %}
-                          <li class="dd-item dd3-item col-12" data-id="{{ i.tahun }}-belanja-{{i.id}}" style="max-width:none;">
-                            {% if i.class|string == "clickable-row" %}
-                            <button data-action="expand" type="button" style="">Expand</button>
-                            {% endif %}
+                        {% if i.class|string == "clickable-row" %}
+                        <li class="dd-item dd3-item col-12" data-id="{{ h.tahun }}-belanja-{{i.id}}" style="max-width:none;">
+                          <button data-action="expand" type="button" style="">Expand</button>
+                          <div class="dd-handle dd3-handle"></div>
+                          <div class="dd3-content">
+                            <table>
+                              <tr >
+                                <td>{{ i.no }}</td>
+                                <td>{{ i.uraian }}</td>
+                                <td>{{ i.anggaran }}</td>
+                                <td>{{ i.realisasi }}</td>
+                                <td>{{ i['lebih/(kurang)'] }}</td>
+                                <td>{{ i.tahun }}</td>
+                              </tr>
+                            </table>
+                          </div>
+                          {% elif i.class == "hidden-row" %}
+                          <ol class="dd-list">
+                            <li class="dd-item dd3-item col-12" data-id="{{ h.tahun }}-belanja-{{i.id}}" style="max-width:none;">
+                              <div class="dd-handle dd3-handle"></div>
+                              <div class="dd3-content">
+                                <table>
+                                  <tr >
+                                    <td>{{ i.no }}</td>
+                                    <td>{{ i.uraian }}</td>
+                                    <td>{{ i.anggaran }}</td>
+                                    <td>{{ i.realisasi }}</td>
+                                    <td>{{ i['lebih/(kurang)'] }}</td>
+                                    <td>{{ i.tahun }}</td>
+                                  </tr>
+                                </table>
+                              </div>
+                              </li>
+                          </ol>
+                        </li>
+                          {% else %}
+                          <li class="dd-item dd3-item col-12" data-id="{{ h.tahun }}-belanja-{{i.id}}" style="max-width:none;">
                             <div class="dd-handle dd3-handle"></div>
                             <div class="dd3-content">
                               <table>
@@ -365,9 +554,9 @@
                                 </tr>
                               </table>
                             </div>
-                         
-                           </li>
-                          {% endif %}
+                            </li>
+                            {% endif %}
+                        {% endif %}
                       {% endfor %}
                     </ol>
                   </div>
@@ -383,13 +572,45 @@
                   <h6 id="welcome_{{h.tahun}}_3" class="tonggle-hide">Realisasi Pembiayaan</h6>
                   <div class="myadmin-dd-empty dd text-black tonggle-hide" style="max-width:none;" id="nestable_{{h.tahun}}_3">
                     <ol class="dd-list">
-                      
                       {% for i in info_list3 %}
                         {% if h.tahun == i.tahun %}
-                          <li class="dd-item dd3-item col-12" data-id="{{ i.tahun }}-pembiayaan-{{i.id}}" style="max-width:none;">
-                            {% if i.class|string == "clickable-row" %}
-                            <button data-action="expand" type="button" style="">Expand</button>
-                            {% endif %}
+                        {% if i.class|string == "clickable-row" %}
+                        <li class="dd-item dd3-item col-12" data-id="{{ h.tahun }}-pembiayaan-{{i.id}}" style="max-width:none;">
+                          <button data-action="expand" type="button" style="">Expand</button>
+                          <div class="dd-handle dd3-handle"></div>
+                          <div class="dd3-content">
+                            <table>
+                              <tr >
+                                <td>{{ i.no }}</td>
+                                <td>{{ i.uraian }}</td>
+                                <td>{{ i.anggaran }}</td>
+                                <td>{{ i.realisasi }}</td>
+                                <td>{{ i['lebih/(kurang)'] }}</td>
+                                <td>{{ i.tahun }}</td>
+                              </tr>
+                            </table>
+                          </div>
+                          {% elif i.class == "hidden-row" %}
+                          <ol class="dd-list">
+                            <li class="dd-item dd3-item col-12" data-id="{{ h.tahun }}-pembiayaan-{{i.id}}" style="max-width:none;">
+                              <div class="dd-handle dd3-handle"></div>
+                              <div class="dd3-content">
+                                <table>
+                                  <tr >
+                                    <td>{{ i.no }}</td>
+                                    <td>{{ i.uraian }}</td>
+                                    <td>{{ i.anggaran }}</td>
+                                    <td>{{ i.realisasi }}</td>
+                                    <td>{{ i['lebih/(kurang)'] }}</td>
+                                    <td>{{ i.tahun }}</td>
+                                  </tr>
+                                </table>
+                              </div>
+                              </li>
+                          </ol>
+                        </li>
+                          {% else %}
+                          <li class="dd-item dd3-item col-12" data-id="{{ h.tahun }}-pembiayaan-{{i.id}}" style="max-width:none;">
                             <div class="dd-handle dd3-handle"></div>
                             <div class="dd3-content">
                               <table>
@@ -404,7 +625,8 @@
                               </table>
                             </div>
                             </li>
-                          {% endif %}
+                            {% endif %}
+                        {% endif %}
                       {% endfor %}
                     </ol>
                   </div>
@@ -433,6 +655,7 @@
 {% block js %}
 <script src="../../static/assets/libs/nestable/jquery.nestable.js"></script>
 <script>
+  $("#nama_nota").hide();
   function toggleDetails(ids) {
     var idArray = ids.split(',');
     idArray.forEach(function(id) {
@@ -444,13 +667,21 @@
       }
     });
   }
-  function upload_note(id) {
+
+  $("#upload_nota").on("click", function(event){
     event.preventDefault();
+    var formData = new FormData();
+    var fileInput = document.getElementById('file_nota');
+    formData.append('file', fileInput.files[0]);
+    formData.append('tahun',$("#tahun_nota").val())
+    formData.append('kategori',$("#kategori_nota").val())
+    formData.append('id',$("#id_nota").val())
+    console.log(formData)
     $.ajax({
       url: '/admin/dana/upload_file',  // Ganti dengan URL endpoint Anda
-      method: 'PUT',
+      method: 'POST',
       contentType: 'application/json',
-      data: JSON.stringify({ nestable: serializedData }), 
+      data: formData, 
       headers: {
         'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
       },
@@ -461,50 +692,36 @@
         console.error("Error saving data:", error);
       }
     });
-  }
-
-  function hapus(year, category, id){
+  });
+  $("#edit").on("click", function(event){
     event.preventDefault();
-    const confirmAction = confirm(`Apakah Anda yakin ingin menghapus data ${category} dengan ID: ${id} untuk tahun ${year}?`);
-    if (confirmAction) {
+    val data = {
+      tahun : $("#tahun_edit").val(),
+      kategori : $("#kategori_edit").val(),
+      id :$("#id_edit").val(),
+      uraian : $('#Uraian').val(),
+      anggaran : $('#Anggaran').val(),
+      realisasi : $('#Realisasi').val(),
+      lebihKurang : $('#Lebih_kurang').val(),
+      tahun_new : $('#tahun_new').val()    
+     }
+     console.log(data)
     $.ajax({
-      url: '/admin/dana/hapus/id',  // Ganti dengan URL endpoint Anda
-      method: 'DELETE',
+      url: '/admin/dana/edit/id',  // Ganti dengan URL endpoint Anda
+      method: 'PUT',
       contentType: 'application/json',
-      data: JSON.stringify({year:year,category:category, id:id}), 
+      data: JSON.stringify(data), 
       headers: {
         'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
       },
       success: function(response) {
-        console.log("Data deleted successfully:", response);
-        window.location.reload()
+        console.log("Data saved successfully:", response);
       },
       error: function(xhr, status, error) {
         console.error("Error saving data:", error);
       }
     });
-    } else {
-      alert('Aksi penghapusan dibatalkan.');
-    }
-  }
-  function edit(){
-    event.preventDefault();
-          $.ajax({
-            url: '/admin/dana/ubah_urutan',  // Ganti dengan URL endpoint Anda
-            method: 'PUT',
-            contentType: 'application/json',
-            data: JSON.stringify({ nestable: serializedData }), 
-            headers: {
-              'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"
-            },
-            success: function(response) {
-              console.log("Data saved successfully:", response);
-            },
-            error: function(xhr, status, error) {
-              console.error("Error saving data:", error);
-            }
-          });
-  }
+  });
   $(document).ready(function() {
     // Fungsi untuk menampilkan nestable berdasarkan tahun dan nomor
     function filterNestable(year, number) {
