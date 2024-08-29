@@ -424,7 +424,7 @@ def edit_id_dana():
     uraian = request.json.get('uraian')
     anggaran = request.json.get('anggaran')
     realisasi = request.json.get('realisasi')
-    lebih_kurang = request.json.get('Lebih_kurang')
+    lebih_kurang = request.json.get('lebih_kurang')
     try:
         g.con.execute(f"UPDATE realisasi_{kategori} SET uraian = %s , anggaran = %s, realisasi = %s, `lebih/(kurang)` = %s , tahun = %s WHERE id = %s",(uraian,anggaran,realisasi,lebih_kurang,tahun,id))
         mysql.connection.commit()
