@@ -98,13 +98,37 @@ def pemerintahan_desa():
 def badan_desa():
     return jsonify({"msg":"under maintance"}),404
 
+def set_urutan_default(info_list):
+    urutan = {}
+    for i in fetch_data_and_format(f"SELECT * FROM realisasi_{info_list} ORDER BY id"):
+        tahun = i["tahun"]
+        urutan.setdefault(tahun, []).append(
+            {"id": f"{i['id']}", "children": [{"id": anak.strip("'")} for anak in i["onclick"].replace("toggleDetails(", "").replace(")", "").split(",")]} 
+            if i["class"].strip() == "clickable-row" else {"id": f"{i['id']}"}
+        ) if i["class"] != "hidden-row" else None
+    print(urutan)
+    return urutan
+
+def set_urutan(column, year):
+    urutan = {}
+    g.con.execute(f"SELECT {column} FROM urutan WHERE tahun = %s", (year,))
+    result= g.con.fetchone()
+    if result:
+        try:
+            urutan.update(json.loads(str(result[0]).replace("'", '"')))
+        except json.JSONDecodeError:
+            print("Error: Hasil bukan JSON yang valid:", result)
+    return urutan if urutan else set_urutan_default(column)
 #halaman dana
 @app.route('/dana/<thn>')
 def dana_desa(thn):
     info_list = fetch_data_and_format("SELECT * FROM realisasi_pendapatan where tahun = "+thn+" ORDER BY id")
     info_list2 = fetch_data_and_format("SELECT * FROM realisasi_belanja where tahun = "+thn+" ORDER BY id")
     info_list3 = fetch_data_and_format("SELECT * FROM realisasi_pembiayaan where tahun = "+thn+" ORDER BY id")
-    return render_template("dana.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn)
+    return render_template("dana.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn,  
+                           urutan_pendapatan=set_urutan("pendapatan", thn), 
+                           urutan_belanja=set_urutan("belanja", thn), 
+                           urutan_pembiayaan=set_urutan("pembiayaan", thn))
 #halaman monografi
 @app.route('/monografi')
 def mono():

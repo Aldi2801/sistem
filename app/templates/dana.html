@@ -1,4 +1,22 @@
 {% extends 'include/base.html' %} 
+{% block head %}
+<style>
+.hidden-row {
+  display: none;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.3s ease!important;
+}
+
+.clickable-row:hover {
+  text-decoration-thickness: 2px;
+  text-decoration: underline;
+  background-color: #b0b0b0!important; /* Warna sedikit lebih gelap saat di-hover */
+}
+</style>
+{% endblock %}
 {% block content %}
 <div class="page-titles">
     <div class="row">
@@ -37,8 +55,10 @@
                               <th >Tahun</th>
                             </tr>
                         </thead>
-                            {% for i in info_list :%}
-                            <tr style="border:0px">
+                            {% for j in urutan_pendapatan[tahun] %}
+                            {% for i in info_list %}
+                            {% if j.id|string == i.id|string %}
+                            <tr class="{{i.class}}" id="{{i.detail}}" onclick="{{i.onclick}}" {% if i.class|string == "clickable-row" %} title="klik untuk melihat detail" {% endif %} style="border:0px">
                                 <td>{{i.no}}</td>
                                 <td>{{i.uraian}}</td>
                                 <td>{{i.anggaran}}</td>
@@ -46,6 +66,8 @@
                                 <td>{{i['lebih/(kurang)']}}</td>
                                 <td>{{i.tahun}}</td>
                             </tr>
+                            {% endif %}
+                            {% endfor %}
                             {% endfor %}
                           </table>
                           {% else %}
@@ -63,6 +85,7 @@
                     <small>Realisasi belanja merujuk pada penggunaan dana atau sumber pembiayaan yang telah disetujui atau dialokasikan untuk membiayai pengeluaran atau belanja yang dilakukan oleh pemerintah desa. Ini mencakup semua pengeluaran yang sebenarnya telah terjadi atau tercatat dalam laporan keuangan desa selama periode tertentu. Realisasi belanja ini mencakup berbagai jenis pengeluaran, seperti pembelian barang, pembayaran gaji pegawai, pembangunan infrastruktur, dan lain sebagainya. </small><br><br>
           <div class = "table-responsive">
                         {% if info_list2 %}
+                        
                         <table id="file_export" class="table table-striped table-bordered display text-nowrap"style="border:0px; border-bottom: 1px solid ;">
                             <thead>
                             <tr>
@@ -73,9 +96,11 @@
                               <th >Lebih/(Kurang)</th>
                               <th >Tahun</th>
                             </tr>
-                        </thead>
-                            {% for i in info_list2 :%}
-                            <tr style="border:0px">
+                            </thead>
+                            {% for j in urutan_belanja[tahun] %}
+                            {% for i in info_list2 %}
+                            {% if j.id|string == i.id|string %}
+                            <tr class="{{i.class}}" id="{{i.detail}}" onclick="{{i.onclick}}" {% if i.class|string == "clickable-row" %} title="klik untuk melihat detail" {% endif %} style="border:0px">
                                 <td>{{i.no}}</td>
                                 <td>{{i.uraian}}</td>
                                 <td>{{i.anggaran}}</td>
@@ -83,13 +108,13 @@
                                 <td>{{i['lebih/(kurang)']}}</td>
                                 <td>{{i.tahun}}</td>
                             </tr>
+                            {% endif %}
                             {% endfor %}
-            
-            
-                          </table>
-                          {% else %}
-    <p>No data available.</p>
-    {% endif %}
+                            {% endfor %}
+                        </table>
+                        {% else %}
+                        <p>No data available.</p>
+                        {% endif %}
                         <!---->
                     </div>
                 </div>
@@ -113,8 +138,10 @@
                               <th >Tahun</th>
                             </tr>
                         </thead>
-                            {% for i in info_list3 :%}
-                            <tr style="border:0px">
+                            {% for j in urutan_pembiayaan[tahun] %}
+                            {% for i in info_list3 %}
+                            {% if j.id|string == i.id|string %}
+                            <tr class="{{i.class}}" id="{{i.detail}}" onclick="{{i.onclick}}" {% if i.class|string == "clickable-row" %} title="klik untuk melihat detail" {% endif %} style="border:0px">
                                 <td>{{i.no}}</td>
                                 <td>{{i.uraian}}</td>
                                 <td>{{i.anggaran}}</td>
@@ -122,9 +149,9 @@
                                 <td>{{i['lebih/(kurang)']}}</td>
                                 <td>{{i.tahun}}</td>
                             </tr>
+                            {% endif %}
                             {% endfor %}
-            
-            
+                            {% endfor %}
                           </table>
                           {% else %}
                         <p>No data available.</p>
@@ -167,4 +194,19 @@
 
     </div>
 </div>
+{% endblock %}
+{% block js %}
+<script>
+  function toggleDetails(ids) {
+    var idArray = ids.split(',');
+    idArray.forEach(function(id) {
+      var element = document.getElementById(id.trim());
+      if (element.style.display === "none" || element.style.display === "") {
+        element.style.display = "table-row";
+      } else {
+        element.style.display = "none";
+      }
+    });
+  }
+</script>
 {% endblock %}
