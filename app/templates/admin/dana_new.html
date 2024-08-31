@@ -260,6 +260,32 @@
   </div>
 </div>
 
+<!-- Modal Hapus Tahun -->
+<div class="modal fade" id="bs-example-modal-x2" tabindex="-1" aria-labelledby="bs-example-modal-lg" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header d-flex align-items-center">
+        <h4 class="modal-title" id="myLargeModalLabel">Hapus Dana Desa berdasarkan tahun</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <span class="mb-2">Keterangan: Pilih data tahun berapa yang mau dihapus</span>
+        <select class="form-select" id="tahun_hps" name="educationDate">
+          <option value="semua_tahun" selected>Semua Tahun</option>
+          {% for i in tahun %}
+          <option value="{{i.tahun}}">{{i.tahun}}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="modal-footer">
+        <div class="col-lg-4 col-md-6 d-md-flex align-items-center justify-content-end">
+          <a id="delete" class="btn btn-info d-flex align-items-center ms-2">Submit</a>
+        </div>
+        <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- Modal Tambah Data -->
 <div class="modal fade" id="bs-example-modal-xl" tabindex="-1" aria-labelledby="bs-example-modal-lg" aria-hidden="true">
   <div class="modal-dialog modal-xl">
@@ -309,8 +335,6 @@
   </div>
   <!-- /.modal-dialog -->
 </div>
-<!-- Modal Tambah Data End -->
-
 <!-- Modal Ubah Urutan -->
 <div class="modal fade" id="bs-urutan-modal-xl" tabindex="-1" aria-labelledby="bs-example-modal-lg" aria-hidden="true">
   <div class="modal-dialog modal-xl">

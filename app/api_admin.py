@@ -545,6 +545,7 @@ def hapus_dana():
             g.con.execute("DELETE FROM realisasi_pendapatan WHERE tahun = %s", (tahun,))
             g.con.execute("DELETE FROM realisasi_belanja WHERE tahun = %s", (tahun,))
             g.con.execute("DELETE FROM realisasi_pembiayaan WHERE tahun = %s", (tahun,))
+            g.con.execute("DELETE FROM urutan WHERE tahun = %s", (tahun,))
             mysql.connection.commit()
             return jsonify({"msg":"SUKSES"})
         except Exception as e:
