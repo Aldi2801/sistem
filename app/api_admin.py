@@ -318,7 +318,7 @@ def admindana():
     info_list = fetch_data_and_format("SELECT * FROM realisasi_pendapatan ORDER BY id")
     info_list2 = fetch_data_and_format("SELECT * FROM realisasi_belanja ORDER BY id")
     info_list3 = fetch_data_and_format("SELECT * FROM realisasi_pembiayaan ORDER BY id")
-    thn = fetch_years("SELECT tahun FROM realisasi_pendapatan GROUP BY tahun")
+    thn = fetch_years("SELECT tahun FROM urutan GROUP BY tahun")
     return render_template("admin/dana_new.html",info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn, 
                            urutan_pendapatan=set_urutan("pendapatan", thn), 
                            urutan_belanja=set_urutan("belanja", thn), 
@@ -415,19 +415,96 @@ def upload_file_dana():
     except Exception as e:
         print(str(e))
         return jsonify({"error": str(e)})
-@app.route('/admin/dana/edit/id', methods=['PUT'])
+def hapus_urutan_lama(id, kategori, tahun_lama):
+    try:
+        g.con.execute(f"SELECT {kategori} FROM urutan WHERE tahun = %s", (tahun_lama,))
+        result = g.con.fetchone()
+        if result:
+            urutan = json.loads(result[0].replace("'", '"'))
+            urutan = [item for item in urutan[tahun_lama] if item.get('id') != id] if isinstance(urutan, list) else None
+            if urutan is None:
+                return jsonify({"error": "Unexpected JSON structure"}), 400
+            g.con.execute(f"UPDATE urutan SET {kategori} = %s WHERE tahun = %s", (json.dumps(urutan), tahun_lama))
+            g.con.connection.commit()
+            return jsonify({"msg": "SUKSES"})
+        return jsonify({"error": "Data tidak ditemukan"}), 404
+    except json.JSONDecodeError:
+        return jsonify({"error": "Invalid JSON format"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+def insert_or_update_urutan(new_id, kategori, tahun_baru):
+    try:
+        # Cek apakah tahun baru sudah ada
+        g.con.execute("SELECT tahun FROM urutan")
+        thn = [row[0] for row in g.con.fetchall()]
+        
+        if tahun_baru not in thn:
+            # Tahun baru, buat entri baru
+            urutan = {tahun_baru: [{"id": new_id}]}
+            g.con.execute(f"INSERT INTO urutan ({kategori}, tahun) VALUES (%s, %s)", (json.dumps(urutan), tahun_baru))
+        else:
+            # Tahun sudah ada, update entri
+            g.con.execute(f"SELECT {kategori} FROM urutan WHERE tahun = %s", (tahun_baru,))
+            result = g.con.fetchone()
+            
+            if result:
+                urutan = json.loads(result[0].replace("'", '"'))
+                urutan.setdefault(tahun_baru, []).append({"id": new_id})
+                g.con.execute(f"UPDATE urutan SET {kategori} = %s WHERE tahun = %s", (json.dumps(urutan), tahun_baru))
+        
+        g.con.connection.commit()
+        return jsonify({"msg": "SUKSES"})
+        
+    except json.JSONDecodeError:
+        return jsonify({"error": "Invalid JSON format"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/admin/dana/tambah/id', methods=['POST'])
 @jwt_required()
-def edit_id_dana():
-    tahun = request.json.get('tahun')
+def tambah_id_dana():
+    tahun_lama = request.json.get('tahun_lama')
+    tahun_baru = request.json.get('tahun_baru')
     kategori = request.json.get("kategori")
-    id = request.json.get("id")
+    no = request.json.get('no')
     uraian = request.json.get('uraian')
     anggaran = request.json.get('anggaran')
     realisasi = request.json.get('realisasi')
     lebih_kurang = request.json.get('lebih_kurang')
+    
     try:
-        g.con.execute(f"UPDATE realisasi_{kategori} SET uraian = %s , anggaran = %s, realisasi = %s, `lebih/(kurang)` = %s , tahun = %s WHERE id = %s",(uraian,anggaran,realisasi,lebih_kurang,tahun,id))
+        # Menyisipkan data
+        g.con.execute(f"INSERT INTO realisasi_{kategori} (no, uraian, anggaran, realisasi, `lebih/(kurang)`, tahun) VALUES (%s, %s, %s, %s, %s, %s)", (no, uraian, anggaran, realisasi, lebih_kurang, tahun_baru))
+        
+        # Mendapatkan ID dari baris yang baru diinsert
+        new_id = g.con.lastrowid
+        
+        # Commit perubahan
+        g.con.connection.commit()
+        insert_or_update_urutan(new_id,kategori,tahun_baru)
+        return jsonify({"msg": "SUKSES"})
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/admin/dana/edit/id', methods=['PUT'])
+@jwt_required()
+def edit_id_dana():
+    tahun_lama = request.json.get('tahun_lama')
+    tahun_baru = request.json.get('tahun_baru')
+    kategori = request.json.get("kategori")
+    uraian = request.json.get('uraian')
+    id = request.json.get("id")
+    no = request.json.get('no')
+    anggaran = request.json.get('anggaran')
+    realisasi = request.json.get('realisasi')
+    lebih_kurang = request.json.get('lebih_kurang')
+    try:
+        g.con.execute(f"UPDATE realisasi_{kategori} SET no = %s, uraian = %s , anggaran = %s, realisasi = %s, `lebih/(kurang)` = %s , tahun = %s WHERE id = %s ",(no,uraian,anggaran,realisasi,lebih_kurang,tahun_baru,id))
         mysql.connection.commit()
+        if tahun_baru != tahun_lama:
+            hapus_urutan_lama(id,kategori,tahun_lama)    
+            insert_or_update_urutan(id,kategori,tahun_baru)
         return jsonify({"msg":"SUKSES"})
     except Exception as e:
         print(str(e))
@@ -453,9 +530,7 @@ def edit_dana():
 @jwt_required()
 def hapus_dana():
     tahun = request.form['tahun']
-    print(tahun)
     tahun = str(tahun)
-    print(tahun)
     if tahun == "semua_tahun":
         try:
             g.con.execute("TRUNCATE `realisasi_belanja`")
@@ -464,7 +539,6 @@ def hapus_dana():
             mysql.connection.commit()
             return jsonify({"msg":"SUKSES"})
         except Exception as e:
-            print(str(e))
             return jsonify({"error": str(e)})
     else:
         try:
@@ -486,6 +560,7 @@ def ubah_urutadana():
     try:
         g.con.execute(f"DELETE FROM realisasi_{category} WHERE id = %s ", (id_,))
         mysql.connection.commit()
+        hapus_urutan_lama(id_, category, tahun)
         return jsonify({"msg":"SUKSES"})
     except Exception as e:
         print(str(e))

@@ -11,30 +11,22 @@
     <meta name="robots" content="noindex,nofollow" />
     <title>Sistem Desa Pangkah</title>
 
-    <link rel="icon" type="image/png" sizes="16x16" href="../static/image/logo_ico.png" />   
+    <link rel="icon" type="image/png" sizes="16x16" href="../static/image/logo_ico.png" />
     <link href="../static/dist/css/style.min.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../static/assets/libs/quill/dist/quill.snow.css" />
+
     <!-- fix ck editor -->
     <style>
-      .ql-align-right{
-        text-align:right;
-      }
-      .ql-align-left{
-        text-align:left;
-      }
-      .ql-align-center{
-        text-align:center
-      }
-      .ql-align-justify{
-        text-align:justify
-      }
-    </style>    
-  <!-- Table -->
-  <link
-  href="../static/assets/extra-libs/datatables.net-bs4/css/dataTables.bootstrap4.css"
-  rel="stylesheet">
-    
+      .ql-align-right { text-align: right !important; }
+      .ql-align-left { text-align: left !important; }
+      .ql-align-center { text-align: center !important; }
+      .ql-align-justify { text-align: justify !important; }
+    </style>
+
+    <!-- Table -->
+    <link href="../static/assets/extra-libs/datatables.net-bs4/css/dataTables.bootstrap4.css" rel="stylesheet">
     <link href="../static/dist/css/style.min.css" rel="stylesheet" />
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -44,173 +36,77 @@
     <script src="../static/assets/libs/jquery/dist/jquery.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="../static/assets/extra-libs/taskboard/js/jquery-ui.min.js"></script>
-    <style type="text/css">
-      .text-yellow {
-        color: #ffff00 !important;
-      }
-    </style>
-    <style type="text/css">
-      .jqstooltip {
-        position: absolute;
-        left: 0px;
-        top: 0px;
-        visibility: hidden;
-        background: rgb(0, 0, 0) transparent;
-        background-color: rgba(0, 0, 0, 0.6);
-        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);
-        -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
-        color: white;
-        font: 10px arial, san serif;
-        text-align: left;
-        white-space: nowrap;
-        padding: 5px;
-        border: 1px solid white;
-        z-index: 10000;
-      }
 
-      .jqsfield {
-        color: white;
-        font: 10px arial, san serif;
-        text-align: left;
-      }
-      
+    <style type="text/css">
+      .text-yellow { color: #ffff00 !important; }
+      .jqstooltip { position: absolute; left: 0px; top: 0px; visibility: hidden; background: rgb(0, 0, 0) transparent; background-color: rgba(0, 0, 0, 0.6); filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000); -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)"; color: white; font: 10px arial, san serif; text-align: left; white-space: nowrap; padding: 5px; border: 1px solid white; z-index: 10000; }
+      .jqsfield { color: white; font: 10px arial, san serif; text-align: left; }
+
       /* Style for user's message */
-      .user-message {
-        text-align: right;
-        color: white;
-        background-color: blue;
-        padding: 5px;
-        margin: 5px;
-        border-radius: 10px;
-        border-bottom-right-radius: 0px;
-        display: inline-block;
-        align-self: flex-end; /* Let user's message align to the right */
-      }
+      .user-message { text-align: right; color: white; background-color: blue; padding: 5px; margin: 5px; border-radius: 10px; border-bottom-right-radius: 0px; display: inline-block; align-self: flex-end; }
     
       /* Style for bot's message */
-      .bot-message {
-        text-align: left;
-        color: white;
-        background-color: green;
-        padding: 5px;
-        margin: 5px;
-        border-radius: 10px;
-        border-bottom-left-radius: 0px;
-        display: inline-block;
-        align-self: flex-start; /* Let bot's message align to the left */
-      }
+      .bot-message { text-align: left; color: white; background-color: green; padding: 5px; margin: 5px; border-radius: 10px; border-bottom-left-radius: 0px; display: inline-block; align-self: flex-start; }
     
       /* Flex container for chat messages */
-      #chatMessages {
-        display: flex;
-        flex-direction: column; /* Stack messages vertically */
-      }
-      /* CSS */
-      .floating-button {
-        position: fixed;
-        z-index:99999;
-        bottom: 20px; /* Atur sesuai dengan posisi vertikal yang diinginkan */
-        right: 20px; /* Atur sesuai dengan posisi horizontal yang diinginkan */
-        border: none;
-        padding: 15px 25px; /* Padding untuk meningkatkan area klik */
-        border-radius: 50%; /* Agar tombol berbentuk lingkaran */
-        font-size: 16px;
-        cursor: pointer;
-        /* Tambahkan efek hover jika diinginkan */
-        transition: background-color 0.3s ease;
-      }
-      .Bot-time {
-        float: left;
-        margin: 5px;
-        text-align: left;
-        display: inline-block;
-        align-self: flex-start; /* Let bot's message align to the left */
-      }
-      .You-time {
-        float: right;
-        margin: 5px;
-        text-align: right;
-        display: inline-block;
-        align-self: flex-end; /* Let user's message align to the right */
-      }
-      .chat-time {
-        font-size: 12px;
-        color: #888;
-        margin-top: 5px;
-      }
-      .dropdown-item:active {
-        background-color: #fff;
-        color:#6c757d;
-      }
-      /*fix style agenda*/
-      .fc-event{
-      color: #67757c ;
-      }
-      .berita {
-        display: flex;
-      }
-      .gambar-berita {
-        width: 300px; 
-        height: 200px;
-      }
-      .profile {
-        display: flex;
-      }
-      .gambar-profile {
-        max-width: 200px;
-      }
+      #chatMessages { display: flex; flex-direction: column; }
+    
+      /* Floating button */
+      .floating-button { position: fixed; z-index: 99999; bottom: 20px; right: 20px; border: none; padding: 15px 25px; border-radius: 50%; font-size: 16px; cursor: pointer; transition: background-color 0.3s ease; }
+    
+      .Bot-time { float: left; margin: 5px; text-align: left; display: inline-block; align-self: flex-start; }
+      .You-time { float: right; margin: 5px; text-align: right; display: inline-block; align-self: flex-end; }
+      .chat-time { font-size: 12px; color: #888; margin-top: 5px; }
+
+      .dropdown-item:active { background-color: #fff; color: #6c757d; }
+
+      /* Fix style agenda */
+      .fc-event { color: #67757c; }
+
+      .berita { display: flex; }
+      .gambar-berita { width: 300px; height: 200px; }
+      .profile { display: flex; }
+      .gambar-profile { max-width: 200px; }
+
       @media (max-width: 640px) {
-        .berita {
-          display: block;
-        }
-        .gambar-berita{
-          width: 100%;
-          margin-bottom: 20px;
-        }
-        .profile {
-          display: block;
-        }
-        .gambar-profile{
-          width: 100%;
-          margin-bottom: 20px;
-        }
-        .geo{
-          text-align:left!important;
-        }
+        .berita { display: block; }
+        .gambar-berita { width: 100%; margin-bottom: 20px; }
+        .profile { display: block; }
+        .gambar-profile { width: 100%; margin-bottom: 20px; }
+        .geo { text-align: left !important; }
       }
-      .loading {
-        display: inline-block;
-        background-color: #f8f9fa;
-        color: #6c757d;
-        padding: 10px;
-        border-radius: 5px;
-        margin-bottom: 10px;
-    }
-    .dropdown-menu{
-      padding-bottom:0px;
-    }
+
+      .loading { display: inline-block; background-color: #f8f9fa; color: #6c757d; padding: 10px; border-radius: 5px; margin-bottom: 10px; }
+      .dropdown-menu { padding-bottom: 0px; }
+
+      .table-responsive { overflow-x: scroll; cursor: grab; padding-bottom: 20px; }
+      .table-responsive:active { cursor: grabbing; }
+      .table-responsive::-webkit-scrollbar { height: 10px; }
+      .table-responsive::-webkit-scrollbar-thumb { background-color: #888; border-radius: 10px; }
+      .table-responsive::-webkit-scrollbar-track { background-color: #f1f1f1; }
+      .table-responsive { scrollbar-color: #888 #f1f1f1; scrollbar-width: thin; }
     </style>
-      <?xml version="1.0" encoding="UTF-8"?>
-      <meta name="description" content="Tentang Desa Pangkah: Desa Pangkah merupakan desa yang memberi pelayanan publik secara cepat dan efisien. Dengan mengedepankan pelayanan dan pengolahan data berbasis IT, Desa Pangkah diharapkan dapat berkembang menjadi yang lebih maju dalam berbagai aspek baik itu SDM, Kesehatan, Kesejahteraan dan Ekonomi. Dengan Portal Desa Digital semua pelayanan menjadi lebih baik.">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta property="og:title" content="Sistem Informasi Desa Pangkah">
-      <meta property="og:description" content="Tentang Desa Pangkah: Desa Pangkah merupakan desa yang memberi pelayanan publik secara cepat dan efisien. Dengan mengedepankan pelayanan dan pengolahan data berbasis IT, Desa Pangkah diharapkan dapat berkembang menjadi yang lebih maju dalam berbagai aspek baik itu SDM, Kesehatan, Kesejahteraan dan Ekonomi. Dengan Portal Desa Digital semua pelayanan menjadi lebih baik.">
-      <meta property="og:image" content="https://desapangkah.com/static/image/logo_ico.png">
-      <meta property="og:url" content="https://desapangkah.com">
-      <script type="application/ld+json">
-         {
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          "name": "Sistem Informasi Desa Pangkah",
-          "url": "http://www.desapangkah.com",
-          "logo": "http://www.desapangkah.com/static/image/logo_ico.png",
-          "contactPoint": {
-              "@type": "ContactPoint",
-              "email": "pemdespangkah@gmail.com",
-              "contactType": "customer service"
-          }
+
+    <meta name="description" content="Tentang Desa Pangkah: Desa Pangkah merupakan desa yang memberi pelayanan publik secara cepat dan efisien. Dengan mengedepankan pelayanan dan pengolahan data berbasis IT, Desa Pangkah diharapkan dapat berkembang menjadi yang lebih maju dalam berbagai aspek baik itu SDM, Kesehatan, Kesejahteraan dan Ekonomi. Dengan Portal Desa Digital semua pelayanan menjadi lebih baik.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="Sistem Informasi Desa Pangkah">
+    <meta property="og:description" content="Tentang Desa Pangkah: Desa Pangkah merupakan desa yang memberi pelayanan publik secara cepat dan efisien. Dengan mengedepankan pelayanan dan pengolahan data berbasis IT, Desa Pangkah diharapkan dapat berkembang menjadi yang lebih maju dalam berbagai aspek baik itu SDM, Kesehatan, Kesejahteraan dan Ekonomi. Dengan Portal Desa Digital semua pelayanan menjadi lebih baik.">
+    <meta property="og:image" content="https://desapangkah.com/static/image/logo_ico.png">
+    <meta property="og:url" content="https://desapangkah.com">
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Sistem Informasi Desa Pangkah",
+        "url": "http://www.desapangkah.com",
+        "logo": "http://www.desapangkah.com/static/image/logo_ico.png",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "email": "pemdespangkah@gmail.com",
+          "contactType": "customer service"
+        }
       }
-      </script>
+    </script>
     {% block head %}{% endblock %}
   </head>
 

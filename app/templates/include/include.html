@@ -1,91 +1,77 @@
 {% if session['jwt_token'] %}
-    <!-- Jika jwt_token ada -->
-
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
-  <head>
+<head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="keywords" content="wrappixel, admin dashboard, html css dashboard, web dashboard, bootstrap 5 admin, bootstrap 5, css3 dashboard, bootstrap 5 dashboard, FlexileDash bootstrap dashboard admin bootstrap 5 dashboard, frontend, responsive bootstrap 5 admin template, material design, FlexileDash bootstrap 5 dashboard template" />
-    <meta name="description" content="FlexileDash is powerful and clean admin dashboard template" />
-    <meta name="robots" content="noindex,nofollow" />
     <title>Admin Desa Pangkah</title>
-    <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="../../static/image/logo_ico.png" />
-    <!-- Side Bar -->
     <link rel="stylesheet" type="text/css" href="../../static/assets/extra-libs/css-chart/css-chart.css" />
-    <!-- Ck Editor -->
     <link rel="stylesheet" type="text/css" href="../../static/assets/libs/quill/dist/quill.snow.css" />
-    <!-- fix ck editor -->
-    <style>
-      .ql-align-right{
-        text-align:right;
-      }
-      .ql-align-left{
-        text-align:left;
-      }
-      .ql-align-center{
-        text-align:center
-      }
-      .ql-align-justify{
-        text-align:justify
-      }     
-      .rata-kiri-mobile{
-        text-align:right!important;
-      }
-      @media (max-width: 640px) {
-        .rata-kiri-mobile{
-          text-align:left!important;
-        }
-        .btn-info{
-          margin-top:5px;
-          margin-bottom:5px;
-        }
-      }
-    </style>
-    <!-- Table -->
-    <link href="../../static/assets/extra-libs/datatables.net-bs4/css/dataTables.bootstrap4.css" rel="stylesheet">  
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="../../static/assets/libs/apexcharts/dist/apexcharts.css" />
     <link href="../../static/dist/css/style.min.css" rel="stylesheet" />
+    <link href="../../static/assets/extra-libs/datatables.net-bs4/css/dataTables.bootstrap4.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../static/assets/libs/apexcharts/dist/apexcharts.css" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <style>
+      .ql-align-right { text-align: right; }
+      .ql-align-left { text-align: left; }
+      .ql-align-center { text-align: center; }
+      .ql-align-justify { text-align: justify; }
+      .rata-kiri-mobile { text-align: right !important; }
+      @media (max-width: 640px) { .rata-kiri-mobile { text-align: left !important; } .btn-info { margin-top: 5px; margin-bottom: 5px; } }
+      .table-responsive { overflow-x: scroll; cursor: grab; padding-bottom: 20px; }
+      .table-responsive:active { cursor: grabbing; }
+      .table-responsive::-webkit-scrollbar { height: 10px; }
+      .table-responsive::-webkit-scrollbar-thumb { background-color: #888; border-radius: 10px; }
+      .table-responsive::-webkit-scrollbar-track { background-color: #f1f1f1; }
+      .table-responsive { scrollbar-color: #888 #f1f1f1; scrollbar-width: thin; }
+    </style>
+    
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="../../static/assets/libs/jquery/dist/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <script src="../../static/assets/extra-libs/taskboard/js/jquery-ui.min.js"></script>
-    <?xml version="1.0" encoding="UTF-8"?>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" ></script>
+    <script src="../../static/assets/libs/jquery/dist/jquery.min.js" ></script>
+    
+    <!-- jQuery UI -->
+    <script src="../../static/assets/extra-libs/taskboard/js/jquery-ui.min.js" ></script>
+    
+    <!-- SEO Meta Tags -->
     <meta name="description" content="Tentang Desa Pangkah: Desa Pangkah merupakan desa yang memberi pelayanan publik secara cepat dan efisien. Dengan mengedepankan pelayanan dan pengolahan data berbasis IT, Desa Pangkah diharapkan dapat berkembang menjadi yang lebih maju dalam berbagai aspek baik itu SDM, Kesehatan, Kesejahteraan dan Ekonomi. Dengan Portal Desa Digital semua pelayanan menjadi lebih baik.">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="Sistem Informasi Desa Pangkah">
     <meta property="og:description" content="Tentang Desa Pangkah: Desa Pangkah merupakan desa yang memberi pelayanan publik secara cepat dan efisien. Dengan mengedepankan pelayanan dan pengolahan data berbasis IT, Desa Pangkah diharapkan dapat berkembang menjadi yang lebih maju dalam berbagai aspek baik itu SDM, Kesehatan, Kesejahteraan dan Ekonomi. Dengan Portal Desa Digital semua pelayanan menjadi lebih baik.">
     <meta property="og:image" content="https://desapangkah.com/static/image/logo_ico.png">
     <meta property="og:url" content="https://desapangkah.com">
+    
+    <!-- JSON-LD Schema.org -->
     <script type="application/ld+json">
-       {
+      {
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "Sistem Informasi Desa Pangkah",
         "url": "http://www.desapangkah.com",
         "logo": "http://www.desapangkah.com/static/image/logo_ico.png",
         "contactPoint": {
-            "@type": "ContactPoint",
-            "email": "pemdespangkah@gmail.com",
-            "contactType": "customer service"
+          "@type": "ContactPoint",
+          "email": "pemdespangkah@gmail.com",
+          "contactType": "customer service"
         }
-    }
+      }
     </script>
-    <script src="../../static/dist/js/app.min.js"></script>
-    <script src="../../static/dist/js/app.init.stylish.js"></script>
-    <script src="../../static/dist/js/app-style-switcher.js"></script>
+    
+    <!-- App Scripts -->
+    <script src="../../static/dist/js/app.min.js" ></script>
+    <script src="../../static/dist/js/app.init.stylish.js" ></script>
+    <script src="../../static/dist/js/app-style-switcher.js" ></script>
+    
     {% block head %}{% endblock %}
-  </head>
+</head>
   <body>
     <div id="main-wrapper">
       <header class="topbar">
@@ -97,10 +83,7 @@
               href="javascript:void(0)"
               ><i class="ri-close-line ri-menu-2-line fs-6"></i
             ></a>
-            <!-- ============================================================== -->
-            <!-- Logo -->
-            <!-- ============================================================== -->
-
+            
             <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
             <!-- Dark Logo icon -->
 
