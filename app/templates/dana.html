@@ -16,6 +16,25 @@
   background-color: #b0b0b0!important; /* Warna sedikit lebih gelap saat di-hover */
 }
 </style>
+<script>
+    function upload_nota(year, category, id,nama_nota){
+        $("#tahun_nota").val(year);
+        $("#kategori_nota").val(category);
+        $("#id_nota").val(id);
+        console.log(nama_nota)
+        if(nama_nota == ""){
+            var pesan = "Tidak Ada Nota / Bukti"
+            $("#nama_nota").html(pesan);
+            $("#nama_nota").show();
+        }
+        else{
+          var pesan = "Nota / Bukti bisa dilihat disini <a target='_blank' href='/static/nota/"+nama_nota+"'>"+nama_nota+"</a>"
+          $("#nama_nota").html(pesan);
+          $("#nama_nota").show();
+        }
+        $("#bs-nota-modal-x2").modal('show'); 
+      }
+</script>
 {% endblock %}
 {% block content %}
 <div class="page-titles">
@@ -53,6 +72,7 @@
                               <th >Realisasi</th>
                               <th >Lebih/(Kurang)</th>
                               <th >Tahun</th>
+                              <th >Nota/Bukti</th>
                             </tr>
                         </thead>
                             {% for j in urutan_pendapatan[tahun] %}
@@ -65,6 +85,9 @@
                                 <td>{{i.realisasi}}</td>
                                 <td>{{i['lebih/(kurang)']}}</td>
                                 <td>{{i.tahun}}</td>
+                                <td>
+                                    <button onclick="upload_nota({{i.tahun}},'pendapatan',{{i.id}},'{{i.nota}}')" class="btn btn-success">Lihat Nota / Bukti</button>
+                                </td>              
                             </tr>
                             {% endif %}
                             {% endfor %}
@@ -95,6 +118,7 @@
                               <th >Realisasi</th>
                               <th >Lebih/(Kurang)</th>
                               <th >Tahun</th>
+                              <th >Nota/Bukti</th>
                             </tr>
                             </thead>
                             {% for j in urutan_belanja[tahun] %}
@@ -107,6 +131,9 @@
                                 <td>{{i.realisasi}}</td>
                                 <td>{{i['lebih/(kurang)']}}</td>
                                 <td>{{i.tahun}}</td>
+                                <td>
+                                    <button onclick="upload_nota({{i.tahun}},'pendapatan',{{i.id}},'{{i.nota}}')" class="btn btn-success">Lihat Nota / Bukti</button>
+                                </td>     
                             </tr>
                             {% endif %}
                             {% endfor %}
@@ -136,6 +163,7 @@
                               <th >Realisasi</th>
                               <th >Lebih/(Kurang)</th>
                               <th >Tahun</th>
+                              <th >Nota/Bukti</th>
                             </tr>
                         </thead>
                             {% for j in urutan_pembiayaan[tahun] %}
@@ -148,6 +176,9 @@
                                 <td>{{i.realisasi}}</td>
                                 <td>{{i['lebih/(kurang)']}}</td>
                                 <td>{{i.tahun}}</td>
+                                <td>
+                                    <button onclick="upload_nota({{i.tahun}},'pendapatan',{{i.id}},'{{i.nota}}')" class="btn btn-success">Lihat Nota / Bukti</button>
+                                </td>     
                             </tr>
                             {% endif %}
                             {% endfor %}
@@ -191,7 +222,27 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
+<!-- Modal upload nota  -->
+<div class="modal fade" id="bs-nota-modal-x2" tabindex="-1" aria-labelledby="bs-nota-modal-lg" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header d-flex align-items-center">
+          <h4 class="modal-title" id="myLargeModalLabel">Upload Nota</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <span id="nama_nota" class="mt-2"></span>
+          <input type="hidden" id="tahun_nota">
+          <input type="hidden" id="kategori_nota">
+          <input type="hidden" id="id_nota">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
     </div>
 </div>
 {% endblock %}
