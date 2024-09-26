@@ -56,6 +56,50 @@
       }
     );
   }
+  function tambahRab(category,tahun) {
+    showModal(
+      'Tambah Rab',
+      `<input type="hidden" id="tahun_rab" value="${tahun}">
+       <input type="hidden" id="kategori_rab" value="${category}">
+       <div class="form-group"><label for="rab">Upload File Excell RAB</label><input type="file" id="upload_excell_rab" class="form-control"></div>
+       `,
+       function() {
+        handleAjax(
+          '/admin/dana/tambah/rab',
+          'POST',
+          {
+            tahun: $("#tahun_rab").val(),
+            kategori: $("#kategori_rab").val(),
+            rab: $("#upload_excell_rab").val()
+          },
+          function(response) { console.log(response)},
+          function(xhr, status, error) { console.error("Error:", error); }
+        );
+       }
+      );
+  }
+  function tambahSummary(category,tahun) {
+    showModal(
+      'Tambah Summary',
+      `<input type="hidden" id="tahun_summary" value="${tahun}">
+       <input type="hidden" id="kategori_summary" value="${category}">
+       <div class="form-group"><label for="summary">Summary / Informasi inti dari data ini </label><input type="text" id="summary" class="form-control"></div>
+       `,
+       function() {
+        handleAjax(
+          '/admin/dana/tambah/summary',
+          'POST',
+          {
+            tahun: $("#tahun_summary").val(),
+            kategori: $("#kategori_summary").val(),
+            summary: $("#summary").val()
+          },
+          function(response) { console.log(response)},
+          function(xhr, status, error) { console.error("Error:", error); }
+        );
+       }
+      );
+  }
   function upload_nota(tahun,category,id,nota) {
     const pesan = nota ? `file sudah ada bisa dilihat disini <a target='_blank' href='/static/nota/${nota}'>${nota}</a>` : "";
     showModal(
@@ -151,7 +195,7 @@
     </div>
     <div class="col-lg-4 col-md-6 d-md-flex align-items-center justify-content-end">
       <a href="javascript:void(0)" class="btn btn-danger d-flex align-items-center ms-2" data-bs-toggle="modal" data-bs-target="#bs-example-modal-x2">Hapus Tahun</a>
-      <a href="javascript:void(0)" class="btn btn-info d-flex align-items-center ms-2" data-bs-toggle="modal" data-bs-target="#bs-urutan-modal-xl">
+      <a href="javascript:void(0)" class="btn btn-secondary d-flex align-items-center ms-2" data-bs-toggle="modal" data-bs-target="#bs-urutan-modal-xl">
         <i class="ri-add-line me-1"></i> Ubah Urutan
       </a>
       <a href="javascript:void(0)" class="btn btn-info d-flex align-items-center ms-2" data-bs-toggle="modal" data-bs-target="#bs-example-modal-xl">
@@ -193,6 +237,8 @@
               {% if info %}
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <h6 class="mb-0">Realisasi {{category}}</h6>
+                <a href="javascript:void(0)" class="btn btn-info" onclick="tambahRab('{{category.lower()}}', {{h.tahun}})">Tambah RAB</a>
+                <a href="javascript:void(0)" class="btn btn-info" onclick="tambahSummary('{{category.lower()}}', {{h.tahun}})">Tambah Summary</a>
                 <a href="javascript:void(0)" class="btn btn-info" onclick="tambahBaris('{{category.lower()}}', {{h.tahun}})">Tambah Baris</a>
               </div>
               

@@ -114,6 +114,8 @@ def insert_data_from_dataframe(df, table):
     for index, row in df.iterrows():
         sql = f"INSERT INTO {table} (no, uraian, anggaran, realisasi, `lebih/(kurang)`, tahun) VALUES (%s, %s, %s, %s, %s, %s)"
         print(row['lebih/(kurang)'])
+        if row['no'] == 'Z' or row['no'] == 'Y':
+            row['no'] = ""
         g.con.execute(sql, (row['no'], row['uraian'], str(format_currency(row['anggaran'])), str(format_currency(row['realisasi'])), str(format_currency(row['lebih/(kurang)'])), row['thn']))
     mysql.connection.commit()
 fields_mono = [
@@ -306,7 +308,10 @@ def set_urutan(column, years):
     for year in years:
         g.con.execute(f"SELECT {column} FROM urutan WHERE tahun = %s", (year["tahun"],))
         result= g.con.fetchone()
-        if result:
+        if result[0]=="":
+            urutan = set_urutan_default(column)
+            print(urutan)
+        else:
             try:
                 urutan.update(json.loads(str(result[0]).replace("'", '"')))
             except json.JSONDecodeError:
@@ -323,7 +328,6 @@ def admindana():
                            urutan_pendapatan=set_urutan("pendapatan", thn), 
                            urutan_belanja=set_urutan("belanja", thn), 
                            urutan_pembiayaan=set_urutan("pembiayaan", thn))
-
 
 @app.route('/admin/dana/ubah_urutan', methods=['PUT'])
 @jwt_required()
@@ -577,6 +581,7 @@ def tambah_dana():
     if filependapatan and allowed_file(filependapatan.filename):
         df_pendapatan = pd.read_excel(filependapatan)
         insert_data_from_dataframe(df_pendapatan, "realisasi_pendapatan")
+        
     else:
         return jsonify({"error_pendapatan": "File 'excellpendapatan' bukan berkas Excel (.xlsx)"})
 
@@ -589,11 +594,25 @@ def tambah_dana():
     if filepembiayaan and allowed_file(filepembiayaan.filename):
         df_pembiayaan = pd.read_excel(filepembiayaan)
         insert_data_from_dataframe(df_pembiayaan, "realisasi_pembiayaan")
+        thn = df_pembiayaan.iloc[0]['thn']  # Misalnya baris pertama
+        sql = "INSERT INTO urutan(tahun) VALUES (%s)"
+        g.con.execute(sql, (thn,))
+        mysql.connection.commit()
     else:
         return jsonify({"error_pembiayaan": "File 'excellpembiayaan' bukan berkas Excel (.xlsx)"})
 
     return jsonify({"msg":"SUKSES"})
 
+@app.route('/admin/dana/rab', methods=['POST'])
+@jwt_required()
+def tambah_rab():
+    return "blabla"
+
+@app.route('/admin/dana/summary', methods=['POST'])
+@jwt_required()
+def tambah_summary():
+    return "blabla"
+   
 #geografi
 @app.route('/admin/geografi')
 def admingeo():

@@ -34,6 +34,20 @@
         }
         $("#bs-nota-modal-x2").modal('show'); 
       }
+      function modal_rab(year,kategori,summary){
+        var judul= "RAB "+kategori+" "+year
+        $("#myLargeModalLabel").html(judul)
+        $("#nama_nota").html(summary);
+        $("#nama_nota").show();
+        $("#bs-nota-modal-x2").modal('show'); 
+      }
+      function modal_summary(year,kategori,summary){
+        var judul= "Summary "+kategori+" "+year
+        $("#myLargeModalLabel").html(judul)
+        $("#nama_nota").html(summary);
+        $("#nama_nota").show();
+        $("#bs-nota-modal-x2").modal('show'); 
+      }
 </script>
 {% endblock %}
 {% block content %}
@@ -57,7 +71,11 @@
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-header">
-                    <h1 class="mb-0 fw-bold">Realisasi Pendapatan</h1>
+                    <div class="d-flex justify-between ">
+                    <h1 class="mb-0 fw-bold mr-3">Realisasi Pendapatan</h1>
+                    <button type="button" class="btn btn-info mr-3" onclick="modal_rab('{{tahun}}','Pendapatan','blabla')">RAB</button>
+                    <button type="button" class="btn btn-warning mr-3" onclick="modal_summary('{{tahun}}','Pendapatan','intinya semua dana yang masuk sudah di gunakan secara efisien')">Summary</button>
+                    </div>
                 </div>
                     <div class="card-body">
                         <small>Realisasi pendapatan desa merujuk pada saat pendapatan desa benar-benar terjadi atau tercatat. Ini mencakup semua sumber pendapatan desa, seperti pajak, dana alokasi, dan sumbangan, yang telah diterima dalam bentuk dana tunai yang dapat digunakan untuk membiayai kegiatan desa.</small><br><br>
@@ -102,7 +120,11 @@
             </div>
             <div class="card">
             <div class="card-header">
-                <h1 class="mb-0 fw-bold">Realisasi Belanja</h1>
+                <div class="d-flex justify-between ">
+                <h1 class="mb-0 fw-bold mr-3">Realisasi Belanja</h1>
+                <button type="button" class="btn btn-info mr-3" onclick="modal_rab('{{tahun}}','Belanja','blabla')">RAB</button>
+                <button type="button" class="btn btn-warning mr-3" onclick="modal_summary('{{tahun}}','Belanja','intinya semua dana yang masuk sudah di gunakan secara efisien')">Summary</button>
+                </div>
             </div>
                 <div class="card-body">
                     <small>Realisasi belanja merujuk pada penggunaan dana atau sumber pembiayaan yang telah disetujui atau dialokasikan untuk membiayai pengeluaran atau belanja yang dilakukan oleh pemerintah desa. Ini mencakup semua pengeluaran yang sebenarnya telah terjadi atau tercatat dalam laporan keuangan desa selama periode tertentu. Realisasi belanja ini mencakup berbagai jenis pengeluaran, seperti pembelian barang, pembayaran gaji pegawai, pembangunan infrastruktur, dan lain sebagainya. </small><br><br>
@@ -148,7 +170,11 @@
             </div>
             <div class="card">
             <div class="card-header">
-                <h1 class="mb-0 fw-bold">Realisasi Pembiayaan</h1>
+                <div class="d-flex justify-between ">
+                <h1 class="mb-0 fw-bold mr-3">Realisasi Pembiayaan</h1>
+                <button type="button" class="btn btn-info mr-3" onclick="modal_rab('{{tahun}}','Pembiayaan','blabla')">RAB</button>
+                <button type="button" class="btn btn-warning mr-3" onclick="modal_summary('{{tahun}}','Pembiayaan','intinya semua dana yang masuk sudah di gunakan secara efisien')">Summary</button>
+                </div>
             </div>
                 <div class="card-body">
                     <small>Realisasi pembiayaan adalah saat dana atau sumber pembiayaan yang telah disetujui atau dijanjikan benar-benar tersedia atau digunakan oleh desa untuk mendukung kegiatan atau proyek tertentu. Ini bisa berupa dana hibah, pinjaman, atau sumber pembiayaan lainnya yang telah dicairkan atau digunakan secara efektif oleh pemerintah desa sesuai dengan peruntukannya</small><br><br>
