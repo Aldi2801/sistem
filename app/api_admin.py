@@ -326,6 +326,7 @@ def admindana():
     info_list2 = fetch_data_and_format("SELECT * FROM realisasi_belanja ORDER BY id")
     info_list3 = fetch_data_and_format("SELECT * FROM realisasi_pembiayaan ORDER BY id")
     thn = fetch_years("SELECT tahun FROM urutan GROUP BY tahun")
+    print(info_list,info_list2, info_list3,thn)
     return render_template("admin/dana_new.html",info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn, 
                            urutan_pendapatan=set_urutan("pendapatan", thn), 
                            urutan_belanja=set_urutan("belanja", thn), 
