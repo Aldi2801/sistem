@@ -479,37 +479,54 @@ def insert_or_update_urutan(new_id, kategori, tahun_baru):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/admin/dana/tambah/tahun', methods=['POST'])
+@jwt_required()
+def tambah_tahun_dana():
+    tahun = request.form['tahun']
+
+    thn = fetch_years("SELECT tahun FROM urutan GROUP BY tahun")
+    if tahun not in thn :
+        g.con.execute(f"INSERT INTO urutan (tahun) VALUES (%s, )", (tahun, ))
+        g.con.connection.commit()
+        return jsonify({"msg":"SUKSES"})
+    else:
+        return jsonify({"msg":"Maaf Tahun sudah ada"}),500
 @app.route('/admin/dana/tambah/id', methods=['POST'])
 @jwt_required()
 def tambah_id_dana():
-    tahun_lama = request.json.get('tahun_lama')
-    tahun_baru = request.json.get('tahun_baru')
-    kategori = request.json.get("kategori")
-    no = request.json.get('no')
-    uraian = request.json.get('uraian')
-    anggaran = request.json.get('anggaran')
-    realisasi = request.json.get('realisasi')
-    lebih_kurang = request.json.get('lebih_kurang')
-    rab = request.json.get('rab')
-    print(f"tahun_lama: {tahun_lama}, tahun_baru: {tahun_baru}, kategori: {kategori}, no: {no}, uraian: {uraian}, anggaran: {anggaran}, realisasi: {realisasi}, lebih_kurang: {lebih_kurang}, rab: {rab}")
-
+    data = request.json
+    tahun_lama, tahun_baru = data.get('tahun_lama'), data.get('tahun_baru')
+    kategori, no, uraian, anggaran = data.get("kategori"), data.get('no'), data.get('uraian'), data.get('anggaran')
+    realisasi, lebih_kurang, rab = data.get('realisasi'), data.get('lebih_kurang'), data.get('rab')
     try:
-        if rab == 0:
-            g.con.execute(f"INSERT INTO realisasi_{kategori} (no, uraian, anggaran, realisasi, `lebih/(kurang)`, tahun,rab) VALUES (%s, %s, %s, %s, %s, %s, %s)", (no, uraian, anggaran, realisasi, lebih_kurang, tahun_baru, rab))
-            new_id = g.con.lastrowid
-            g.con.connection.commit()
-            insert_or_update_urutan(new_id,kategori,tahun_baru)
-        else:
-            g.con.execute(f"INSERT INTO realisasi_{kategori} (no, uraian, anggaran, realisasi, `lebih/(kurang)`, tahun,`rab`,jumlah) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (no, uraian, anggaran, realisasi, lebih_kurang, tahun_lama, rab, tahun_baru))
-            new_id = g.con.lastrowid
-            g.con.connection.commit()
-            insert_or_update_urutan(new_id,kategori,tahun_lama)
-        
+        def insert_data(tahun, rab_val, new_tahun=None):
+            query = f"INSERT INTO realisasi_{kategori} (no, uraian, anggaran, realisasi, `lebih/(kurang)`, tahun, rab" + (", jumlah)" if new_tahun else ")") + " VALUES (%s, %s, %s, %s, %s, %s, %s" + (", %s)" if new_tahun else ")")
+            params = (no, uraian, anggaran, realisasi, lebih_kurang, tahun, rab_val) + ((new_tahun,) if new_tahun else ())
+            g.con.execute(query, params)
+            return g.con.lastrowid
+        def update_urutan(tahun, new_id):
+            if '.' in no:
+                ids = no.split('.')
+                g.con.execute(f"SELECT no FROM realisasi_{kategori} WHERE no = %s", (ids[0],))
+                parent_id = g.con.fetchone()
+                if parent_id:
+                    parent_id = parent_id['no']
+                    g.con.execute(f"SELECT {kategori} FROM urutan WHERE tahun = %s", (tahun,))
+                    list_id = g.con.fetchone()[tahun]
+                    for idx, item in enumerate(list_id):
+                        if item['id'] == parent_id:
+                            list_id.insert(idx + 1, {'id': new_id})
+                            g.con.execute(f"UPDATE urutan SET {kategori} = %s WHERE tahun = %s", (list_id, tahun))
+                            break
+        new_id = insert_data(tahun_baru if rab == 0 else tahun_lama, rab, tahun_baru if rab != 0 else None)
+        g.con.connection.commit()
+        insert_or_update_urutan(new_id, kategori, tahun_baru if rab == 0 else tahun_lama)
+        update_urutan(tahun_baru if rab == 0 else tahun_lama, new_id)
         return jsonify({"msg": "SUKSES"})
     except Exception as e:
         print(str(e))
         return jsonify({"error": str(e)}), 500
-
+    
 @app.route('/admin/dana/edit/id', methods=['PUT'])
 @jwt_required()
 def edit_id_dana():

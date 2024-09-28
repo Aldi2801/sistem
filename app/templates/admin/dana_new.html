@@ -392,32 +392,14 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <span class="mb-2">Keterangan: Download dan edit 3 file Excel .xlsx <a href='https://drive.google.com/drive/folders/1PxN3Lb0oBcfA61zQUto5pxG2IAyuhwSO?usp=sharing'>di sini</a> dan upload ke form di bawah</span>
-        <h4>Input Excel Realisasi Pendapatan</h4>
+        <!-- <span class="mb-2">Keterangan: Download dan edit 3 file Excel .xlsx <a href='https://drive.google.com/drive/folders/1PxN3Lb0oBcfA61zQUto5pxG2IAyuhwSO?usp=sharing'>di sini</a> dan upload ke form di bawah</span>
+        <h4>Input Excel Realisasi Pendapatan</h4> -->
         <form>
           <div class="input-group mb-3">
             <div class="custom-file">
-              <input class="form-control" type="file" id="formpendapatan" />
+              <input class="form-control" type="number" min="1000" max="9999" id="formtahun" />
             </div>      
-            {% if error_pendapatan %} <div style="color: red;"> {{ error_pendapatan }} </div> {% endif %}
-          </div>
-        </form>
-        <h4>Input Excel Realisasi Belanja</h4>
-        <form>
-          <div class="input-group mb-3">
-            <div class="custom-file">
-              <input class="form-control" type="file" id="formbelanja" />
-            </div>
-            {% if error_belanja %} <div style="color: red;"> {{ error_belanja }} </div> {% endif %}
-          </div>
-        </form>
-        <h4>Input Excel Realisasi Pembiayaan</h4>
-        <form>
-          <div class="input-group mb-3">
-            <div class="custom-file">
-              <input class="form-control" type="file" id="formpembiayaan" />
-            </div>
-            {% if error_pembiayaan %} <div style="color: red;"> {{ error_pembiayaan }} </div> {% endif %}
+            {% if error_tahun %} <div style="color: red;"> {{ error_tahun }} </div> {% endif %}
           </div>
         </form>
       </div>
@@ -709,16 +691,19 @@
     });
 
     $("#tambah").on("click", function() {
-      var excellpendapatan = $('#formpendapatan')[0].files[0];
-      var excellbelanja = $('#formbelanja')[0].files[0];
-      var excellpembiayaan = $('#formpembiayaan')[0].files[0];
+      //var excellpendapatan = $('#formpendapatan')[0].files[0];
+      //var excellbelanja = $('#formbelanja')[0].files[0];
+      //var excellpembiayaan = $('#formpembiayaan')[0].files[0];
+      var tahun = $('#formtahun').val();
       var formData = new FormData();
-      formData.append('excellpendapatan', excellpendapatan);
-      formData.append('excellbelanja', excellbelanja);
-      formData.append('excellpembiayaan', excellpembiayaan);
+      formData.append('tahun',tahun);
+      //formData.append('excellpendapatan', excellpendapatan);
+      //formData.append('excellbelanja', excellbelanja);
+      //formData.append('excellpembiayaan', excellpembiayaan);
       $("#tambah").html("Loading ...");
       $.ajax({
-        url: "/admin/tambah_dana",
+        //url: "/admin/tambah_dana",
+        url: "/admin/dana/tambah/tahun",
         data: formData,
         cache: false,
         contentType: false,
@@ -728,8 +713,9 @@
           'Authorization': 'Bearer ' + token
         },
         success: function(data) {
-          handleResponse(data, "tambah", "/admin/dana");
-        }
+          handleResponse(data, "tambah tahun dana", "/admin/dana");
+        },
+        error: function(xhr, status, error) { console.log(xhr,status,error);  }
       });
       event.preventDefault();
     });
