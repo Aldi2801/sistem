@@ -49,9 +49,43 @@
             anggaran: $('#anggaran_baris').val(),
             realisasi: $('#realisasi_baris').val(),
             lebih_kurang: $('#lebih_kurang_baris').val(),
-            tahun_baru: $('#tahun_baru_baris').val()
+            tahun_baru: $('#tahun_baru_baris').val(),
+            rab:0
           },
-          function(response) { console.log(response)},
+          function(response) {  window.location.reload()},
+          function(xhr, status, error) { console.error("Error:", error); }
+        );
+      }
+    );
+  }
+    function tambahBaris2(category,tahun_lama) {
+    showModal(
+      'Tambah Baris',
+      `
+       <input type="hidden" id="tahun_lama_baris" value="${tahun_lama}">
+       <input type="hidden" id="kategori_baris" value="${category}">
+       <div class="form-group"><label for="no">No</label><input type="text" id="no_baris" class="form-control"></div>
+       <div class="form-group"><label for="uraian">Uraian</label><input type="text" id="uraian_baris" class="form-control"></div>
+       <div class="form-group"><label for="anggaran">Volume</label><input type="text" id="anggaran_baris" class="form-control"></div>
+       <div class="form-group"><label for="realisasi">Satuan</label><input type="text" id="realisasi_baris" class="form-control"></div>
+       <div class="form-group"><label for="lebih_kurang">Harga Satuan (Rp)</label><input type="text" id="lebih_kurang_baris" class="form-control"></div>
+       <div class="form-group"><label for="tahun_baru">Jumlah (Rp)</label><input type="text" id="tahun_baru_baris" class="form-control"></div>`,
+       function() {
+        handleAjax(
+          '/admin/dana/tambah/id',
+          'POST',
+          {
+            tahun_lama: $("#tahun_lama_baris").val(),
+            kategori: $("#kategori_baris").val(),
+            no: $("#no_baris").val(),
+            uraian: $('#uraian_baris').val(),
+            anggaran: $('#anggaran_baris').val(),
+            realisasi: $('#realisasi_baris').val(),
+            lebih_kurang: $('#lebih_kurang_baris').val(),
+            tahun_baru: $('#tahun_baru_baris').val(),
+            rab:1
+          },
+          function(response) {  window.location.reload()},
           function(xhr, status, error) { console.error("Error:", error); }
         );
       }
@@ -98,7 +132,7 @@
             kategori: $("#kategori_summary").val(),
             summary: $("#summary").val()
           },
-          function(response) { console.log(response)},
+          function(response) {  window.location.reload()},
           function(xhr, status, error) { console.error("Error:", error); }
         );
        }
@@ -241,7 +275,7 @@
               {% if info %}
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <h6 class="mb-0">Realisasi {{category}}</h6>
-                <a href="javascript:void(0)" class="btn btn-info" onclick="tambahRab('{{category.lower()}}', {{h.tahun}})">Tambah RAB</a>
+                <a href="javascript:void(0)" class="btn btn-info" onclick="tambahBaris2('{{category.lower()}}', {{h.tahun}})">Tambah RAB</a>
                 <a href="javascript:void(0)" class="btn btn-info" onclick="tambahSummary('{{category.lower()}}', {{h.tahun}})">Tambah Summary</a>
                 <a href="javascript:void(0)" class="btn btn-info" onclick="tambahBaris('{{category.lower()}}', {{h.tahun}})">Tambah Baris</a>
               </div>
@@ -262,20 +296,30 @@
                 <tbody>
                   {% for j in order[h.tahun] %}
                   {% for i in info %}
-                    {% if h.tahun == i.tahun and j.id|string == i.id|string %}
-                  <tr class="{{i.class}}" id="{{i.detail}}" onclick="{{i.onclick}}" title="{{ 'klik untuk melihat detail' if i.class|string == 'clickable-row' }}">
+                  {% if h.tahun == i.tahun and j.id|string == i.id|string %}
+                  {% set modified_onclick = i.onclick %}
+                  {% if i.punya_rab == 1 %} {% set modified_onclick = i.onclick.replace("')", "") + ',' + i.detail + '-rab' + "')"%} {% endif %}
+                  <tr class="{{ i.class }}" id="{{ i.detail }}" onclick="{{ modified_onclick }}" title="{{ 'klik untuk melihat detail' if i.class == 'clickable-row' }}">
                     <td>{{ i.no }}</td>
                     <td>{{ i.uraian }}</td>
                     <td>{{ i.anggaran }}</td>
                     <td>{{ i.realisasi }}</td>
-                    <td>{{  (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency  }}</td>
-                    <td>{{ i.tahun }}</td>
+                    {% if i.rab == 0 %}
+                      <td>{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency  }}</td>
+                      <td>{{ i.tahun }}</td>
+                    {% else %} 
+                      <td>{{ i["lebih/(kurang)"]  }}</td>
+                      <td>{{ i.Jumlah }}</td>
+                    {% endif %}
                     <td>
                       <button onclick="upload_nota({{h.tahun}},'{{category.lower()}}',{{i.id}},'{{i.nota}}')" class="btn btn-success">nota</button>
                       <button onclick="edit({{h.tahun}},'{{category.lower()}}',{{i.id}},{{i.no}}, '{{i.uraian}}', '{{i.anggaran}}', '{{i.realisasi}}', '{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}', {{i.tahun}})" class="btn btn-warning">edit</button>
                       <button onclick="hapus({{h.tahun}},'{{category.lower()}}',{{i.id}})" class="btn btn-danger">hapus</button>
                     </td>
                   </tr>
+                  {% if i.punya_rab == 1 %}
+                  <tr class="hidden-row" id="{{i.detail}}-rab" title="{{ 'data di bawah adalah rincian rab' }}"><td>No</td><td>Uraian</td><td>Volume</td><td>Satuan</td><td>Harga Satuan (Rp)</td><td>Jumlah (Rp)</td><td>Aksi</td></tr>
+                  {% endif %}
                   {% endif %}
                   {% endfor %}
                   {% endfor %}
@@ -412,18 +456,19 @@
             <div id="table_{{h.tahun}}">
               <h4 id="welcome_{{h.tahun}}" class="toggle-hide">Dana Desa Tahun {{h.tahun}}</h4>
               <div class="all">
-                {% for type, info_list in [('1', info_list), ('2', info_list2), ('3', info_list3)] %}
+                {% for type, info_list in [('1', info_list), ('2', info_list2), ('3', info_list3)],order in categories %}
                   {% if info_list %}
                     <h6 id="welcome_{{h.tahun}}_{{type}}" class="toggle-hide">
                       {% if type == '1' %}Realisasi Pendapatan{% elif type == '2' %}Realisasi Belanja{% else %}Realisasi Pembiayaan{% endif %}
                     </h6>
                     <div class="myadmin-dd-empty dd text-black toggle-hide" style="max-width:none;" id="nestable_{{h.tahun}}_{{type}}">
                       <ol class="dd-list">
-                        {% for i in info_list %}
-                          {% if h.tahun == i.tahun %}
+                          {% for j in order[h.tahun] %}
+                          {% for i in info %}
+                          {% if h.tahun == i.tahun and j.id|string == i.id|string %}
                             {% if i.class|string == "hidden-row" %}
                             {% else %}
-                            <li class="dd-item dd3-item col-12" data-id="{{ h.tahun }}-{{ 'pendapatan' if type == '1' else 'belanja' if type == '2' else 'pembiayaan' }}-{{i.id}}" style="max-width:none;">
+                            <li class="dd-item dd3-item col-12" data-id="{{ h.tahun }}-{{ 'pendapatan' if type == '1' else 'belanja' if type == '2' else 'pembiayaan' }}-{{i.id}}-{{i.rab}}" style="max-width:none;">
                               {% if i.class|string == "clickable-row" %}
                                 <button data-action="expand" type="button">Expand</button>
                               {% endif %} 
@@ -435,8 +480,13 @@
                                     <td>{{ i.uraian }}</td>
                                     <td>{{ i.anggaran }}</td>
                                     <td>{{ i.realisasi }}</td>
-                                    <td>{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency   }}</td>
-                                    <td>{{ i.tahun }}</td>
+                                    {% if i.rab == 0 %}
+                                      <td>{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency  }}</td>
+                                      <td>{{ i.tahun }}</td>
+                                    {% else %} 
+                                      <td>{{ i["lebih/(kurang)"]  }}</td>
+                                      <td>{{ i.Jumlah }}</td>
+                                    {% endif %}
                                   </tr>
                                 </table>
                               </div>
@@ -448,7 +498,7 @@
                                 {% for part in parts %}
                                   {% for j in info_list %}
                                   {% if j.id == part.split('-')[-1]  %}
-                                    <li class="dd-item dd3-item col-12" data-id="{{ h.tahun }}-{{ 'pendapatan' if type == '1' else 'belanja' if type == '2' else 'pembiayaan' }}-{{j.id}}" style="max-width:none;">
+                                    <li class="dd-item dd3-item col-12" data-id="{{ h.tahun }}-{{ 'pendapatan' if type == '1' else 'belanja' if type == '2' else 'pembiayaan' }}-{{j.id}}-{{ j.rab }}" style="max-width:none;">
                                       <div class="dd-handle dd3-handle"></div>
                                       <div class="dd3-content">
                                         <table>
@@ -457,14 +507,20 @@
                                             <td>{{ j.uraian }}</td>
                                             <td>{{ j.anggaran }}</td>
                                             <td>{{ j.realisasi }}</td>
-                                            <td>{{  (j.anggaran | clean_currency - j.realisasi | clean_currency) | format_currency  }}</td>
-                                            <td>{{ j.tahun }}</td>
+                                            {% if j.rab == 0 %}
+                                              <td>{{ (j.anggaran | clean_currency - j.realisasi | clean_currency) | format_currency  }}</td>
+                                              <td>{{ j.tahun }}</td>
+                                            {% else %} 
+                                              <td>{{ i["lebih/(kurang)"]  }}</td>
+                                              <td>{{ j.Jumlah }}</td>
+                                            {% endif %}
                                           </tr>
                                         </table>
                                       </div>
                                     </li>
                                     {% endif %}
                                     {% endfor %}
+                                  {% endfor %}
                                   {% endfor %}
                                   </ol>
                                   {% endif %}

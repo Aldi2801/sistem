@@ -340,17 +340,23 @@ def ubah_urutan_dana():
 
     def update_children(data):
         children_list = []
+        rab_list = []  # Variabel untuk menyimpan rab
+
         for i in data:
-            year, tabel, child_id = str(i['id']).split('-')
+            year, tabel, child_id, rab = str(i['id']).split('-')
             g.con.execute(f"UPDATE realisasi_{tabel} SET class = 'hidden-row', detail = %s, onclick = '' WHERE id = %s AND tahun = %s",
-                          (f"{year}-{tabel}-{child_id}", child_id, year))
+                        (f"{year}-{tabel}-{child_id}", child_id, year))
+            
             children_list.append({"id": child_id})
-        return children_list
+            rab_list.append(rab)  # Tambahkan rab ke rab_list
+
+        # Kembalikan kedua data secara terpisah
+        return {"children": children_list, "rab": rab_list}
 
     def update_urutan(data):
         urutan_baru = {}
         for i in data:
-            tahun, tabel, id_ = str(i['id']).split('-')
+            tahun, tabel, id_, rab = str(i['id']).split('-')
             entry = {"id": id_}
             
             # Update untuk parent
@@ -361,12 +367,18 @@ def ubah_urutan_dana():
             
             # Tambahkan children jika ada
             if 'children' in i:
-                g.con.execute(f"UPDATE realisasi_{tabel} SET class = 'clickable-row', detail = '', onclick = %s WHERE id = %s AND tahun = %s",
-                              (f"toggleDetails('{','.join([str(j['id']) for j in i['children']])}')", id_, tahun))
-                
                 # Dapatkan daftar children dan tambahkan mereka ke dalam urutan_baru setelah parent
                 children_data = update_children(i['children'])
-                urutan_baru.setdefault(tahun, []).extend(children_data)
+                rab_children = children_data['rab']  # Ambil data rab
+                children = children_data['children']  # Ambil data children
+                if '1' in rab_children: 
+                    g.con.execute(f"UPDATE realisasi_{tabel} SET class = 'clickable-row', detail = '', onclick = %s, punya_rab = %s WHERE id = %s AND tahun = %s",
+                              ( f"toggleDetails('{','.join([str(j['id']) for j in i['children']][:-1])}')", 1, id_, tahun))
+                else:
+                    g.con.execute(f"UPDATE realisasi_{tabel} SET class = 'clickable-row', detail = '', onclick = %s WHERE id = %s AND tahun = %s",
+                              ( f"toggleDetails('{','.join([str(j['id']) for j in i['children']][:-1])}')", id_, tahun))
+                
+                urutan_baru.setdefault(tahun, []).extend(children)
         
         print(urutan_baru)
         mysql.connection.commit()
@@ -392,7 +404,7 @@ def ubah_urutan_dana():
         mysql.connection.commit()
 
     for i in data_json:
-        _, tabel, id_ = str(i['id']).split('-')
+        _, tabel, id_,rab = str(i['id']).split('-')
         urutan = update_urutan(data_json)
         update_database(tabel, urutan, init_tahun)
 
@@ -477,17 +489,21 @@ def tambah_id_dana():
     anggaran = request.json.get('anggaran')
     realisasi = request.json.get('realisasi')
     lebih_kurang = request.json.get('lebih_kurang')
-    
+    rab = request.json.get('rab')
+    print(f"tahun_lama: {tahun_lama}, tahun_baru: {tahun_baru}, kategori: {kategori}, no: {no}, uraian: {uraian}, anggaran: {anggaran}, realisasi: {realisasi}, lebih_kurang: {lebih_kurang}, rab: {rab}")
+
     try:
-        # Menyisipkan data
-        g.con.execute(f"INSERT INTO realisasi_{kategori} (no, uraian, anggaran, realisasi, `lebih/(kurang)`, tahun) VALUES (%s, %s, %s, %s, %s, %s)", (no, uraian, anggaran, realisasi, lebih_kurang, tahun_baru))
+        if rab == 0:
+            g.con.execute(f"INSERT INTO realisasi_{kategori} (no, uraian, anggaran, realisasi, `lebih/(kurang)`, tahun,rab) VALUES (%s, %s, %s, %s, %s, %s, %s)", (no, uraian, anggaran, realisasi, lebih_kurang, tahun_baru, rab))
+            new_id = g.con.lastrowid
+            g.con.connection.commit()
+            insert_or_update_urutan(new_id,kategori,tahun_baru)
+        else:
+            g.con.execute(f"INSERT INTO realisasi_{kategori} (no, uraian, anggaran, realisasi, `lebih/(kurang)`, tahun,`rab`,jumlah) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (no, uraian, anggaran, realisasi, lebih_kurang, tahun_lama, rab, tahun_baru))
+            new_id = g.con.lastrowid
+            g.con.connection.commit()
+            insert_or_update_urutan(new_id,kategori,tahun_lama)
         
-        # Mendapatkan ID dari baris yang baru diinsert
-        new_id = g.con.lastrowid
-        
-        # Commit perubahan
-        g.con.connection.commit()
-        insert_or_update_urutan(new_id,kategori,tahun_baru)
         return jsonify({"msg": "SUKSES"})
     except Exception as e:
         print(str(e))
