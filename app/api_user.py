@@ -247,3 +247,6 @@ def bpd():
     list_info = fetch_data_and_format("SELECT * FROM bpd")
     sorted_list_info = sorted(list_info, key=lambda x: urutan_jabatan.index(x['jabatan']) if x['jabatan'] in urutan_jabatan else len(urutan_jabatan))
     return render_template('bpd.html', list_info=sorted_list_info)
+@app.route('/coba_excell')
+def coba_excell():
+    return render_template('coba_excell.html')

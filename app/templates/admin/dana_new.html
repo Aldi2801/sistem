@@ -5,6 +5,7 @@
 .clickable-row { cursor: pointer; transition: background-color 0.3s ease; }
 .clickable-row:hover { text-decoration: underline; background-color: #b0b0b0; }
 </style>
+<script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
 <script>
   function handleAjax(url, method, data, onSuccess, onError) {
     $.ajax({
@@ -61,21 +62,24 @@
       'Tambah Rab',
       `<input type="hidden" id="tahun_rab" value="${tahun}">
        <input type="hidden" id="kategori_rab" value="${category}">
-       <div class="form-group"><label for="rab">Upload File Excell RAB</label><input type="file" id="upload_excell_rab" class="form-control"></div>
+       <div class="form-group"><label for="rab">Upload File Excell RAB</label><input type="file" id="file_rab" class="form-control"></div>
        `,
-       function() {
-        handleAjax(
-          '/admin/dana/tambah/rab',
-          'POST',
-          {
-            tahun: $("#tahun_rab").val(),
-            kategori: $("#kategori_rab").val(),
-            rab: $("#upload_excell_rab").val()
-          },
-          function(response) { console.log(response)},
-          function(xhr, status, error) { console.error("Error:", error); }
-        );
-       }
+      function() {
+        const formData = new FormData();
+        formData.append('file_rab', document.getElementById('file_rab').files[0]);
+        formData.append('tahun', $("#tahun_rab").val());
+        formData.append('kategori', $("#kategori_rab").val());
+        $.ajax({
+          url: '/admin/dana/tambah/rab',
+          method: 'POST',
+          data: formData,
+          contentType: false,
+          processData: false,
+          headers: { 'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}" },
+          success: function() { window.location.reload(); },
+          error: function(xhr, status, error) { console.error("Error:", error); }
+        });
+      }
       );
   }
   function tambahSummary(category,tahun) {
@@ -264,11 +268,11 @@
                     <td>{{ i.uraian }}</td>
                     <td>{{ i.anggaran }}</td>
                     <td>{{ i.realisasi }}</td>
-                    <td>{{ i['lebih/(kurang)'] }}</td>
+                    <td>{{  (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency  }}</td>
                     <td>{{ i.tahun }}</td>
                     <td>
                       <button onclick="upload_nota({{h.tahun}},'{{category.lower()}}',{{i.id}},'{{i.nota}}')" class="btn btn-success">nota</button>
-                      <button onclick="edit({{h.tahun}},'{{category.lower()}}',{{i.id}},{{i.no}}, '{{i.uraian}}', '{{i.anggaran}}', '{{i.realisasi}}', '{{i['lebih/(kurang)']}}', {{i.tahun}})" class="btn btn-warning">edit</button>
+                      <button onclick="edit({{h.tahun}},'{{category.lower()}}',{{i.id}},{{i.no}}, '{{i.uraian}}', '{{i.anggaran}}', '{{i.realisasi}}', '{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}', {{i.tahun}})" class="btn btn-warning">edit</button>
                       <button onclick="hapus({{h.tahun}},'{{category.lower()}}',{{i.id}})" class="btn btn-danger">hapus</button>
                     </td>
                   </tr>
@@ -394,8 +398,9 @@
       </div>
       <div class="modal-body">
         <select class="form-control" id="yearDropdown">
-          <option value="2022">2022</option>
-          <option value="2023">2023</option>
+          {% for i in tahun %}
+            <option value="{{i.tahun}}">{{i.tahun}}</option>
+          {% endfor %}
         </select>
         <select class="form-control mt-2 mb-2" id="numberDropdown">
           <option value="1">Pendapatan</option>
@@ -416,10 +421,12 @@
                       <ol class="dd-list">
                         {% for i in info_list %}
                           {% if h.tahun == i.tahun %}
+                            {% if i.class|string == "hidden-row" %}
+                            {% else %}
                             <li class="dd-item dd3-item col-12" data-id="{{ h.tahun }}-{{ 'pendapatan' if type == '1' else 'belanja' if type == '2' else 'pembiayaan' }}-{{i.id}}" style="max-width:none;">
                               {% if i.class|string == "clickable-row" %}
                                 <button data-action="expand" type="button">Expand</button>
-                              {% endif %}
+                              {% endif %} 
                               <div class="dd-handle dd3-handle"></div>
                               <div class="dd3-content">
                                 <table>
@@ -428,31 +435,41 @@
                                     <td>{{ i.uraian }}</td>
                                     <td>{{ i.anggaran }}</td>
                                     <td>{{ i.realisasi }}</td>
-                                    <td>{{ i['lebih/(kurang)'] }}</td>
+                                    <td>{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency   }}</td>
                                     <td>{{ i.tahun }}</td>
                                   </tr>
                                 </table>
                               </div>
-                              {% if i.class == "hidden-row" %}
+                                {% if i.class|string == "clickable-row" %}
                                 <ol class="dd-list">
-                                  <li class="dd-item dd3-item col-12" data-id="{{ h.tahun }}-{{ 'pendapatan' if type == '1' else 'belanja' if type == '2' else 'pembiayaan' }}-{{i.id}}" style="max-width:none;">
-                                    <div class="dd-handle dd3-handle"></div>
-                                    <div class="dd3-content">
-                                      <table>
-                                        <tr>
-                                          <td>{{ i.no }}</td>
-                                          <td>{{ i.uraian }}</td>
-                                          <td>{{ i.anggaran }}</td>
-                                          <td>{{ i.realisasi }}</td>
-                                          <td>{{ i['lebih/(kurang)'] }}</td>
-                                          <td>{{ i.tahun }}</td>
-                                        </tr>
-                                      </table>
-                                    </div>
-                                  </li>
-                                </ol>
-                              {% endif %}
+                                {% set id_str = i.onclick %}
+                                {% set raw_ids = id_str.split('(')[1].replace("toggleDetails('", "").replace("')", "") %}
+                                {% set parts = raw_ids.split(',') %}
+                                {% for part in parts %}
+                                  {% for j in info_list %}
+                                  {% if j.id == part.split('-')[-1]  %}
+                                    <li class="dd-item dd3-item col-12" data-id="{{ h.tahun }}-{{ 'pendapatan' if type == '1' else 'belanja' if type == '2' else 'pembiayaan' }}-{{j.id}}" style="max-width:none;">
+                                      <div class="dd-handle dd3-handle"></div>
+                                      <div class="dd3-content">
+                                        <table>
+                                          <tr>
+                                            <td>{{ j.no }}</td>
+                                            <td>{{ j.uraian }}</td>
+                                            <td>{{ j.anggaran }}</td>
+                                            <td>{{ j.realisasi }}</td>
+                                            <td>{{  (j.anggaran | clean_currency - j.realisasi | clean_currency) | format_currency  }}</td>
+                                            <td>{{ j.tahun }}</td>
+                                          </tr>
+                                        </table>
+                                      </div>
+                                    </li>
+                                    {% endif %}
+                                    {% endfor %}
+                                  {% endfor %}
+                                  </ol>
+                                  {% endif %}
                             </li>
+                          {% endif %}
                           {% endif %}
                         {% endfor %}
                       </ol>

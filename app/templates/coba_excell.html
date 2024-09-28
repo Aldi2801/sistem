@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Excel with Formulas</title>
+  <!-- Handsontable CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    #spreadsheet {
+      width: 100%;
+      height: 500px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Online Excel-like Spreadsheet</h1>
+  <div id="spreadsheet"></div>
+
+  <!-- Handsontable JS -->
+  <script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
+  <!-- HyperFormula JS (for formula support) -->
+  <script src="https://cdn.jsdelivr.net/npm/hyperformula@1.1.2/dist/hyperformula.full.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Create an instance of HyperFormula for formula evaluation
+      const hyperformula = HyperFormula.buildEmpty({
+        licenseKey: 'internal-use-in-handsontable'
+      });
+
+      // Initialize Handsontable with formula support
+      const container = document.getElementById('spreadsheet');
+      const hot = new Handsontable(container, {
+        data: Handsontable.helper.createSpreadsheetData(10, 10), // Create 10x10 table
+        rowHeaders: true,
+        colHeaders: true,
+        formulas: {
+          engine: hyperformula
+        },
+        licenseKey: 'non-commercial-and-evaluation' // License key for Handsontable
+      });
+    });
+  </script>
+
+</body>
+</html>

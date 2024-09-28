@@ -291,6 +291,11 @@ def hapus_berita():
 def format_currency(value):
     locale.setlocale(locale.LC_ALL, 'id_ID.UTF-8')
     return locale.currency(value, grouping=True, symbol='Rp')
+@app.template_filter('clean_currency')
+def clean_currency(value):
+    """Remove 'Rp', dots, commas, and any spaces, then convert to integer"""
+    cleaned_value = value.replace('Rp', '').replace('RP', '').replace('.', '').replace(',', '').strip()
+    return int(cleaned_value)
 
 def set_urutan_default(info_list):
     urutan = {}
@@ -308,10 +313,7 @@ def set_urutan(column, years):
     for year in years:
         g.con.execute(f"SELECT {column} FROM urutan WHERE tahun = %s", (year["tahun"],))
         result= g.con.fetchone()
-        if result[0]=="":
-            urutan = set_urutan_default(column)
-            print(urutan)
-        else:
+        if result:
             try:
                 urutan.update(json.loads(str(result[0]).replace("'", '"')))
             except json.JSONDecodeError:
@@ -606,11 +608,21 @@ def tambah_dana():
 @app.route('/admin/dana/rab', methods=['POST'])
 @jwt_required()
 def tambah_rab():
+    filerab = request.files['file_rab']
+    if filerab and allowed_file(filerab.filename):
+        df_rab = pd.read_excel(filerab)
+        for index, row in df_rab.iterrows():
+            sql = f"INSERT INTO rab (content,kategori , tahun) VALUES (%s, %s, %s,)"
+            if row['no'] == 'Z' or row['no'] == 'Y':
+                row['no'] = ""
+            g.con.execute(sql, (row['no'], row['uraian'], str(format_currency(row['anggaran'])), str(format_currency(row['realisasi'])), str(format_currency(row['lebih/(kurang)'])), row['thn']))
+    mysql.connection.commit()
     return "blabla"
 
 @app.route('/admin/dana/summary', methods=['POST'])
 @jwt_required()
 def tambah_summary():
+    summary = request.json.get("summary")
     return "blabla"
    
 #geografi
