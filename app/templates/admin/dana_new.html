@@ -58,21 +58,51 @@
       }
     );
   }
+ function ubahLabel() {
+    const isRab = document.querySelector('input[name="rab"]:checked').value;
+    const label1 = document.getElementById('label1');
+    const label2 = document.getElementById('label2');
+    const label3 = document.getElementById('label3');
+    const label4 = document.getElementById('label4');
+    const rab = document.getElementById('rab');
+    
+    if (isRab === 'yes') {
+        label1.textContent = "Volume";
+        label2.textContent = "Satuan";
+        label3.textContent = "Harga Satuan (Rp)";
+        label4.textContent = "Jumlah (Rp)";
+        rab.value = 1; // Set value 1 jika Yes dipilih
+    } else {
+        label1.textContent = "Anggaran";
+        label2.textContent = "Realisasi";
+        label3.textContent = "Lebih/(Kurang)";
+        label4.textContent = "Tahun";
+        rab.value = 0; // Set value 0 jika No dipilih
+    }
+    console.log("rab value: ", rab.value); // Tambahkan untuk debug
+}
+
     function tambahBaris2(category,tahun_lama) {
     showModal(
       'Tambah Baris',
       `
        <input type="hidden" id="tahun_lama_baris" value="${tahun_lama}">
        <input type="hidden" id="kategori_baris" value="${category}">
+       <input type="hidden" id="rab" >
+       <input type="hidden" id="parent_id" >
+       <div class="form-group"><label id="tanya" for="tanya">Apakah ini Data RAB?</label>
+        <div class="form-check"> <input class="form-check-input" type="radio" name="rab" id="rab-ya" value="yes" checked onchange="ubahLabel()"> <label class="form-check-label" for="rab-ya">Ya</label> </div>
+        <div class="form-check"> <input class="form-check-input" type="radio" name="rab" id="rab-tidak" value="no" onchange="ubahLabel()"> <label class="form-check-label" for="rab-tidak">Tidak</label> </div>
+       </div>
        <div class="form-group"><label for="no">No</label><input type="text" id="no_baris" class="form-control"></div>
        <div class="form-group"><label for="uraian">Uraian</label><input type="text" id="uraian_baris" class="form-control"></div>
-       <div class="form-group"><label for="anggaran">Volume</label><input type="text" id="anggaran_baris" class="form-control"></div>
-       <div class="form-group"><label for="realisasi">Satuan</label><input type="text" id="realisasi_baris" class="form-control"></div>
-       <div class="form-group"><label for="lebih_kurang">Harga Satuan (Rp)</label><input type="text" id="lebih_kurang_baris" class="form-control"></div>
-       <div class="form-group"><label for="tahun_baru">Jumlah (Rp)</label><input type="text" id="tahun_baru_baris" class="form-control"></div>`,
+       <div class="form-group"><label id="label1" for="anggaran">Volume</label><input type="text" id="anggaran_baris" class="form-control"></div>
+       <div class="form-group"><label id="label2" for="realisasi">Satuan</label><input type="text" id="realisasi_baris" class="form-control"></div>
+       <div class="form-group"><label id="label3" for="lebih_kurang">Harga Satuan (Rp)</label><input type="text" id="lebih_kurang_baris" class="form-control"></div>
+       <div class="form-group"><label id="label4" for="tahun_baru">Jumlah (Rp)</label><input type="text" id="tahun_baru_baris" class="form-control"></div>`,
        function() {
         handleAjax(
-          '/admin/dana/tambah/id',
+          '/admin/dana/tambah/sub',
           'POST',
           {
             tahun_lama: $("#tahun_lama_baris").val(),
@@ -83,11 +113,17 @@
             realisasi: $('#realisasi_baris').val(),
             lebih_kurang: $('#lebih_kurang_baris').val(),
             tahun_baru: $('#tahun_baru_baris').val(),
-            rab:1
+            rab: document.querySelector('input[name="rab"]:checked').value,
+            parent_id: $('#parent_id').val()
           },
-          function(response) {  window.location.reload()},
-          function(xhr, status, error) { console.error("Error:", error); }
+          function(response) {
+            window.location.reload();
+          },
+          function(xhr, status, error) {
+            console.error("Error:", error);
+          }
         );
+
       }
     );
   }
@@ -275,8 +311,6 @@
               {% if info %}
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <h6 class="mb-0">Realisasi {{category}}</h6>
-                <a href="javascript:void(0)" class="btn btn-info" onclick="tambahBaris2('{{category.lower()}}', {{h.tahun}})">Tambah RAB</a>
-                <a href="javascript:void(0)" class="btn btn-info" onclick="tambahSummary('{{category.lower()}}', {{h.tahun}})">Tambah Summary</a>
                 <a href="javascript:void(0)" class="btn btn-info" onclick="tambahBaris('{{category.lower()}}', {{h.tahun}})">Tambah Baris</a>
               </div>
               
@@ -312,6 +346,7 @@
                       <td>{{ i.Jumlah }}</td>
                     {% endif %}
                     <td>
+                <a href="javascript:void(0)" class="btn btn-info" onclick="tambahBaris2('{{category.lower()}}', {{h.tahun}})">Tambah SUB</a>
                       <button onclick="upload_nota({{h.tahun}},'{{category.lower()}}',{{i.id}},'{{i.nota}}')" class="btn btn-success">nota</button>
                       <button onclick="edit({{h.tahun}},'{{category.lower()}}',{{i.id}},{{i.no}}, '{{i.uraian}}', '{{i.anggaran}}', '{{i.realisasi}}', '{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}', {{i.tahun}})" class="btn btn-warning">edit</button>
                       <button onclick="hapus({{h.tahun}},'{{category.lower()}}',{{i.id}})" class="btn btn-danger">hapus</button>
@@ -395,12 +430,12 @@
         <!-- <span class="mb-2">Keterangan: Download dan edit 3 file Excel .xlsx <a href='https://drive.google.com/drive/folders/1PxN3Lb0oBcfA61zQUto5pxG2IAyuhwSO?usp=sharing'>di sini</a> dan upload ke form di bawah</span>
         <h4>Input Excel Realisasi Pendapatan</h4> -->
         <form>
-          <div class="input-group mb-3">
             <div class="custom-file">
+              <label> Masukan Tahun Baru </label>
               <input class="form-control" type="number" min="1000" max="9999" id="formtahun" />
             </div>      
             {% if error_tahun %} <div style="color: red;"> {{ error_tahun }} </div> {% endif %}
-          </div>
+          
         </form>
       </div>
       <div class="modal-footer">
@@ -714,8 +749,13 @@
         },
         success: function(data) {
           handleResponse(data, "tambah tahun dana", "/admin/dana");
-        },
-        error: function(xhr, status, error) { console.log(xhr,status,error);  }
+        },    
+        error: function(xhr, status, error) {
+          let errorMsg = xhr.responseJSON ? xhr.responseJSON.msg : "Terjadi kesalahan";
+          console.log("Error: ", errorMsg); // Log pesan error
+          alert("Error: "+errorMsg)
+          $("#tambah").html("Submit");
+        }
       });
       event.preventDefault();
     });
