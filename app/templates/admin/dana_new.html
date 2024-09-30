@@ -370,7 +370,7 @@
                     <td>
                 <a href="javascript:void(0)" class="btn btn-info" onclick="tambahBaris2('{{category.lower()}}', {{h.tahun}}, {{ i.id }})">Tambah SUB</a>
                       <button onclick="upload_nota({{h.tahun}},'{{category.lower()}}',{{i.id}},'{{i.nota}}')" class="btn btn-success">nota</button>
-                      <button onclick="edit({{h.tahun}},'{{category.lower()}}',{{i.id}},{{i.no}}, '{{i.uraian}}', '{{i.anggaran}}', '{{i.realisasi}}', '{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}', {{i.tahun}})" class="btn btn-warning">edit</button>
+                      <button onclick="edit({{h.tahun}},'{{category.lower()}}',{{i.id}},'{{i.no}}', '{{i.uraian}}', '{{i.anggaran}}', '{{i.realisasi}}', '{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}', {{i.tahun}})" class="btn btn-warning">edit</button>
                       <button onclick="hapus({{h.tahun}},'{{category.lower()}}',{{i.id}})" class="btn btn-danger">hapus</button>
                     </td>
                   </tr>
