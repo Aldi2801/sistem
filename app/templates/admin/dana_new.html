@@ -354,7 +354,7 @@
                   {% if h.tahun == i.tahun and j.id|string == i.id|string %}
                   {% set modified_onclick = i.onclick %}
                   {% if i.punya_rab == 1 %} {% set modified_onclick = i.onclick.replace("')", "") + ',' + i.detail + '-rab' + "')"%} {% endif %}
-                  {% if i.rab == 0 %} {% set modified_class = i.class+" sub-detail" %} {% else %} {% set modified_class = i.class+" sub-rab" %} {% endif %}
+                  {% if i.class == 'hidden-row' %} {% if i.rab == 0 %} {% set modified_class = i.class+" sub-detail" %} {% else %} {% set modified_class = i.class+" sub-rab" %} {% endif %} {% elif i.class == 'hidden-row clickable-row' %} {% if i.rab == 0 %} {% set modified_class = i.class+" sub-detail" %} {% else %} {% set modified_class = i.class+" sub-rab" %} {% endif %} {% else %} {% set modified_class = i.class+" data-utama" %} {% endif %}
                   <tr class="{{ modified_class }} " id="{{ i.detail }}" onclick="{{ modified_onclick }}" title="{{ 'klik untuk melihat detail' if i.class == 'clickable-row' }}">
                     <td>{{ i.no }}</td>
                     <td>{{ i.uraian }}</td>
