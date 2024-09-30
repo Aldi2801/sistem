@@ -368,11 +368,11 @@ def ubah_urutan_dana():
             if result:
                 class_value, detail_value, onclick_value = result
 
-                # Jika class 'hidden_row', update menjadi 'hidden_row, clickable_row'
-                if class_value == 'hidden_row':
-                    new_class = 'hidden_row, clickable_row'
+                # Jika class 'hidden-row', update menjadi 'hidden-row, clickable-row'
+                if class_value == 'hidden-row':
+                    new_class = 'hidden-row, clickable-row'
                 else:
-                    new_class = 'clickable_row'
+                    new_class = 'clickable-row'
 
                 # Lakukan UPDATE sesuai kondisi
                 g.con.execute(f"UPDATE realisasi_{tabel} SET class = %s, detail = %s, onclick = %s WHERE id = %s AND tahun = %s", 
@@ -390,11 +390,11 @@ def ubah_urutan_dana():
 
                 if '1' in rab_children:
                     onclick_value = f"toggleDetails('{','.join([str(j['id']) for j in i['children']][:-1])}')"
-                    g.con.execute(f"UPDATE realisasi_{tabel} SET class = 'clickable_row', detail = '', onclick = %s, punya_rab = %s WHERE id = %s AND tahun = %s",
+                    g.con.execute(f"UPDATE realisasi_{tabel} SET class = 'clickable-row', detail = '', onclick = %s, punya_rab = %s WHERE id = %s AND tahun = %s",
                                 (onclick_value, 1, id_, tahun))
                 else:
                     onclick_value = f"toggleDetails('{','.join([str(j['id']) for j in i['children']][:-1])}')"
-                    g.con.execute(f"UPDATE realisasi_{tabel} SET class = 'clickable_row', detail = '', onclick = %s WHERE id = %s AND tahun = %s",
+                    g.con.execute(f"UPDATE realisasi_{tabel} SET class = 'clickable-row', detail = '', onclick = %s WHERE id = %s AND tahun = %s",
                                 (onclick_value, id_, tahun))
 
                 urutan_baru.setdefault(tahun, []).extend(children)
@@ -469,43 +469,70 @@ def hapus_urutan_lama(id, kategori, tahun_lama):
         return jsonify({"error": "Invalid JSON format"}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+
 def insert_or_update_urutan(new_id, kategori, tahun_baru, parent_id=None):
     try:
+        print(f"Checking if tahun_baru {tahun_baru} exists in urutan")
         # Cek apakah tahun baru sudah ada
         g.con.execute("SELECT COUNT(*) FROM urutan WHERE tahun = %s", (tahun_baru,))
         tahun_exists = g.con.fetchone()[0] > 0
+        print(f"Tahun exists: {tahun_exists}")
 
         if not tahun_exists:
             # Tahun baru, buat entri baru
             urutan = [{"id": new_id}]
-            g.con.execute("INSERT INTO urutan ({kategori}, tahun) VALUES (%s, %s)", (json.dumps(urutan), tahun_baru))
+            query = f"INSERT INTO urutan ({kategori}, tahun) VALUES (%s, %s)"
+            print(f"Inserting new urutan with query: {query}, params: {urutan}, {tahun_baru}")
+            g.con.execute(query, (json.dumps(urutan), tahun_baru))
         else:
             # Tahun sudah ada, update entri
             g.con.execute(f"SELECT {kategori} FROM urutan WHERE tahun = %s", (tahun_baru,))
             result = g.con.fetchone()
 
+            # Debugging hasil query
+            print(f"Result of urutan fetch: {result}")
+
             if result:
-                urutan = json.loads(result[0].replace("'", '"'))  # Pastikan JSON valid
+                urutan = json.loads(result[0].replace("'", '"'))  # Convert string to JSON
+                print(urutan)
+                # Ambil list dari tahun yang sesuai
+                if tahun_baru in urutan:
+                    id_list = urutan[tahun_baru]  # Ini adalah list yang berisi dict dengan 'id'
+                    print(id_list)
+                    if parent_id:
+                        # Insert setelah parent_id jika ada
+                        for idx, item in enumerate(id_list):
+                            print(idx)
+                            if item['id'] == parent_id:
+                                id_list.insert(idx + 1, {'id': new_id})
+                                break
+                    else:
+                        print(parent_id)
+                        # Tambahkan ke list id
+                        id_list.append({"id": new_id})
+                    
+                    # Simpan perubahan kembali ke urutan
+                    urutan[tahun_baru] = id_list
+                    print(urutan[tahun_baru])
+                    g.con.execute(f"UPDATE urutan SET {kategori} = %s WHERE tahun = %s", (json.dumps(urutan), tahun_baru))
 
-                if parent_id:
-                    # Insert setelah parent_id jika ada
-                    for idx, item in enumerate(urutan):
-                        if item['id'] == parent_id:
-                            urutan.insert(idx + 1, {'id': new_id})
-                            break
                 else:
-                    # Tambahkan ke urutan
-                    urutan.append({"id": new_id})
-
-                # Update database
-                g.con.execute(f"UPDATE urutan SET {kategori} = %s WHERE tahun = %s", (json.dumps(urutan), tahun_baru))
+                    # Jika tahun belum ada, tambahkan tahun dan id baru
+                    urutan[tahun_baru] = [{"id": new_id}]
+                    print(urutan[tahun_baru])
+                    g.con.execute(f"UPDATE urutan SET {kategori} = %s WHERE tahun = %s", (json.dumps(urutan), tahun_baru))
 
         g.con.connection.commit()
+        print(f"Urutan table updated successfully for tahun: {tahun_baru}")
         return jsonify({"msg": "SUKSES"})
 
     except json.JSONDecodeError:
+        print("JSON Decode Error occurred")
         return jsonify({"error": "Invalid JSON format"}), 400
     except Exception as e:
+        print(f"An error occurred: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -561,44 +588,68 @@ def tambah_sub_dana():
     realisasi, lebih_kurang, rab = data.get('realisasi'), data.get('lebih_kurang'), data.get('rab')
     parent_id = data.get('parent_id')
 
-    print(f"tahun_lama: {tahun_lama}, tahun_baru: {tahun_baru}, kategori: {kategori}, no: {no}, uraian: {uraian}, anggaran: {anggaran}, realisasi: {realisasi}, lebih_kurang: {lebih_kurang}, rab: {rab}")
+    # Debugging input data
+    print(f"Input data: {data}")
+    print(f"tahun_lama: {tahun_lama}, tahun_baru: {tahun_baru}, kategori: {kategori}, no: {no}, uraian: {uraian}, anggaran: {anggaran}, realisasi: {realisasi}, lebih_kurang: {lebih_kurang}, rab: {rab}, parent_id: {parent_id}")
 
     # Fungsi untuk insert data ke tabel realisasi
     def insert_data(tahun, rab_val, new_tahun=None):
         query = f"INSERT INTO realisasi_{kategori} (no, uraian, anggaran, realisasi, `lebih/(kurang)`, tahun, rab" + (", jumlah)" if new_tahun else ")") + " VALUES (%s, %s, %s, %s, %s, %s, %s" + (", %s)" if new_tahun else ")")
         params = (no, uraian, anggaran, realisasi, lebih_kurang, tahun, rab_val) + ((new_tahun,) if new_tahun else ())
         
+        # Debugging query insert realisasi
+        print(f"Insert Query: {query}")
+        print(f"Insert Params: {params}")
+
         g.con.execute(query, params)
         new_id = g.con.lastrowid
         detail = ""
 
         mysql.connection.commit()
-        
+        print(f"New ID after insert: {new_id}")
+
         if parent_id:
             detail = f"{tahun}-{kategori}-{new_id}"
-            g.con.execute(f"UPDATE realisasi_{kategori} SET class = 'hidden_row', detail = %s WHERE id = %s", (detail, new_id))
+            update_query = f"UPDATE realisasi_{kategori} SET class = 'hidden-row', detail = %s WHERE id = %s"
+            g.con.execute(update_query, (detail, new_id))
             mysql.connection.commit()
-        
+            print(f"Updated child row with detail: {detail}")
+
         return new_id, detail
 
     # Fungsi untuk update urutan data
     def update_urutan(tahun, new_id, detail):
-        g.con.execute(f"SELECT class, onclick FROM realisasi_{kategori} WHERE no = %s", (parent_id,))
+        g.con.execute(f"SELECT class, onclick FROM realisasi_{kategori} WHERE id = %s", (parent_id,))
         parent = g.con.fetchone()
 
-        if parent_id and parent:
-            parent_onclick = parent['onclick'].replace("')", "")
-            parent_onclick = f"{parent_onclick}{detail}')"
+        # Debugging query hasil
+        print(f"Parent data: {parent}")
 
-            g.con.execute(f"UPDATE realisasi_{kategori} SET class = 'clickable_row', onclick = %s WHERE id = %s", (parent_onclick, parent_id))
+        if parent_id and parent:
+            parent_onclick = parent[1].replace("')", "")
+            if parent[1] == '':
+                parent_onclick = "toggleDetails('" 
+                parent_onclick = f"{parent_onclick}{detail}')"
+            else:
+                parent_onclick = f"{parent_onclick},{detail}')"
+            if parent[0] == "hidden-row":
+               parent_class = "hidden-row clickable-row"
+            else:
+                parent_class = "clickable-row" 
+            g.con.execute(f"UPDATE realisasi_{kategori} SET class = %s, onclick = %s WHERE id = %s", (parent_class, parent_onclick, parent_id))
             mysql.connection.commit()
+            print(f"Updated parent onclick: {parent_onclick}")
 
     # Insert data baru
+    print(f"Inserting data for tahun: {tahun_baru if rab == 0 else tahun_lama}, rab: {rab}")
     new_id, detail = insert_data(tahun_baru if rab == 0 else tahun_lama, rab, tahun_baru if rab != 0 else None)
 
     # Update urutan jika diperlukan
+    print(f"Updating urutan for new_id: {new_id}, detail: {detail}")
     update_urutan(tahun_baru if rab == 0 else tahun_lama, new_id, detail)
-    insert_or_update_urutan(new_id,kategori,tahun_baru)
+
+    print(f"Inserting or updating urutan for tahun_baru: {tahun_baru}")
+    insert_or_update_urutan(new_id, kategori, tahun_lama, parent_id)
 
     return jsonify({"msg": "SUKSES"})
 
