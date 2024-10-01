@@ -303,16 +303,31 @@
                               <tr class="{{ modified_class }}" id="{{ i.detail }}" onclick="{{ modified_onclick }}" title="{{ 'klik untuk melihat detail' if i.class == 'clickable-row' }}">
                                 <td>{{ i.no }}</td>
                                 <td>{{ i.uraian }} </td>
+       
                                 {% if i.rab|int == 0 %}
+                                {% if modified_class == 'data-utama' %}
+                                <td class="anggaran_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.anggaran | clean_currency }}">{{ i.anggaran | clean_currency | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
+                                <td class="realisasi_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.realisasi | clean_currency }}">{{ i.realisasi | clean_currency  | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
+                                <td class="lebih_kurang_{{ category.lower() }}_{{ h.tahun }}" data="{{ i['lebih/(kurang)'] | clean_currency }}">{{ i["lebih/(kurang)"] | clean_currency  | format_currency}}</td> <!-- Contoh, sesuaikan dengan data Anda -->
+                                <td>{{ i.tahun }}</td>
+                                {% else %} 
                                   <td>{{ i.anggaran if i.anggaran else info[i.id-1].anggaran }}</td>
                                   <td id="{{ 'punya_rab' if i.punya_rab|int == 1 }}">{{ i.realisasi }}</td>
                                   <td>{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}</td>
                                   <td>{{ i.tahun }}</td>
+                                {% endif %}
                                 {% else %}
+                                {% if modified_class == 'data-utama' %}
+                                <td class="anggaran_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.anggaran | clean_currency }}">{{ i.anggaran | clean_currency | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
+                                <td class="realisasi_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.realisasi | clean_currency }}">{{ i.realisasi | clean_currency  | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
+                                <td class="lebih_kurang_{{ category.lower() }}_{{ h.tahun }}" data="{{ i['lebih/(kurang)'] | clean_currency }}">{{ i["lebih/(kurang)"] | clean_currency  | format_currency}}</td> <!-- Contoh, sesuaikan dengan data Anda -->
+                                <td>{{ i.tahun }}</td>
+                                {% else %} 
                                   <td>{{ i.anggaran }}</td>
                                   <td>{{ i.realisasi }}</td>
                                   <td>{{ i["lebih/(kurang)"] }}</td>
                                   <td id="total_rab_{{ i.id }}_{{ h.tahun }}">{{ (i["lebih/(kurang)"] | clean_currency * i.anggaran | clean_currency) | format_currency }}</td>
+                                {% endif %}
                                 {% endif %}
                                 <td>
                                   <a href="javascript:void(0)" class="btn btn-info" onclick="tambahBaris2('{{ category.lower() }}', {{ h.tahun }}, {{ i.id }})">Tambah SUB</a>
@@ -322,7 +337,7 @@
                                 </td>
                               </tr>
                               {% if i.punya_rab|int == 1 %}
-                                <tr class="head-sub-rab hidden-row" id="{{ i.detail }}-rab" title="{{ 'data di bawah adalah rincian rab' }}">
+                                <tr class="head-sub-rab hidden-row"  style="border: 2px solid black;"  id="{{ i.detail }}-rab" title="{{ 'data di bawah adalah rincian rab' }}">
                                   <td>No</td>
                                   <td>Uraian</td>
                                   <td>Volume</td>
@@ -352,10 +367,46 @@
                               {% endif %}
                             {% endif %}
                           {% endfor %}
+                          
                         {% endfor %}
-                      </tbody>
-                    </table>
-                  </div>
+                        <tr class="jumlah" id="JUMLAH_PENDAPATAN_{{ h.tahun }}">
+                            <td></td>
+                            <td><strong>JUMLAH PENDAPATAN</strong></td>
+                            <td id="jml_anggaran_{{ category.lower() }}_{{ h.tahun }}"></td>
+                            <td id="jml_realisasi_{{ category.lower() }}_{{ h.tahun }}"></td>
+                            <td id="jml_lebih_kurang_{{ category.lower() }}_{{ h.tahun }}"></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+<script>
+   function formatNumber(number) {
+        // Mengubah angka menjadi string dan memisahkan bagian desimal
+        var parts = number.toString().split(".");
+        // Memformat bagian ribuan dengan titik
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        // Mengembalikan string yang diformat dengan koma sebagai desimal
+        return parts.join(","); 
+    }
+    function calculateTotal(className) {
+        var elements = document.querySelectorAll('.' + className);
+        var total = 0;
+        elements.forEach(function(element) {
+            var value = parseFloat(element.getAttribute('data')) || 0; // Mengambil nilai dan konversi ke float
+            total += value; // Menambahkan nilai ke total
+        });
+        total = formatNumber(total.toFixed(2))
+        return "Rp"+total; // Mengembalikan total dengan 2 desimal
+    }
+    var totalAnggaran = calculateTotal('anggaran_{{ category.lower() }}_{{ h.tahun }}');
+    document.getElementById("jml_anggaran_{{ category.lower() }}_{{ h.tahun }}").textContent = totalAnggaran;
+    var totalRealisasi = calculateTotal('realisasi_{{ category.lower() }}_{{ h.tahun }}');
+    document.getElementById("jml_realisasi_{{ category.lower() }}_{{ h.tahun }}").textContent = totalRealisasi;
+    var totalLebihKurang = calculateTotal('lebih_kurang_{{ category.lower() }}_{{ h.tahun }}');
+    document.getElementById("jml_lebih_kurang_{{ category.lower() }}_{{ h.tahun }}").textContent = totalLebihKurang;
+</script>
+</div>
                 {% endif %}
               {% endfor %}
             </div>
@@ -578,6 +629,18 @@ function toggleDetails(ids) {
         element.style.display = "table-row";
       } else {
         element.style.display = "none";
+           if (element.classList.contains('clickable-row')) {
+            console.log("Elemen ini memiliki kelas 'clickable-row'.");
+            var list_id = element.getAttribute("onclick");
+            list_id = list_id.replace("toggleDetails('","")
+            list_id = list_id.replace("')","")
+            list_id = list_id.split(',')
+            console.log(list_id)
+            list_id.forEach(function(id){
+            var element_child = document.getElementById(id.trim());
+            if (element_child) { element_child.style.display = "none" } 
+            });
+        } 
       }
     } else {
       // Jika elemen tidak ditemukan, log pesan atau biarkan saja
