@@ -215,12 +215,16 @@
     }
     function calculateTotal(className) {
         var elements = document.querySelectorAll('.' + className);
+        console.log(elements)
         var total = 0;
         elements.forEach(function(element) {
+          console.log(element)
             var value = parseFloat(element.getAttribute('data')) || 0; // Mengambil nilai dan konversi ke float
+            console.log(value)
             total += value; // Menambahkan nilai ke total
         });
         total = formatNumber(total.toFixed(2))
+
         return "Rp"+total; // Mengembalikan total dengan 2 desimal
     }
 </script>
@@ -271,6 +275,7 @@
           </div>
         </div>
         <div class="card-body">
+          {% set jml_realisasi = 0 %}  {# Inisialisasi jml_realisasi sebagai 0 #}
           {% for h in tahun %}
             <div id="table_{{ h.tahun }}"class="mt-3">
               <h4>Dana Desa Tahun {{ h.tahun }}</h4>
@@ -305,10 +310,17 @@
                               {% if i.punya_rab|int == 1 %}
                                 <script> var parent_punya_rab = "{{ i.detail }}" 
                                 </script>
-                                {% set a = i.onclick | replace("toggleDetails('", "") %}
-                                {% set b = a | replace("')", "") %}
-                                {% set modified_onclick = i.onclick | replace("')", "") + ',' + i.detail + '-rab,' + b + "-total-jumlah-rab')" %}
+                              {% set a = i.onclick | replace("toggleDetails('", "") | replace("')", "") %}
+
+                              {% if ',' in a %}
+                                  {% set parts = a.split(",") %}
+                                  {% set b = parts[-1] %}
+                                  {% set modified_onclick = i.onclick | replace("')", "") + ',' + i.detail + '-rab,' + b + "-total-jumlah-rab')" %}
+                              {% else %}
+                                  {% set modified_onclick = i.onclick | replace("')", "") + ',' + i.detail + '-rab,' + a + "-total-jumlah-rab')" %}
+                                  
                               {% endif %}
+  {% endif %}
                               {% set modified_class = i.class %}
                               {% if i.class == 'hidden-row' %}
                                 {% set modified_class = modified_class + ' sub-detail' if i.rab == 0 else modified_class + ' sub-rab' %}
@@ -322,20 +334,57 @@
                               {% else %}
                                 {% set modified_class = 'data-utama' %}
                               {% endif %}
-                              <tr class="{{ modified_class }}" id="{{ i.detail }}" onclick="{{ modified_onclick }}" title="{{ 'klik untuk melihat detail' if i.class == 'clickable-row' }}">
+                              <tr class="{{ modified_class }}" id="{{ i.detail }}" onclick="{{ modified_onclick }}"style="{{ 'border-left: 2px solid black; border-right: 2px solid black;' if i.rab|int == 1 }}" title="{{ 'klik untuk melihat detail' if i.class == 'clickable-row' }}">
                                 <td>{{ i.no }}</td>
                                 <td>{{ i.uraian }} </td>
-       
+                               
                                 {% if i.rab|int == 0 %}
                                 {% if modified_class == 'data-utama' %}
                                 <td class="anggaran_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.anggaran | clean_currency }}">{{ i.anggaran | clean_currency | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
-                                <td class="realisasi_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.realisasi | clean_currency }}">{{ i.realisasi | clean_currency  | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
+                                <td class="realisasi_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.realisasi | clean_currency }}">{{ i.realisasi | clean_currency  | format_currency  }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
+                                <td class="lebih_kurang_{{ category.lower() }}_{{ h.tahun }}" data="{{ i['lebih/(kurang)'] | clean_currency }}">{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}
+                                <td>{{ i.tahun }}</td>
+                                {% elif modified_class == 'clickable-row data-utama' %}
+                                  <td class="anggaran_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.anggaran | clean_currency }}">{{ i.anggaran | clean_currency | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
+                                <td class="realisasi_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.realisasi | clean_currency }}">{{ i.realisasi | clean_currency  | format_currency  }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
                                 <td class="lebih_kurang_{{ category.lower() }}_{{ h.tahun }}" data="{{ i['lebih/(kurang)'] | clean_currency }}">{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}
                                 <td>{{ i.tahun }}</td>
                                 {% else %} 
                                   <td>{{ i.anggaran  | clean_currency | format_currency }}</td>
-                                  <td >{{ i.realisasi  | clean_currency | format_currency  }}</td>
-                                  <td>{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}</td>
+                              {% if i.punya_rab|int == 1 %}
+                                {% set a = i.onclick | replace("toggleDetails('", "") | replace("')", "") %}
+
+                              {% if ',' in a %}
+                                  {% set parts = a.split(",") %}
+                                  {% set b = parts[-1] %}
+                                  
+                                  {% for part in parts %}
+                                      {% for k in info %}
+                                          {% if part|string == k.detail|string %}
+                                              {% set jml_realisasi = jml_realisasi + (k["lebih/(kurang)"] | clean_currency * k.anggaran | clean_currency) %}
+                                              {{ 'ketemu' }}
+                                          {% endif %}
+                                      {% endfor %}
+                                  {% endfor %}
+                                  <td>{{ jml_realisasi | format_currency  }}</td>
+                                  <td>{{ (i.anggaran | clean_currency - jml_realisasi ) | format_currency }}</td>
+                              {% else %}
+                                  {% for k in info %}
+                                      {% if a|string == k.detail|string %}
+                                          {% set jml_realisasi = jml_realisasi + (k["lebih/(kurang)"] | clean_currency * k.anggaran | clean_currency) %}
+                                          {{ 'ketemu' }}
+                                          {{ jml_realisasi }}
+                                  <td>{{ jml_realisasi | format_currency  }}</td>
+                                  <td>{{ (i.anggaran | clean_currency - jml_realisasi ) | format_currency }}</td>
+                                      {% endif %}
+                                  {% endfor %}
+                              {% endif %}
+                              {{ jml_realisasi }}
+                                  {% else %}
+                                  <td>{{ i.realisasi |clean_currency | format_currency  }}</td>
+                                  <td>{{ (i.anggaran | clean_currency - i.realisasi | clean_currency ) | format_currency }}</td>
+
+                                  {% endif %}
                                   <td>{{ i.tahun }}</td>
                                 {% endif %}
                                 {% else %}
@@ -345,21 +394,25 @@
                                 <td class="lebih_kurang_{{ category.lower() }}_{{ h.tahun }}" data="{{ i['lebih/(kurang)'] | clean_currency }}">{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
                                 <td>{{ i.tahun }}</td>
                                 {% else %} 
-                                  <td>{{ i.anggaran  | clean_currency | format_currency  }}</td>
-                                  <td>{{ i.realisasi   }}</td>
+                                  <td >{{ i.anggaran  | clean_currency  }}</td>
+                                  <td>{{ i.realisasi  | clean_currency  }}</td>
                                   <td>{{ i["lebih/(kurang)"]  | clean_currency | format_currency  }}</td>
-                                  <td class="total_rab_{{ category.lower() }}_{{ h.tahun }}">{{ (i["lebih/(kurang)"] | clean_currency * i.anggaran | clean_currency) | format_currency }}</td>
+                                  <td class="total_rab_{{ category.lower() }}_{{ h.tahun }}"  data='{{( i["lebih/(kurang)"] | clean_currency * i.anggaran | clean_currency)}}'>{{ (i["lebih/(kurang)"] | clean_currency * i.anggaran | clean_currency) | format_currency }}</td>
                                 {% endif %}
                                 {% endif %}
                                 <td>
-                                  <a href="javascript:void(0)" class="btn btn-info" onclick="tambahBaris2('{{ category.lower() }}', {{ h.tahun }}, {{ i.id }})">Tambah SUB</a>
+                                   {% if i.rab|int == 0 %}<a href="javascript:void(0)" class="btn btn-info" onclick="tambahBaris2('{{ category.lower() }}', {{ h.tahun }}, {{ i.id }})">Tambah SUB</a>{% endif %}
                                   <button onclick="upload_nota({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.nota }}')" class="btn btn-success">Nota</button>
                                   <button onclick="edit({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.no }}', '{{ i.uraian }}', '{{ i.anggaran }}', '{{ i.realisasi }}', '{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}', {{ i.tahun }})" class="btn btn-warning">Edit</button>
                                   <button onclick="hapus({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }})" class="btn btn-danger">Hapus</button>
                                 </td>
                               </tr>
                               {% if i.punya_rab|int == 1 %}
-                                <tr class="head-sub-rab hidden-row"  style="border: 2px solid black;"  id="{{ i.detail }}-rab" title="{{ 'data di bawah adalah rincian rab' }}">
+                                <tr class="head-sub-rab hidden-row"  style="
+  border-top: 2px solid black; 
+  border-left: 2px solid black;
+  border-right: 2px solid black;  
+" id="{{ i.detail }}-rab" title="{{ 'data di bawah adalah rincian rab' }}">
                                   <td>No</td>
                                   <td>Uraian</td>
                                   <td>Volume</td>
@@ -371,13 +424,15 @@
                               {% endif %}
                               
                               {% if i.rab|int == 1 %}
-                              <tr class="hidden-row jumlah" id="{{ i.detail }}-total-jumlah-rab" >
+                              <tr class="hidden-row jumlah" style="
+  border-top: 2px solid black;
+  border-left: 2px solid black;
+  border-right: 2px solid black; 
+  border-bottom: 2px solid black; 
+" id="{{ i.detail }}-total-jumlah-rab" >
                                 <td></td>
-                                <td><strong>Total RAB</strong></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td id="jumlah_total_rab_{{ i.detail }}">{{ (i["lebih/(kurang)"] | clean_currency * i.anggaran | clean_currency) | format_currency }}</td>
+                                <td style="border-left: none;"><strong>Total RAB</strong></td>
+                                <td colspan="4"  id="jumlah_total_rab_{{ i.detail }}">{{ (i["lebih/(kurang)"] | clean_currency * i.anggaran | clean_currency) | format_currency }}</td>
                                 <td></td>
                               </tr>
                               <script>
