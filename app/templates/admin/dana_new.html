@@ -1,14 +1,14 @@
 {% extends 'include/include.html' %}
 {% block head %}
 <style>
-.hidden-row { display: none; background-color: }
+.hidden-row { display: none; }
 .clickable-row { cursor: pointer; transition: background-color 0.3s ease; }
 .clickable-row:hover { text-decoration: underline; background-color: #b0b0b0; }
 .data-utama { background-color: #e6f7ff; /* Biru muda lembut */ color: #000; /* Warna teks hitam */ }
 .sub-detail { background-color: #d9f7be; /* Hijau muda lembut */ color: #000; /* Warna teks hitam */ }
 .sub-rab { background-color: #fffbe6; /* Kuning pastel lembut */ color: #000; /* Warna teks hitam */ }
 .head-sub-rab { background-color: #bae7ff; /* Biru sedikit lebih gelap dari data utama */ color: #000; /* Warna teks hitam */ }
-.jumlah{ background-color: #07c83d;; /* Biru sedikit lebih gelap dari data utama */ color: #000; /* Warna teks hitam */ }
+.jumlah{ background-color: #e7e9f0; ; /* Biru sedikit lebih gelap dari data utama */ color: #000; /* Warna teks hitam */ }
 
 </style>
 <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
@@ -205,6 +205,24 @@
       alert('Aksi penghapusan dibatalkan.');
     }
   }
+     function formatNumber(number) {
+        // Mengubah angka menjadi string dan memisahkan bagian desimal
+        var parts = number.toString().split(".");
+        // Memformat bagian ribuan dengan titik
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        // Mengembalikan string yang diformat dengan koma sebagai desimal
+        return parts.join(","); 
+    }
+    function calculateTotal(className) {
+        var elements = document.querySelectorAll('.' + className);
+        var total = 0;
+        elements.forEach(function(element) {
+            var value = parseFloat(element.getAttribute('data')) || 0; // Mengambil nilai dan konversi ke float
+            total += value; // Menambahkan nilai ke total
+        });
+        total = formatNumber(total.toFixed(2))
+        return "Rp"+total; // Mengembalikan total dengan 2 desimal
+    }
 </script>
 {% endblock %}
 {% block content %}
@@ -268,7 +286,7 @@
 
                   <div class="table-responsive">
                     <table id="table_{{ h.tahun }}_{{ loop.index }}" class="table table-bordered display text-nowrap">
-                      <thead>
+                      <thead style="background-color:#f6f8fb;">
                         <tr>
                           <th>No</th>
                           <th>Uraian</th>
@@ -287,18 +305,22 @@
                               {% if i.punya_rab|int == 1 %}
                                 <script> var parent_punya_rab = "{{ i.detail }}" 
                                 </script>
-                                {% set modified_onclick = i.onclick.replace("')", "") + ',' + i.detail + '-rab'+ ',' + i.detail + '-total-jumlah-rab' + "')"%}
+                                {% set a = i.onclick | replace("toggleDetails('", "") %}
+                                {% set b = a | replace("')", "") %}
+                                {% set modified_onclick = i.onclick | replace("')", "") + ',' + i.detail + '-rab,' + b + "-total-jumlah-rab')" %}
                               {% endif %}
                               {% set modified_class = i.class %}
                               {% if i.class == 'hidden-row' %}
                                 {% set modified_class = modified_class + ' sub-detail' if i.rab == 0 else modified_class + ' sub-rab' %}
                               {% elif i.class == 'hidden-row clickable-row' %}
                                 {% set modified_class = modified_class + ' sub-detail' if i.rab == 0 else modified_class + ' sub-rab' %}
-                                <script> var parent_detail = "{{ i.id }}" 
+                                <script> 
+                                var parent_detail = "{{ i.id }}" 
                                 </script>
+                              {% elif i.class == 'clickable-row' %}
+                                {% set modified_class = 'clickable-row data-utama' %}
                               {% else %}
                                 {% set modified_class = 'data-utama' %}
-                              
                               {% endif %}
                               <tr class="{{ modified_class }}" id="{{ i.detail }}" onclick="{{ modified_onclick }}" title="{{ 'klik untuk melihat detail' if i.class == 'clickable-row' }}">
                                 <td>{{ i.no }}</td>
@@ -308,11 +330,11 @@
                                 {% if modified_class == 'data-utama' %}
                                 <td class="anggaran_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.anggaran | clean_currency }}">{{ i.anggaran | clean_currency | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
                                 <td class="realisasi_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.realisasi | clean_currency }}">{{ i.realisasi | clean_currency  | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
-                                <td class="lebih_kurang_{{ category.lower() }}_{{ h.tahun }}" data="{{ i['lebih/(kurang)'] | clean_currency }}">{{ i["lebih/(kurang)"] | clean_currency  | format_currency}}</td> <!-- Contoh, sesuaikan dengan data Anda -->
+                                <td class="lebih_kurang_{{ category.lower() }}_{{ h.tahun }}" data="{{ i['lebih/(kurang)'] | clean_currency }}">{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}
                                 <td>{{ i.tahun }}</td>
                                 {% else %} 
-                                  <td>{{ i.anggaran if i.anggaran else info[i.id-1].anggaran }}</td>
-                                  <td id="{{ 'punya_rab' if i.punya_rab|int == 1 }}">{{ i.realisasi }}</td>
+                                  <td>{{ i.anggaran  | clean_currency | format_currency }}</td>
+                                  <td >{{ i.realisasi  | clean_currency | format_currency  }}</td>
                                   <td>{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}</td>
                                   <td>{{ i.tahun }}</td>
                                 {% endif %}
@@ -320,13 +342,13 @@
                                 {% if modified_class == 'data-utama' %}
                                 <td class="anggaran_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.anggaran | clean_currency }}">{{ i.anggaran | clean_currency | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
                                 <td class="realisasi_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.realisasi | clean_currency }}">{{ i.realisasi | clean_currency  | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
-                                <td class="lebih_kurang_{{ category.lower() }}_{{ h.tahun }}" data="{{ i['lebih/(kurang)'] | clean_currency }}">{{ i["lebih/(kurang)"] | clean_currency  | format_currency}}</td> <!-- Contoh, sesuaikan dengan data Anda -->
+                                <td class="lebih_kurang_{{ category.lower() }}_{{ h.tahun }}" data="{{ i['lebih/(kurang)'] | clean_currency }}">{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
                                 <td>{{ i.tahun }}</td>
                                 {% else %} 
-                                  <td>{{ i.anggaran }}</td>
-                                  <td>{{ i.realisasi }}</td>
-                                  <td>{{ i["lebih/(kurang)"] }}</td>
-                                  <td id="total_rab_{{ i.id }}_{{ h.tahun }}">{{ (i["lebih/(kurang)"] | clean_currency * i.anggaran | clean_currency) | format_currency }}</td>
+                                  <td>{{ i.anggaran  | clean_currency | format_currency  }}</td>
+                                  <td>{{ i.realisasi   }}</td>
+                                  <td>{{ i["lebih/(kurang)"]  | clean_currency | format_currency  }}</td>
+                                  <td class="total_rab_{{ category.lower() }}_{{ h.tahun }}">{{ (i["lebih/(kurang)"] | clean_currency * i.anggaran | clean_currency) | format_currency }}</td>
                                 {% endif %}
                                 {% endif %}
                                 <td>
@@ -355,14 +377,12 @@
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                <td id="jumlah_total_rab_{{ category.lower() }}_{{ h.tahun }}">{{ (i["lebih/(kurang)"] | clean_currency * i.anggaran | clean_currency) | format_currency }}</td>
+                                <td id="jumlah_total_rab_{{ i.detail }}">{{ (i["lebih/(kurang)"] | clean_currency * i.anggaran | clean_currency) | format_currency }}</td>
                                 <td></td>
                               </tr>
                               <script>
-                                var sebelum = document.getElementById('jumlah_total_rab_{{ category.lower() }}_{{ h.tahun }}').innerHTML;
-                                var sekarang = parseFloat(sebelum) + parseFloat(document.getElementById('total_rab_{{ i.id }}_{{ h.tahun }}').innerHTML);
-                                document.getElementById('jumlah_total_rab_{{ category.lower() }}_{{ h.tahun }}').innerHTML = sekarang.toFixed(2);
-                                document.getElementById(parent_punya_rab).getAttribute('onclick');
+                                var totalRAB = calculateTotal('total_rab_{{ category.lower() }}_{{ h.tahun }}');
+                                document.getElementById("jumlah_total_rab_{{ i.detail }}").textContent = totalRAB;
                               </script>
                               {% endif %}
                             {% endif %}
@@ -381,24 +401,6 @@
                     </tbody>
                 </table>
 <script>
-   function formatNumber(number) {
-        // Mengubah angka menjadi string dan memisahkan bagian desimal
-        var parts = number.toString().split(".");
-        // Memformat bagian ribuan dengan titik
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        // Mengembalikan string yang diformat dengan koma sebagai desimal
-        return parts.join(","); 
-    }
-    function calculateTotal(className) {
-        var elements = document.querySelectorAll('.' + className);
-        var total = 0;
-        elements.forEach(function(element) {
-            var value = parseFloat(element.getAttribute('data')) || 0; // Mengambil nilai dan konversi ke float
-            total += value; // Menambahkan nilai ke total
-        });
-        total = formatNumber(total.toFixed(2))
-        return "Rp"+total; // Mengembalikan total dengan 2 desimal
-    }
     var totalAnggaran = calculateTotal('anggaran_{{ category.lower() }}_{{ h.tahun }}');
     document.getElementById("jml_anggaran_{{ category.lower() }}_{{ h.tahun }}").textContent = totalAnggaran;
     var totalRealisasi = calculateTotal('realisasi_{{ category.lower() }}_{{ h.tahun }}');
