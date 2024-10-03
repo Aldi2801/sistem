@@ -158,7 +158,7 @@
     );
   }
 
-  function edit(tahun_lama, category, id,no, uraian, anggaran, realisasi, lebihKurang,tahun_baru) {
+  function edit(tahun_lama, category, id,no, uraian, anggaran, realisasi, lebihKurang,tahun_baru,rab) {
     showModal(
       'Edit Data',
       `<input type="hidden" id="tahun_lama" value="${tahun_lama}">
@@ -166,10 +166,10 @@
        <input type="hidden" id="id_edit" value="${id}">
        <div class="form-group"><label for="no">No</label><input type="text" id="no_edit" class="form-control"value="${no}"></div>
        <div class="form-group"><label for="uraian">Uraian</label><input type="text" id="uraian" class="form-control" value="${uraian}"></div>
-       <div class="form-group"><label for="anggaran">Anggaran</label><input type="text" id="anggaran" class="form-control" value="${anggaran}"></div>
-       <div class="form-group"><label for="realisasi">Realisasi</label><input type="text" id="realisasi" class="form-control" value="${realisasi}"></div>
-       <div class="form-group"><label for="lebih_kurang">Lebih/(Kurang)</label><input type="text" id="lebih_kurang" class="form-control" value="${lebihKurang}"></div>
-       <div class="form-group"><label for="tahun_baru">Tahun</label><input type="text" id="tahun_baru" class="form-control" value="${tahun_baru}"></div>`,
+       <div class="form-group"><label for="anggaran">${rab === 1 ? 'Volume' : 'Anggaran'}</label><input type="text" id="anggaran" class="form-control" value="${anggaran}"></div>
+       <div class="form-group"><label for="realisasi">${rab === 1 ? 'Satuan' : 'Realisasi'}</label><input type="text" id="realisasi" class="form-control" value="${realisasi}"></div>
+       <div class="form-group"><label for="lebih_kurang">${rab === 1 ? 'Harga Satuan (Rp)' : 'Lebih/(Kurang)'}</label><input type="text" id="lebih_kurang" class="form-control" value="${lebihKurang}"></div>
+       <div class="form-group"><label for="tahun_baru">${rab === 1 ? 'Jumlah (Rp)' : 'Tahun'}</label><input type="text" id="tahun_baru" class="form-control" value="${tahun_baru}"></div>`,
       function() {
         handleAjax(
           '/admin/dana/edit/id',
@@ -183,7 +183,8 @@
             anggaran: $('#anggaran').val(),
             realisasi: $('#realisasi').val(),
             lebih_kurang: $('#lebih_kurang').val(),
-            tahun_baru: $('#tahun_baru').val()
+            tahun_baru: $('#tahun_baru').val(),
+            rab:rab
           },
           function() { window.location.reload(); },
           function(xhr, status, error) { console.error("Error:", error); }
@@ -344,11 +345,23 @@
                                 <td class="realisasi_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.realisasi | clean_currency }}">{{ i.realisasi | clean_currency  | format_currency  }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
                                 <td class="lebih_kurang_{{ category.lower() }}_{{ h.tahun }}" data="{{ i['lebih/(kurang)'] | clean_currency }}">{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}
                                 <td>{{ i.tahun }}</td>
+                                <td>
+                                  {% if i.rab|int == 0 %}<a href="javascript:void(0)" class="btn btn-info" onclick="tambahBaris2('{{ category.lower() }}', {{ h.tahun }}, {{ i.id }})">Tambah SUB</a>{% endif %}
+                                  <button onclick="upload_nota({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.nota }}')" class="btn btn-success">Nota</button>
+                                  <button onclick="edit({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.no }}', '{{ i.uraian }}', '{{ i.anggaran }}', '{{ i.realisasi }}', '{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}', {{ i.tahun }})" class="btn btn-warning">Edit</button>
+                                  <button onclick="hapus({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }})" class="btn btn-danger">Hapus</button>
+                                </td>
                                 {% elif modified_class == 'clickable-row data-utama' %}
                                   <td class="anggaran_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.anggaran | clean_currency }}">{{ i.anggaran | clean_currency | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
                                 <td class="realisasi_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.realisasi | clean_currency }}">{{ i.realisasi | clean_currency  | format_currency  }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
                                 <td class="lebih_kurang_{{ category.lower() }}_{{ h.tahun }}" data="{{ i['lebih/(kurang)'] | clean_currency }}">{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}
                                 <td>{{ i.tahun }}</td>
+                                <td>
+                                   {% if i.rab|int == 0 %}<a href="javascript:void(0)" class="btn btn-info" onclick="tambahBaris2('{{ category.lower() }}', {{ h.tahun }}, {{ i.id }})">Tambah SUB</a>{% endif %}
+                                  <button onclick="upload_nota({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.nota }}')" class="btn btn-success">Nota</button>
+                                  <button onclick="edit({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.no }}', '{{ i.uraian }}', '{{ i.anggaran }}', '{{ i.realisasi }}', '{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}', {{ i.tahun }})" class="btn btn-warning">Edit</button>
+                                  <button onclick="hapus({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }})" class="btn btn-danger">Hapus</button>
+                                </td>
                                 {% else %} 
                                   <td>{{ i.anggaran  | clean_currency | format_currency }}</td>
                               {% if i.punya_rab|int == 1 %}
@@ -386,26 +399,26 @@
 
                                   {% endif %}
                                   <td>{{ i.tahun }}</td>
-                                {% endif %}
-                                {% else %}
-                                {% if modified_class == 'data-utama' %}
-                                <td class="anggaran_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.anggaran | clean_currency }}">{{ i.anggaran | clean_currency | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
-                                <td class="realisasi_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.realisasi | clean_currency }}">{{ i.realisasi | clean_currency  | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
-                                <td class="lebih_kurang_{{ category.lower() }}_{{ h.tahun }}" data="{{ i['lebih/(kurang)'] | clean_currency }}">{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
-                                <td>{{ i.tahun }}</td>
-                                {% else %} 
-                                  <td >{{ i.anggaran  | clean_currency  }}</td>
-                                  <td>{{ i.realisasi  | clean_currency  }}</td>
-                                  <td>{{ i["lebih/(kurang)"]  | clean_currency | format_currency  }}</td>
-                                  <td class="total_rab_{{ category.lower() }}_{{ h.tahun }}"  data='{{( i["lebih/(kurang)"] | clean_currency * i.anggaran | clean_currency)}}'>{{ (i["lebih/(kurang)"] | clean_currency * i.anggaran | clean_currency) | format_currency }}</td>
-                                {% endif %}
-                                {% endif %}
-                                <td>
+                                   <td>
                                    {% if i.rab|int == 0 %}<a href="javascript:void(0)" class="btn btn-info" onclick="tambahBaris2('{{ category.lower() }}', {{ h.tahun }}, {{ i.id }})">Tambah SUB</a>{% endif %}
                                   <button onclick="upload_nota({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.nota }}')" class="btn btn-success">Nota</button>
                                   <button onclick="edit({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.no }}', '{{ i.uraian }}', '{{ i.anggaran }}', '{{ i.realisasi }}', '{{ (i.anggaran | clean_currency - i.realisasi | clean_currency) | format_currency }}', {{ i.tahun }})" class="btn btn-warning">Edit</button>
                                   <button onclick="hapus({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }})" class="btn btn-danger">Hapus</button>
                                 </td>
+                                {% endif %}
+                                {% else %}
+                                  <td >{{ i.anggaran  | clean_currency  }}</td>
+                                  <td>{{ i.realisasi   }}</td>
+                                  <td>{{ i["lebih/(kurang)"]  | clean_currency | format_currency  }}</td>
+                                  <td class="total_rab_{{ category.lower() }}_{{ h.tahun }}"  data='{{( i["lebih/(kurang)"] | clean_currency * i.anggaran | clean_currency)}}'>{{ (i["lebih/(kurang)"] | clean_currency * i.anggaran | clean_currency) | format_currency }}</td>
+                                <td>
+                                   {% if i.rab|int == 0 %}<a href="javascript:void(0)" class="btn btn-info" onclick="tambahBaris2('{{ category.lower() }}', {{ h.tahun }}, {{ i.id }})">Tambah SUB</a>{% endif %}
+                                  <button onclick="upload_nota({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.nota }}')" class="btn btn-success">Nota</button>
+                                  <button onclick="edit({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.no }}', '{{ i.uraian }}', '{{ i.anggaran }}', '{{ i.realisasi }}','{{ i['lebih/(kurang)']  | clean_currency | format_currency  }}', '{{ (i['lebih/(kurang)'] | clean_currency * i.anggaran | clean_currency) | format_currency }}',1)" class="btn btn-warning">Edit</button>
+                                  <button onclick="hapus({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }})" class="btn btn-danger">Hapus</button>
+                                </td>
+                                {% endif %}
+                                
                               </tr>
                               {% if i.punya_rab|int == 1 %}
                                 <tr class="head-sub-rab hidden-row"  style="

@@ -293,9 +293,10 @@ def format_currency(value):
     return locale.currency(value, grouping=True, symbol='Rp')
 @app.template_filter('clean_currency')
 def clean_currency(value):
-    """Remove 'Rp', dots, commas, and any spaces, then convert to integer"""
-    cleaned_value = value.replace('Rp', '').replace('RP', '').replace('.', '').replace(',', '').strip()
-    return int(cleaned_value)
+    """Remove 'Rp', dots, and spaces, then convert to float"""
+    cleaned_value = value.replace('Rp', '').replace('RP', '').replace('.', '').replace(',', '.').strip()
+    return float(cleaned_value)
+
 
 def set_urutan_default(info_list):
     urutan = {}
@@ -322,19 +323,38 @@ def set_urutan(column, years):
 
 @app.route('/admin/dana')
 def admindana():
-    info_list = fetch_data_and_format("SELECT * FROM realisasi_pendapatan ORDER BY id")
-    info_list2 = fetch_data_and_format("SELECT * FROM realisasi_belanja ORDER BY id")
-    info_list3 = fetch_data_and_format("SELECT * FROM realisasi_pembiayaan ORDER BY id")
-    thn = fetch_years("SELECT tahun FROM urutan GROUP BY tahun")
-    print(info_list,info_list2, info_list3,thn)
-    urutan_pendapatan=set_urutan("pendapatan", thn)
-    urutan_belanja=set_urutan("belanja", thn)
-    urutan_pembiayaan=set_urutan("pembiayaan", thn)
+    # Mengambil data dari tabel
+    info_list = fetch_data_and_format("SELECT * FROM tabel_anggaran ORDER BY no")
+    info_list2 = fetch_data_and_format("SELECT * FROM tabel_transaksi ORDER BY no")
+    gabung = fetch_data_and_format("SELECT * FROM gabung_anggaran_transaksi")
 
-    return render_template("admin/dana_new.html",info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn, 
-                           urutan_pendapatan=set_urutan("pendapatan", thn), 
-                           urutan_belanja=set_urutan("belanja", thn), 
-                           urutan_pembiayaan=set_urutan("pembiayaan", thn))
+    info_list3 = []
+
+    # Proses penggabungan data
+    for j in info_list:  # j adalah dictionary, akses dengan key ['id']
+        item = {
+            'id': j['id'],  # Akses sebagai dictionary
+            'no': j['no'],
+            'uraian': j['uraian'],
+            'anggaran': j['anggaran'],
+            'tahun': j['tahun'],
+            'realisasi': 0  # Inisialisasi total nominal
+        }
+        
+        # Menjumlahkan nominal dari transaksi berdasarkan id_tabel_anggaran
+        for i in gabung:  # i adalah dictionary, akses dengan key ['id_tabel_anggaran']
+            if i['id_tabel_anggaran'] == j['id']:
+                for k in info_list2:  # k adalah dictionary, akses dengan key ['id']
+                    if i['id_transaksi'] == k['id']:
+                        # Menambahkan nominal dari transaksi ke dalam item
+                        item['realisasi'] += int(k['nominal'])
+
+        # Masukkan item yang sudah dijumlahkan ke dalam list
+        info_list3.append(item)
+    print(info_list3)
+    thn = fetch_years("SELECT tahun FROM tabel_anggaran GROUP BY tahun")
+    print(info_list,info_list2, info_list3,thn)
+    return render_template("admin/dana_transaksi.html",info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn)
 
 @app.route('/admin/dana/ubah_urutan', methods=['PUT'])
 @jwt_required()
@@ -556,6 +576,39 @@ def tambah_tahun_dana():
         # Jika tahun sudah ada, berikan pesan error
         return jsonify({"msg": "Maaf, Tahun sudah ada"}), 500
 
+
+@app.route('/admin/dana_new/tambah/id', methods=['POST'])
+@jwt_required()
+def tambah_id_dana_new():
+    tahun_lama = request.json.get('tahun_lama')
+    tahun_baru = request.json.get('tahun_baru')
+    kategori = request.json.get("kategori")
+    no = request.json.get('no')
+    
+    try:
+        if kategori == 'Anggaran':
+            uraian   = request.json.get('uraian')  
+            anggaran = request.json.get('anggaran')
+            type     = request.json.get('type')
+            # Menyisipkan data
+            g.con.execute(f"INSERT INTO tabel_anggaran (no, uraian, anggaran, type, tahun) VALUES (%s, %s, %s, %s, %s)", (no, uraian, anggaran, type, tahun_baru))
+            # Commit perubahan
+            g.con.connection.commit()
+        else :
+            tanggal = request.json.get('tanggal')
+            keterangan = request.json.get('keterangan')
+            nominal   = request.json.get('nominal')
+            id_anggaran   = request.json.get('id_anggaran')
+            g.con.execute(f"INSERT INTO tabel_transaksi (no, tanggal, keterangan, nominal, alokasi, tahun) VALUES (%s, %s, %s, %s, %s, %s)", (no, tanggal, keterangan, nominal, alokasi, tahun_baru))
+            new_id = g.con.lastrowid
+            g.con.execute(f"INSERT INTO gabung_anggaran_transaksi (id_tabel_anggaran, id_transaksi) VALUES (%s, %s)", (id_anggaran, new_id))
+            # Commit perubahan
+            g.con.connection.commit()
+        return jsonify({"msg": "SUKSES"})
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/admin/dana/tambah/id', methods=['POST'])
 @jwt_required()
 def tambah_id_dana():
@@ -670,12 +723,23 @@ def edit_id_dana():
     anggaran = request.json.get('anggaran')
     realisasi = request.json.get('realisasi')
     lebih_kurang = request.json.get('lebih_kurang')
+    rab = request.json.get('rab', 0)  # Default ke 0 jika 'rab' tidak ditemukan
     try:
-        g.con.execute(f"UPDATE realisasi_{kategori} SET no = %s, uraian = %s , anggaran = %s, realisasi = %s, `lebih/(kurang)` = %s , tahun = %s WHERE id = %s ",(no,uraian,anggaran,realisasi,lebih_kurang,tahun_baru,id))
-        mysql.connection.commit()
-        if tahun_baru != tahun_lama:
-            hapus_urutan_lama(id,kategori,tahun_lama)    
-            insert_or_update_urutan(id,kategori,tahun_baru)
+        print(rab)
+        if int(rab) == 1:
+            lebih_kurang = format_currency(clean_currency(lebih_kurang))
+            print(tahun_baru)
+            g.con.execute(f"UPDATE realisasi_{kategori} SET no = %s, uraian = %s , anggaran = %s, realisasi = %s, `lebih/(kurang)` = %s , jumlah = %s WHERE id = %s ",(no,uraian,anggaran,realisasi,lebih_kurang,tahun_baru,id))
+            mysql.connection.commit()
+        else:
+            g.con.execute(f"UPDATE realisasi_{kategori} SET no = %s, uraian = %s , anggaran = %s, realisasi = %s, `lebih/(kurang)` = %s , tahun = %s WHERE id = %s ",(no,uraian,anggaran,realisasi,lebih_kurang,tahun_baru,id))
+            mysql.connection.commit()
+            
+            print("jalan 1")
+            if tahun_baru != tahun_lama:
+                    print("jalan 2")
+                    hapus_urutan_lama(id,kategori,tahun_lama)    
+                    insert_or_update_urutan(id,kategori,tahun_baru)
         return jsonify({"msg":"SUKSES"})
     except Exception as e:
         print(str(e))
@@ -737,7 +801,23 @@ def ubah_urutadana():
     except Exception as e:
         print(str(e))
         return jsonify({"error": str(e)})
-    
+
+@app.route('/admin/dana_new/hapus/id', methods=['DELETE'])
+@jwt_required()
+def hapus_dana_new_id():
+    tahun = request.json.get("year")
+    category = request.json.get("category")
+
+
+    id_ = request.json.get("id")
+    try:
+        g.con.execute(f"DELETE FROM {category} WHERE id = %s ", (id_,))
+        mysql.connection.commit()
+        hapus_urutan_lama(id_, category, tahun)
+        return jsonify({"msg":"SUKSES"})
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)})
 @app.route('/admin/tambah_dana', methods=['POST'])
 @jwt_required()
 def tambah_dana():

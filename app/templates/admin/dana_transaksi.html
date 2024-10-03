@@ -1,0 +1,637 @@
+{% extends 'include/include.html' %}
+{% block head %}
+<style>
+.hidden-row { display: none; }
+.clickable-row { cursor: pointer; transition: background-color 0.3s ease; }
+.clickable-row:hover { text-decoration: underline; background-color: #b0b0b0; }
+.data-utama { background-color: #e6f7ff; /* Biru muda lembut */ color: #000; /* Warna teks hitam */ }
+.sub-detail { background-color: #d9f7be; /* Hijau muda lembut */ color: #000; /* Warna teks hitam */ }
+.sub-rab { background-color: #fffbe6; /* Kuning pastel lembut */ color: #000; /* Warna teks hitam */ }
+.head-sub-rab { background-color: #bae7ff; /* Biru sedikit lebih gelap dari data utama */ color: #000; /* Warna teks hitam */ }
+.jumlah{ background-color: #e7e9f0; ; /* Biru sedikit lebih gelap dari data utama */ color: #000; /* Warna teks hitam */ }
+.dataTables_wrapper .dataTables_filter { float: left; text-align: left; margin-right: 10px; }
+</style>
+<script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
+<script>
+  function handleAjax(url, method, data, onSuccess, onError) {
+    $.ajax({
+      url: url,
+      method: method,
+      data: JSON.stringify(data),
+      contentType: 'application/json',
+      headers: { 'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}" },
+      success: onSuccess,
+      error: onError
+    });
+  }
+
+  function showModal(title, body, onSubmit) {
+    document.getElementById('modal-title').innerText = title;
+    document.getElementById('modal-body').innerHTML = body;
+    document.getElementById('modal-submit').onclick = onSubmit;
+    $('#generic-modal').modal('show');
+  }
+
+  function tambahBaris(category,tahun_lama) {
+       showModal(
+        'Tambah Baris',
+        `
+        <input type="hidden" id="tahun_lama_baris" value="${tahun_lama}">
+        <input type="hidden" id="kategori_baris" value="${category}"> <div class="form-group"> <label for="no">No</label> <input type="text" id="no_baris" class="form-control"> </div>
+
+        ${category === 'anggaran' ? `
+        <div class="form-group"> <label for="uraian">Uraian</label> <input type="text" id="uraian_baris" class="form-control"> </div>
+        <div class="form-group"> <label for="anggaran">Anggaran</label> <input type="number" id="anggaran_baris" class="form-control"> </div>
+        <div class="form-group">
+            <label for="type">Type</label>
+            <select class="form-select" id="typedropdownSelect">
+                <option selected>Pilih...</option>
+                <option value="pengeluaran">Pengeluaran</option>
+                <option value="pendapatan">Pendapatan</option>
+            </select>
+        </div>` : `
+        <div class="form-group"> <label for="keterangan">Tanggal</label> <input type="date" id="keterangan_baris" class="form-control"> </div>
+        <div class="form-group"> <label for="keterangan">Keterangan</label> <input type="text" id="keterangan_baris" class="form-control"> </div>
+        <div class="form-group"> <label for="nominal">Nominal</label> <input type="number" id="nominal_baris" class="form-control"> </div>
+        <div class="form-group">
+            <label for="alokasi">Alokasi</label>
+            <select class="form-select" id="alokasidropdownSelect">
+                <option selected>Pilih...</option>
+                    {% for i in info_list %}
+                        <option value="{{ i.id }}">{{ i.uraian }}</option>
+                   {% endfor %}
+            </select>
+        </div>`}
+        <div class="form-group"> <label for="tahun">Tahun</label> <input type="number" id="tahun_baris" class="form-control"> </div>
+        `,
+       function() {
+          // Siapkan data untuk dikirim berdasarkan kategori
+            const data = {
+                tahun_lama: $("#tahun_lama_baris").val(),
+                kategori: $("#kategori_baris").val(),
+                no: $("#no_baris").val(),
+                tahun_baru: $('#tahun_baris').val(),
+                rab: 0
+            };
+
+            // Jika kategori adalah 'Anggaran', tambahkan data terkait Anggaran
+            if (category === 'Anggaran') {
+                data.uraian = $('#uraian_baris').val();
+                data.anggaran = $('#anggaran_baris').val();
+                data.type = $('#typedropdownSelect').val();
+            } else {
+                // Jika kategori bukan 'Anggaran', tambahkan data terkait transaksi lainnya
+                data.keterangan = $('#keterangan_baris').val();
+                data.nominal = $('#nominal_baris').val();
+                data.alokasi = $('#alokasidropdownSelect').val();
+            }
+        handleAjax(
+          '/admin/dana_new/tambah/id',
+          'POST',
+          data,
+          function(response) {  window.location.reload()},
+          function(xhr, status, error) { console.error("Error:", error); }
+        );
+       }
+    );
+  }
+ function ubahLabel() {
+    const isRab = document.querySelector('input[name="rab"]:checked').value;
+    const label1 = document.getElementById('label1');
+    const label2 = document.getElementById('label2');
+    const label3 = document.getElementById('label3');
+    const label4 = document.getElementById('label4');
+    const rab = document.getElementById('rab');
+    
+    if (isRab === '1') {
+        label1.textContent = "Volume";
+        label2.textContent = "Satuan";
+        label3.textContent = "Harga Satuan (Rp)";
+        label4.textContent = "Jumlah (Rp)";
+    } else {
+        label1.textContent = "Anggaran";
+        label2.textContent = "Realisasi";
+        label3.textContent = "Lebih/(Kurang)";
+        label4.textContent = "Tahun";
+    }
+}
+
+    function tambahBaris2(category,tahun_lama,parent_id) {
+    showModal(
+      'Tambah Baris',
+      `
+       <input type="hidden" id="tahun_lama_baris" value="${tahun_lama}">
+       <input type="hidden" id="kategori_baris" value="${category}">
+       <input type="hidden" id="rab" >
+       <input type="hidden" id="parent_id" value="${parent_id}" >
+       <div class="form-group"><label id="tanya" for="tanya">Apakah ini Data RAB?</label>
+        <div class="form-check"> <input class="form-check-input" type="radio" name="rab" id="rab-ya" value="1" checked onchange="ubahLabel()"> <label class="form-check-label" for="rab-ya">Ya</label> </div>
+        <div class="form-check"> <input class="form-check-input" type="radio" name="rab" id="rab-tidak" value="0" onchange="ubahLabel()"> <label class="form-check-label" for="rab-tidak">Tidak</label> </div>
+       </div>
+       <div class="form-group"><label for="no">No</label><input type="text" id="no_baris" class="form-control"></div>
+       <div class="form-group"><label for="uraian">Uraian</label><input type="text" id="uraian_baris" class="form-control"></div>
+       <div class="form-group"><label id="label1" for="anggaran">Volume</label><input type="text" id="anggaran_baris" class="form-control"></div>
+       <div class="form-group"><label id="label2" for="realisasi">Satuan</label><input type="text" id="realisasi_baris" class="form-control"></div>
+       <div class="form-group"><label id="label3" for="lebih_kurang">Harga Satuan (Rp)</label><input type="text" id="lebih_kurang_baris" class="form-control"></div>
+       <div class="form-group"><label id="label4" for="tahun_baru">Jumlah (Rp)</label><input type="text" id="tahun_baru_baris" class="form-control"></div>`,
+       function() {
+        handleAjax(
+          '/admin/dana/tambah/sub',
+          'POST',
+          {
+            tahun_lama: $("#tahun_lama_baris").val(),
+            kategori: $("#kategori_baris").val(),
+            no: $("#no_baris").val(),
+            uraian: $('#uraian_baris').val(),
+            anggaran: $('#anggaran_baris').val(),
+            realisasi: $('#realisasi_baris').val(),
+            lebih_kurang: $('#lebih_kurang_baris').val(),
+            tahun_baru: $('#tahun_baru_baris').val(),
+            rab: document.querySelector('input[name="rab"]:checked').value,
+            parent_id: $('#parent_id').val()
+          },
+          function(response) {
+            window.location.reload();
+          },
+          function(xhr, status, error) {
+            console.error("Error:", error);
+          }
+        );
+
+      }
+    );
+  }
+  function upload_nota(tahun,category,id,nota) {
+    const pesan = nota ? `file sudah ada bisa dilihat disini <a target='_blank' href='/static/nota/${nota}'>${nota}</a>` : "";
+    showModal(
+      'Upload Nota / Bukti',
+      `<span class="mb-2">Upload Nota / Bukti untuk ${category} tahun ${tahun}</span><br>   
+        <span class="mb-2">${pesan}</span>
+       <input type="hidden" id="tahun_nota" value="${tahun}">
+       <input type="hidden" id="kategori_nota" value="${category}">
+       <input type="file" id="file_nota" class="form-control">`,
+      function() {
+        const formData = new FormData();
+        formData.append('file', document.getElementById('file_nota').files[0]);
+        formData.append('tahun', $("#tahun_nota").val());
+        formData.append('kategori', $("#kategori_nota").val());
+        $.ajax({
+          url: '/admin/dana_new/upload_file',
+          method: 'POST',
+          data: formData,
+          contentType: false,
+          processData: false,
+          headers: { 'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}" },
+          success: function() { window.location.reload(); },
+          error: function(xhr, status, error) { console.error("Error:", error); }
+        });
+      }
+    );
+  }
+
+  function edit(tahun_lama, category, no, uraian, anggaran,type ) {
+    showModal(
+        'Edit Data',
+        `<form><input type="hidden" id="tahun_lama_baris" value="${tahun_lama}">
+        <input type="hidden" id="kategori_baris" value="${category}"> 
+        <div class="form-group"> <label for="no">No</label> <input type="number" value="${no}" id="no_baris" class="form-control"> </div>
+        ${category === 'anggaran' ? `
+        <div class="form-group"> <label for="uraian">Uraian</label> <input type="text" id="uraian_baris" value="${uraian}" class="form-control"> </div>
+        <div class="form-group"> <label for="anggaran">Anggaran</label> <input type="number" id="anggaran_baris" value="${anggaran}" class="form-control"> </div>
+        <div class="form-group">
+            <label for="type">Type</label>
+            <select class="form-select" id="typedropdownSelect">
+                <option selected>Pilih...</option>
+                <option value="pengeluaran">Pengeluaran</option>
+                <option value="pendapatan">Pendapatan</option>
+            </select>
+        </div>` : `
+        <div class="form-group"> <label for="keterangan">Tanggal</label> <input type="date" id="keterangan_baris" class="form-control"> </div>
+        <div class="form-group"> <label for="keterangan">Keterangan</label> <input type="text" id="keterangan_baris" class="form-control"> </div>
+        <div class="form-group"> <label for="nominal">Nominal</label> <input type="number" id="nominal_baris" class="form-control"> </div>
+        <div class="form-group">
+            <label for="alokasi">Alokasi</label>
+            <select class="form-select" id="alokasidropdownSelect">
+                <option selected>Pilih...</option>
+                   {% for i in info_list %}
+                        <option value="{{ i.id }}">{{ i.uraian }}</option>
+                   {% endfor %}
+            </select>
+        </div>`}
+        <div class="form-group"> <label for="tahun">Tahun</label> <input type="number" id="tahun_baris" value="${tahun_lama}" class="form-control"> </div></form>`,
+        function() {
+             // Siapkan data untuk dikirim berdasarkan kategori
+            const data = {
+                tahun_lama: $("#tahun_lama_baris").val(),
+                kategori: $("#kategori_baris").val(),
+                no: $("#no_baris").val(),
+                tahun_baru: $('#tahun_baris').val(),
+                rab: 0
+            };
+
+            // Jika kategori adalah 'Anggaran', tambahkan data terkait Anggaran
+            if (category === 'Anggaran') {
+                data.uraian = $('#uraian_baris').val();
+                data.anggaran = $('#anggaran_baris').val();
+                data.type = $('#typedropdownSelect').val();
+            } else {
+                // Jika kategori bukan 'Anggaran', tambahkan data terkait transaksi lainnya
+                data.keterangan = $('#keterangan_baris').val();
+                data.nominal = $('#nominal_baris').val();
+                data.alokasi = $('#alokasidropdownSelect').val();
+            }
+        handleAjax(
+          '/admin/dana_new/edit/id',
+          'PUT',
+          data,
+          function() { window.location.reload(); },
+          function(xhr, status, error) { console.error("Error:", error); }
+        );
+      }
+    );
+  }
+
+  function hapus(tahun, category, id) {
+    if (confirm(`Are you sure you want to delete ${category} for ${tahun}?`)) {
+      handleAjax(
+        '/admin/dana_new/hapus/id',
+        'DELETE',
+        { tahun: tahun, category: category, id: id },
+        function() { window.location.reload(); },
+        function(xhr, status, error) { console.error("Error:", error); }
+      );
+    } else {
+      alert('Aksi penghapusan dibatalkan.');
+    }
+  }
+     function formatNumber(number) {
+        // Mengubah angka menjadi string dan memisahkan bagian desimal
+        var parts = number.toString().split(".");
+        // Memformat bagian ribuan dengan titik
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        // Mengembalikan string yang diformat dengan koma sebagai desimal
+        return parts.join(","); 
+    }
+    function calculateTotal(className) {
+        var elements = document.querySelectorAll('.' + className);
+        console.log(elements)
+        var total = 0;
+        elements.forEach(function(element) {
+          console.log(element)
+            var value = parseFloat(element.getAttribute('data')) || 0; // Mengambil nilai dan konversi ke float
+            console.log(value)
+            total += value; // Menambahkan nilai ke total
+        });
+        total = formatNumber(total.toFixed(2))
+
+        return "Rp"+total; // Mengembalikan total dengan 2 desimal
+    }
+</script>
+{% endblock %}
+{% block content %}
+<div class="page-titles">
+  <div class="row">
+    <div class="col-lg-8 col-md-6 col-12 align-self-center">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0 d-flex align-items-center">
+          <li class="breadcrumb-item">
+            <a href="index.html" class="link">
+              <i class="ri-home-3-line fs-5"></i>
+            </a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">Dana Desa</li>
+        </ol>
+      </nav>
+      <h1 class="mb-0 fw-bold">Dana Desa</h1>
+    </div>
+    <div class="col-lg-4 col-md-6 d-md-flex align-items-center justify-content-end">
+      <a href="javascript:void(0)" class="btn btn-danger d-flex align-items-center ms-2" data-bs-toggle="modal" data-bs-target="#bs-example-modal-x2">Hapus Tahun</a>
+      <a href="javascript:void(0)" class="btn btn-info d-flex align-items-center ms-2" data-bs-toggle="modal" data-bs-target="#bs-example-modal-xl">
+        <i class="ri-add-line me-1"></i> Tambah Data
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="border-bottom title-part-padding">
+          <h4>Dana Desa Tahun:</h4>
+          <div class="col-sm-3">
+            <div class="mb-3">
+              <select class="form-select" id="tahun" name="educationDate">
+                <option value="tahun" selected>Semua Tahun</option>
+                {% for i in tahun %}
+                  <option value="{{ i.tahun }}">{{ i.tahun }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          {% set jml_realisasi = 0 %}  
+          {% for h in tahun %}
+            <div id="table_{{ h.tahun }}" class="mt-3">
+              <h4>Dana Desa Tahun {{ h.tahun }}</h4>
+
+              {% set categories = [('Anggaran', info_list), ('Transaksi', info_list2), ('Report Dana', info_list3)] %}
+              
+              {% for category, info in categories %}
+                {% if info %}
+                  <div class="d-flex justify-content-between align-items-center mb-2 mt-3">
+                    <h6 class="mb-0">Realisasi {{ category }}</h6>
+                    {% if category == "Report Dana" %}
+                    {% else %}
+                    <a href="javascript:void(0)" class="btn btn-info" onclick="tambahBaris('{{ category.lower() }}', {{ h.tahun }})">Tambah Baris</a>
+                    {% endif %}
+                  </div>
+                  <div class="table-responsive">
+                    <table id="table_{{ h.tahun }}_{{ loop.index }}" class="table table-bordered display text-nowrap">
+                      <thead style="background-color:#f6f8fb;">
+                        <tr>
+                          <th>No</th>
+                            {% if category == "Anggaran" %}
+                          <th>Uraian</th>
+                          <th>Anggaran</th>
+                          <th>Type</th>
+                          <th>Tahun</th>
+                          <th>Aksi</th>
+                                {% elif category == "Transaksi" %}
+                          <th>Tanggal</th>
+                          <th>Keterangan</th>
+                          <th>Nominal</th>
+                          <th>Alokasi</th>
+                          <th>Aksi</th>
+                                {% elif category == "Report Dana" %}
+                          <th>Uraian</th>
+                          <th>Estimasi / Anggaran</th>
+                          <th>Realisasi</th>
+                          <th>Tahun</th>
+                                {% endif %}
+                        </tr>
+                      </thead>
+                      <tbody>
+                          {% for i in info %}
+                            {% if h.tahun == i.tahun %}
+                                <tr class="{{ i.class }} data-utama" id="{{ i.detail }}">
+                                <td>{{ i.no }}</td>
+                                {% if category == "Anggaran" %}
+                                <td>{{ i.uraian }} </td>
+                                <td class="anggaran_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.anggaran | clean_currency }}">{{ i.anggaran | clean_currency | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
+                                <td>{{ i.type }}</td>
+                                <td>{{ i.tahun }}</td>
+                                <td>
+                                  <button onclick="edit({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.no }}', '{{ i.uraian }}', '{{ i.anggaran }}', {{ i.tahun }})" class="btn btn-warning">Edit</button>
+                                  <button onclick="hapus({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }})" class="btn btn-danger">Hapus</button>
+                                </td>
+                                {% elif category == "Transaksi" %}
+                                <td>{{ i.tanggal }} </td>
+                                <td>{{ i.keterangan }}</td>
+                                <td>{{ i.nominal | clean_currency | format_currency }}</td>
+                                <td>{{ i.alokasi }}</td>
+                                <td>
+                                 <button onclick="upload_nota({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.nota }}')" class="btn btn-success">Nota</button>
+                                  <button onclick="edit({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.no }}', '{{ i.uraian }}', '{{ i.anggaran }}', {{ i.tahun }})" class="btn btn-warning">Edit</button>
+                                  <button onclick="hapus({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }})" class="btn btn-danger">Hapus</button>
+                                </td>
+                                {% elif category == "Report Dana" %}
+                                <td>{{ i.uraian }} </td>
+                                <td>{{ i.anggaran | clean_currency | format_currency }}</td>
+                                <td>{{ i.realisasi | format_currency }}</td>
+                                <td>{{ i.tahun }}</td>
+                                {% endif %}
+                              </tr>
+                            {% endif %}
+                          {% endfor %}
+                    </tbody>
+                </table>
+                <script>$("#table_{{ h.tahun }}_{{ loop.index }}").DataTable({
+                      "paging": false,          // Menonaktifkan pagination
+                "info": false,           // Menonaktifkan info jumlah entri
+                "searching": true,       // Mengaktifkan fitur pencarian
+                "lengthChange": false,   // Menonaktifkan pilihan jumlah entri yang ditampilkan
+                "language": {
+                    "search": "",          // Kosongkan label pencarian
+                    "searchPlaceholder": "Cari..." // Placeholder untuk input pencarian
+                },
+                "dom": '<"top"f>rt'      // Menempatkan form pencarian di atas tabel
+                })</script>
+                </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+            
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal template -->
+<div class="modal fade" id="generic-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header d-flex align-items-center">
+        <h4 class="modal-title" id="modal-title">Title</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="modal-body">...</div>
+      <div class="modal-footer">
+        <div class="col-lg-4 col-md-6 d-md-flex align-items-center justify-content-end">
+          <a id="modal-submit" class="btn btn-info d-flex align-items-center ms-2">Submit</a>
+        </div>
+        <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Hapus Tahun -->
+<div class="modal fade" id="bs-example-modal-x2" tabindex="-1" aria-labelledby="bs-example-modal-lg" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header d-flex align-items-center">
+        <h4 class="modal-title" id="myLargeModalLabel">Hapus Dana Desa berdasarkan tahun</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <span class="mb-2">Keterangan: Pilih data tahun berapa yang mau dihapus</span>
+        <select class="form-select" id="tahun_hps" name="educationDate">
+          <option value="semua_tahun" selected>Semua Tahun</option>
+          {% for i in tahun %}
+          <option value="{{i.tahun}}">{{i.tahun}}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="modal-footer">
+        <div class="col-lg-4 col-md-6 d-md-flex align-items-center justify-content-end">
+          <a id="delete" class="btn btn-info d-flex align-items-center ms-2">Submit</a>
+        </div>
+        <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal Tambah Data -->
+<div class="modal fade" id="bs-example-modal-xl" tabindex="-1" aria-labelledby="bs-example-modal-lg" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header d-flex align-items-center">
+        <h4 class="modal-title" id="myLargeModalLabel">Tambah Dana Desa</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- <span class="mb-2">Keterangan: Download dan edit 3 file Excel .xlsx <a href='https://drive.google.com/drive/folders/1PxN3Lb0oBcfA61zQUto5pxG2IAyuhwSO?usp=sharing'>di sini</a> dan upload ke form di bawah</span>
+        <h4>Input Excel Realisasi Pendapatan</h4> -->
+        <form>
+            <div class="custom-file">
+              <label> Masukan Tahun Baru </label>
+              <input class="form-control" type="number" min="1000" max="9999" id="formtahun" />
+            </div>      
+            {% if error_tahun %} <div style="color: red;"> {{ error_tahun }} </div> {% endif %}
+          
+        </form>
+      </div>
+      <div class="modal-footer">
+        <div class="col-lg-4 col-md-6 d-md-flex align-items-center justify-content-end">
+          <a id="tambah" href="javascript:void(0)" class="btn btn-info d-flex align-items-center ms-2">Submit</a>
+        </div>
+        <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+{% endblock %}
+{% block js %}
+
+
+<script src="../../static/assets/libs/nestable/jquery.nestable.js"></script>
+<script>
+  $("#nama_nota").hide();
+function toggleDetails(ids) {
+  var idArray = ids.split(',');
+  idArray.forEach(function(id) {
+    var element = document.getElementById(id.trim());
+
+    // Pengecekan apakah elemen dengan ID ditemukan
+    if (element) {
+      console.log(element);
+      if (element.style.display === "none" || element.style.display === "") {
+        element.style.display = "table-row";
+      } else {
+        element.style.display = "none";
+           if (element.classList.contains('clickable-row')) {
+            console.log("Elemen ini memiliki kelas 'clickable-row'.");
+            var list_id = element.getAttribute("onclick");
+            list_id = list_id.replace("toggleDetails('","")
+            list_id = list_id.replace("')","")
+            list_id = list_id.split(',')
+            console.log(list_id)
+            list_id.forEach(function(id){
+            var element_child = document.getElementById(id.trim());
+            if (element_child) { element_child.style.display = "none" } 
+            });
+        } 
+      }
+    } else {
+      // Jika elemen tidak ditemukan, log pesan atau biarkan saja
+      console.warn("Element with ID '" + id.trim() + "' not found.");
+    }
+  });
+}
+  $(document).ready(function() {
+    $('#yearDropdown, #numberDropdown').change(function() {
+      var selectedYear = $('#yearDropdown').val();
+      var selectedNumber = $('#numberDropdown').val();
+    });
+
+    // Set default view
+    var selectedYear = $('#yearDropdown').val('2022');
+    var selectedNumber = $('#numberDropdown').val('1');
+
+    var updateOutput = function (e) {
+      var list = e.length ? e : $(e.target),
+          output = list.data("output");
+      if (window.JSON) {
+        var serializedData = window.JSON.stringify(list.nestable("serialize"));
+        output.val(serializedData);
+        console.log(serializedData)
+        // Kirim data ke server menggunakan AJAX
+        // Cari elemen modal-footer dengan class tonggle-show
+
+        var selectedYear = $('#yearDropdown').val();
+        var selectedNumber = $('#numberDropdown').val();
+        var submitButton = $('#submit_' + selectedYear + '_' + selectedNumber);
+
+        // Menghapus event handler klik sebelumnya agar tidak menumpuk
+        submitButton.off('click');
+    
+    
+      } else {
+        output.val("JSON browser support required for this demo.");
+      }
+    };
+
+    var data = {{ tahun | tojson | safe }};      
+    // Ambil nilai 'tahun' dari setiap objek dalam data
+    var years = data.map(function(item) {
+      return item.tahun;
+    });
+
+    $("#tambah").on("click", function() {
+      //var excellpendapatan = $('#formpendapatan')[0].files[0];
+      //var excellbelanja = $('#formbelanja')[0].files[0];
+      //var excellpembiayaan = $('#formpembiayaan')[0].files[0];
+      var tahun = $('#formtahun').val();
+      var formData = new FormData();
+      formData.append('tahun',tahun);
+      //formData.append('excellpendapatan', excellpendapatan);
+      //formData.append('excellbelanja', excellbelanja);
+      //formData.append('excellpembiayaan', excellpembiayaan);
+      $("#tambah").html("Loading ...");
+      $.ajax({
+        //url: "/admin/tambah_dana",
+        url: "/admin/dana_new/tambah/tahun",
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        },
+        success: function(data) {
+          handleResponse(data, "tambah tahun dana", "/admin/dana");
+        },    
+        error: function(xhr, status, error) {
+          let errorMsg = xhr.responseJSON ? xhr.responseJSON.msg : "Terjadi kesalahan";
+          console.log("Error: ", errorMsg); // Log pesan error
+          alert("Error: "+errorMsg)
+          $("#tambah").html("Submit");
+        }
+      });
+      event.preventDefault();
+    });
+
+    $("#delete").on("click", function() {
+      var tahun = $("#tahun_hps").val();
+      $("#delete").html("Loading ...");
+      $.ajax({
+        url: "/admin/hapus_dana_new",
+        method: 'DELETE',
+        headers: {'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"},
+        data: { tahun: tahun },
+        dataType: 'json',
+        success: function(data) {
+          handleResponse(data, "hapus", "/admin/dana");
+        }
+      });
+      event.preventDefault();
+    });
+  });
+</script>
+{% endblock %}
