@@ -34,10 +34,11 @@
 
   function tambahBaris(category,tahun_lama) {
        showModal(
-        'Tambah Baris',
+        `Tambah Baris ${category}`,
         `
         <input type="hidden" id="tahun_lama_baris" value="${tahun_lama}">
-        <input type="hidden" id="kategori_baris" value="${category}"> <div class="form-group"> <label for="no">No</label> <input type="text" id="no_baris" class="form-control"> </div>
+        <input type="hidden" id="kategori_baris" value="${category}"> <div class="form-group"> 
+        <label for="no">No</label> <input type="number" id="no_baris" class="form-control"> </div>
 
         ${category === 'anggaran' ? `
         <div class="form-group"> <label for="uraian">Uraian</label> <input type="text" id="uraian_baris" class="form-control"> </div>
@@ -50,7 +51,7 @@
                 <option value="pendapatan">Pendapatan</option>
             </select>
         </div>` : `
-        <div class="form-group"> <label for="keterangan">Tanggal</label> <input type="date" id="keterangan_baris" class="form-control"> </div>
+        <div class="form-group"> <label for="keterangan">Tanggal</label> <input type="date" id="tanggal_baris" class="form-control"> </div>
         <div class="form-group"> <label for="keterangan">Keterangan</label> <input type="text" id="keterangan_baris" class="form-control"> </div>
         <div class="form-group"> <label for="nominal">Nominal</label> <input type="number" id="nominal_baris" class="form-control"> </div>
         <div class="form-group">
@@ -58,7 +59,7 @@
             <select class="form-select" id="alokasidropdownSelect">
                 <option selected>Pilih...</option>
                     {% for i in info_list %}
-                        <option value="{{ i.id }}">{{ i.uraian }}</option>
+                        <option value="{{ i.id }}-{{ i.uraian }}">{{ i.uraian }}</option>
                    {% endfor %}
             </select>
         </div>`}
@@ -75,12 +76,65 @@
             };
 
             // Jika kategori adalah 'Anggaran', tambahkan data terkait Anggaran
-            if (category === 'Anggaran') {
+            if (category === 'anggaran') {
                 data.uraian = $('#uraian_baris').val();
                 data.anggaran = $('#anggaran_baris').val();
                 data.type = $('#typedropdownSelect').val();
             } else {
                 // Jika kategori bukan 'Anggaran', tambahkan data terkait transaksi lainnya
+                data.tanggal = $('#tanggal_baris').val();
+                data.keterangan = $('#keterangan_baris').val();
+                data.nominal = $('#nominal_baris').val();
+                data.alokasi = $('#alokasidropdownSelect').val();
+            }
+        handleAjax(
+          '/admin/dana_new/tambah/id',
+          'POST',
+          data,
+          function(response) {  window.location.reload()},
+          function(xhr, status, error) { console.error("Error:", error); }
+        );
+       }
+    );
+  }
+   function tambahBaris3() {
+       showModal(
+        'Tambah Baris Anggaran',
+        `
+        <input type="hidden" id="tahun_lama_baris" value="0">
+        <input type="hidden" id="kategori_baris" value="anggaran"> <div class="form-group"> 
+        <label for="no">No</label> <input type="number" id="no_baris" class="form-control"> </div>
+        <div class="form-group"> <label for="uraian">Uraian</label> <input type="text" id="uraian_baris" class="form-control"> </div>
+        <div class="form-group"> <label for="anggaran">Anggaran</label> <input type="number" id="anggaran_baris" class="form-control"> </div>
+        <div class="form-group">
+            <label for="type">Type</label>
+            <select class="form-select" id="typedropdownSelect">
+                <option selected>Pilih...</option>
+                <option value="pengeluaran">Pengeluaran</option>
+                <option value="pendapatan">Pendapatan</option>
+            </select>
+        </div>
+        <div class="form-group"> <label for="tahun">Tahun</label> <input type="number" id="tahun_baris" class="form-control"> </div>
+        `,
+       function() {
+          // Siapkan data untuk dikirim berdasarkan kategori
+            const data = {
+                tahun_lama: $("#tahun_lama_baris").val(),
+                kategori: $("#kategori_baris").val(),
+                no: $("#no_baris").val(),
+                tahun_baru: $('#tahun_baris').val(),
+                rab: 0
+            };
+
+            // Jika kategori adalah 'Anggaran', tambahkan data terkait Anggaran
+            var category = $("#kategori_baris").val();
+            if (category === 'anggaran') {
+                data.uraian = $('#uraian_baris').val();
+                data.anggaran = $('#anggaran_baris').val();
+                data.type = $('#typedropdownSelect').val();
+            } else {
+                // Jika kategori bukan 'Anggaran', tambahkan data terkait transaksi lainnya
+                data.tanggal = $('#tanggal_baris').val();
                 data.keterangan = $('#keterangan_baris').val();
                 data.nominal = $('#nominal_baris').val();
                 data.alokasi = $('#alokasidropdownSelect').val();
@@ -189,9 +243,9 @@
     );
   }
 
-  function edit(tahun_lama, category, no, uraian, anggaran,type ) {
+  function edit(tahun_lama, category, id, no, uraian, anggaran,type, tanggal,keterangan,nominal,alokasi ) {
     showModal(
-        'Edit Data',
+        `Edit Data ${category}`,
         `<form><input type="hidden" id="tahun_lama_baris" value="${tahun_lama}">
         <input type="hidden" id="kategori_baris" value="${category}"> 
         <div class="form-group"> <label for="no">No</label> <input type="number" value="${no}" id="no_baris" class="form-control"> </div>
@@ -201,20 +255,18 @@
         <div class="form-group">
             <label for="type">Type</label>
             <select class="form-select" id="typedropdownSelect">
-                <option selected>Pilih...</option>
-                <option value="pengeluaran">Pengeluaran</option>
-                <option value="pendapatan">Pendapatan</option>
+                <option value="pengeluaran" ${type === 'pengeluaran' ? `selected`:``}>Pengeluaran</option>
+                <option value="pendapatan" ${type === 'pendapatan' ? `selected`:``}>Pendapatan</option>
             </select>
         </div>` : `
-        <div class="form-group"> <label for="keterangan">Tanggal</label> <input type="date" id="keterangan_baris" class="form-control"> </div>
-        <div class="form-group"> <label for="keterangan">Keterangan</label> <input type="text" id="keterangan_baris" class="form-control"> </div>
-        <div class="form-group"> <label for="nominal">Nominal</label> <input type="number" id="nominal_baris" class="form-control"> </div>
+        <div class="form-group"> <label for="tanggal">Tanggal</label> <input type="date" id="tanggal_baris" value="${tanggal}" class="form-control"> </div>
+        <div class="form-group"> <label for="keterangan">Keterangan</label> <input type="text" id="keterangan_baris" value="${keterangan}" class="form-control"> </div>
+        <div class="form-group"> <label for="nominal">Nominal</label> <input type="number" id="nominal_baris" value="${nominal}" class="form-control"> </div>
         <div class="form-group">
             <label for="alokasi">Alokasi</label>
             <select class="form-select" id="alokasidropdownSelect">
-                <option selected>Pilih...</option>
                    {% for i in info_list %}
-                        <option value="{{ i.id }}">{{ i.uraian }}</option>
+                        <option value="{{ i.id }}-{{ i.uraian }}" ${alokasi === '{{ i.uraian }}' ? `selected`:``}>{{ i.uraian }}</option>
                    {% endfor %}
             </select>
         </div>`}
@@ -225,27 +277,30 @@
                 tahun_lama: $("#tahun_lama_baris").val(),
                 kategori: $("#kategori_baris").val(),
                 no: $("#no_baris").val(),
+                id: id,
                 tahun_baru: $('#tahun_baris').val(),
                 rab: 0
             };
 
             // Jika kategori adalah 'Anggaran', tambahkan data terkait Anggaran
-            if (category === 'Anggaran') {
+            if (category === 'anggaran') {
                 data.uraian = $('#uraian_baris').val();
                 data.anggaran = $('#anggaran_baris').val();
                 data.type = $('#typedropdownSelect').val();
             } else {
                 // Jika kategori bukan 'Anggaran', tambahkan data terkait transaksi lainnya
+                data.tanggal = $('#tanggal_baris').val();
                 data.keterangan = $('#keterangan_baris').val();
                 data.nominal = $('#nominal_baris').val();
+                data.alokasi_lama = alokasi;
                 data.alokasi = $('#alokasidropdownSelect').val();
             }
         handleAjax(
           '/admin/dana_new/edit/id',
           'PUT',
           data,
-          function() { window.location.reload(); },
-          function(xhr, status, error) { console.error("Error:", error); }
+          function(response) { window.location.reload();},
+          function(xhr, status, error) { console.error("Error:", error); console.log(xhr.responseText); alert("Error :"+error) }
         );
       }
     );
@@ -306,7 +361,7 @@
     </div>
     <div class="col-lg-4 col-md-6 d-md-flex align-items-center justify-content-end">
       <a href="javascript:void(0)" class="btn btn-danger d-flex align-items-center ms-2" data-bs-toggle="modal" data-bs-target="#bs-example-modal-x2">Hapus Tahun</a>
-      <a href="javascript:void(0)" class="btn btn-info d-flex align-items-center ms-2" data-bs-toggle="modal" data-bs-target="#bs-example-modal-xl">
+      <a href="javascript:void(0)" class="btn btn-info d-flex align-items-center ms-2" onclick="tambahBaris3()">
         <i class="ri-add-line me-1"></i> Tambah Data
       </a>
     </div>
@@ -383,8 +438,8 @@
                                 <td>{{ i.type }}</td>
                                 <td>{{ i.tahun }}</td>
                                 <td>
-                                  <button onclick="edit({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.no }}', '{{ i.uraian }}', '{{ i.anggaran }}', {{ i.tahun }})" class="btn btn-warning">Edit</button>
-                                  <button onclick="hapus({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }})" class="btn btn-danger">Hapus</button>
+                                  <button onclick="edit({{ i.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.no }}', '{{ i.uraian }}', '{{ i.anggaran }}', '{{ i.type }}', '','','','')" class="btn btn-warning">Edit</button>
+                                  <button onclick="hapus({{ i.tahun }}, '{{ category.lower() }}', {{ i.id }})" class="btn btn-danger">Hapus</button>
                                 </td>
                                 {% elif category == "Transaksi" %}
                                 <td>{{ i.tanggal }} </td>
@@ -393,7 +448,7 @@
                                 <td>{{ i.alokasi }}</td>
                                 <td>
                                  <button onclick="upload_nota({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.nota }}')" class="btn btn-success">Nota</button>
-                                  <button onclick="edit({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.no }}', '{{ i.uraian }}', '{{ i.anggaran }}', {{ i.tahun }})" class="btn btn-warning">Edit</button>
+                                  <button onclick="edit({{ i.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.no }}', '','','','{{ i.tanggal }}', '{{ i.keterangan }}', {{i.nominal}}, '{{ i.alokasi }}' )" class="btn btn-warning">Edit</button>
                                   <button onclick="hapus({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }})" class="btn btn-danger">Hapus</button>
                                 </td>
                                 {% elif category == "Report Dana" %}
@@ -581,7 +636,19 @@ function toggleDetails(ids) {
     var years = data.map(function(item) {
       return item.tahun;
     });
-
+ $("#tahun").val("tahun");
+    $("#tahun").change(function() {
+      var data_thn = JSON.parse('{{ tahun | tojson | safe }}');
+      var thn = $('#tahun').val();
+      for (var key in data_thn) {
+        var table_thn = data_thn[key].tahun;
+        if (table_thn == thn || thn == "tahun") {
+          $('#table_' + table_thn).show();
+        } else {
+          $('#table_' + table_thn).hide();
+        }
+      }
+    });
     $("#tambah").on("click", function() {
       //var excellpendapatan = $('#formpendapatan')[0].files[0];
       //var excellbelanja = $('#formbelanja')[0].files[0];

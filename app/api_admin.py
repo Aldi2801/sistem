@@ -351,9 +351,7 @@ def admindana():
 
         # Masukkan item yang sudah dijumlahkan ke dalam list
         info_list3.append(item)
-    print(info_list3)
     thn = fetch_years("SELECT tahun FROM tabel_anggaran GROUP BY tahun")
-    print(info_list,info_list2, info_list3,thn)
     return render_template("admin/dana_transaksi.html",info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn)
 
 @app.route('/admin/dana/ubah_urutan', methods=['PUT'])
@@ -586,7 +584,7 @@ def tambah_id_dana_new():
     no = request.json.get('no')
     
     try:
-        if kategori == 'Anggaran':
+        if kategori == 'anggaran':
             uraian   = request.json.get('uraian')  
             anggaran = request.json.get('anggaran')
             type     = request.json.get('type')
@@ -598,7 +596,9 @@ def tambah_id_dana_new():
             tanggal = request.json.get('tanggal')
             keterangan = request.json.get('keterangan')
             nominal   = request.json.get('nominal')
-            id_anggaran   = request.json.get('id_anggaran')
+            alokasi   = request.json.get('alokasi')
+            id_anggaran = alokasi.split("-")[0]
+            alokasi = alokasi.split("-")[1]
             g.con.execute(f"INSERT INTO tabel_transaksi (no, tanggal, keterangan, nominal, alokasi, tahun) VALUES (%s, %s, %s, %s, %s, %s)", (no, tanggal, keterangan, nominal, alokasi, tahun_baru))
             new_id = g.con.lastrowid
             g.con.execute(f"INSERT INTO gabung_anggaran_transaksi (id_tabel_anggaran, id_transaksi) VALUES (%s, %s)", (id_anggaran, new_id))
@@ -744,6 +744,41 @@ def edit_id_dana():
     except Exception as e:
         print(str(e))
         return jsonify({"error": str(e)})
+
+@app.route('/admin/dana_new/edit/id', methods=['PUT'])
+@jwt_required()
+def edit_id_dana_new():
+    tahun_lama = request.json.get('tahun_lama')
+    tahun_baru = request.json.get('tahun_baru') or ''
+    kategori = request.json.get("kategori")
+    id = request.json.get("id")
+    no = request.json.get('no')
+    if kategori == 'anggaran':
+        uraian = request.json.get('uraian') or ''
+        anggaran = request.json.get('anggaran') or ''
+        type = request.json.get('type') or ''
+        # Menggunakan cursor untuk execute dan rowcount
+        print(f"UPDATE tabel_transaksi SET no = {no},  uraian = '{uraian}', anggaran = {anggaran}, type = '{type}', tahun = '{tahun_baru}' WHERE id = {id}")
+        g.con.execute(f"UPDATE tabel_anggaran SET no = {no}, uraian = '{uraian}', anggaran = {anggaran}, type = '{type}', tahun = '{tahun_baru}' WHERE id = {id}")
+        g.con.connection.commit()
+    else:
+        tanggal = request.json.get('tanggal')
+        keterangan = request.json.get('keterangan')
+        nominal = request.json.get('nominal')
+        alokasi_lama = request.json.get('alokasi_lama')
+        alokasi = request.json.get('alokasi')
+        alokasi_parts = alokasi.split("-")
+        id_anggaran = alokasi_parts[0]
+        alokasi = alokasi_parts[1]
+        g.con.execute(f"UPDATE tabel_transaksi SET no = {no}, tanggal = '{tanggal}', keterangan = '{keterangan}', nominal = {nominal}, alokasi= '{alokasi}', tahun = '{tahun_baru}' WHERE id = {id}")
+        if alokasi_lama != alokasi:
+            g.con.execute(f"UPDATE gabung_anggaran_transaksi SET id_tabel_anggaran = %s WHERE id_transaksi = %s", 
+                           (id_anggaran, id,))
+        # Commit perubahan
+        g.con.connection.commit()
+    return jsonify({"msg":"SUKSES"})
+
+
 @app.route('/admin/edit_dana', methods=['PUT'])
 @jwt_required()
 def edit_dana():
@@ -1140,7 +1175,7 @@ def agenda_tambah():
     try:
         random_name = do_image("tambah","agenda","")
         g.con.execute("INSERT INTO agenda(title, start, end, kategori, pemimpin_kegiatan, keterangan, gambar) VALUES(%s, %s, %s, %s, %s, %s, %s)", (title, jam_mulai, jam_selesai, kategori, pemimpin_kegiatan, keterangan, random_name))
-        mysql.connection.commit()  # Commit setelah INSERT
+        mysql.connection.commit()  
         return jsonify({"msg": "SUKSES"})
     except Exception as e:
         print(str(e))
