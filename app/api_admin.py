@@ -821,6 +821,31 @@ def hapus_dana():
         except Exception as e:
             print(str(e))
             return jsonify({"error": str(e)})
+#hapus
+@app.route('/admin/hapus_dana_new', methods=['DELETE'])
+@jwt_required()
+def hapus_dana_new():
+    tahun = request.form['tahun']
+    tahun = str(tahun)
+    if tahun == "semua_tahun":
+        try:
+            g.con.execute("TRUNCATE `tabel_anggaran`")
+            g.con.execute("TRUNCATE `tabel_transaksi`")
+            g.con.execute("TRUNCATE `gabung_anggaran_transaksi`")
+            mysql.connection.commit()
+            return jsonify({"msg":"SUKSES"})
+        except Exception as e:
+            return jsonify({"error": str(e)})
+    else:
+        try:
+            g.con.execute("DELETE FROM tabel_anggaran WHERE tahun = %s", (tahun,))
+            g.con.execute("DELETE FROM tabel_transaksi WHERE tahun = %s", (tahun,))
+            mysql.connection.commit()
+            return jsonify({"msg":"SUKSES"})
+        except Exception as e:
+            print(str(e))
+            return jsonify({"error": str(e)})
+        
 
 @app.route('/admin/dana/hapus/id', methods=['DELETE'])
 @jwt_required()
