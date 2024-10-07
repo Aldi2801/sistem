@@ -42,7 +42,8 @@
 
         ${category === 'anggaran' ? `
         <div class="form-group"> <label for="uraian">Uraian</label> <input type="text" id="uraian_baris" class="form-control"> </div>
-        <div class="form-group"> <label for="anggaran">Anggaran</label> <input type="number" id="anggaran_baris" class="form-control"> </div>
+    <input  id="harga" >
+        <div class="form-group"> <label for="anggaran">Anggaran</label> <input type="text" oninput="formatRupiah(this)" placeholder="0" id="anggaran_baris" class="form-control"> </div>
         <div class="form-group">
             <label for="type">Type</label>
             <select class="form-select" id="typedropdownSelect">
@@ -53,7 +54,7 @@
         </div>` : `
         <div class="form-group"> <label for="keterangan">Tanggal</label> <input type="date" id="tanggal_baris" class="form-control"> </div>
         <div class="form-group"> <label for="keterangan">Keterangan</label> <input type="text" id="keterangan_baris" class="form-control"> </div>
-        <div class="form-group"> <label for="nominal">Nominal</label> <input type="number" id="nominal_baris" class="form-control"> </div>
+        <div class="form-group"> <label for="nominal">Nominal</label> <input type="text" oninput="formatRupiah(this)" placeholder="0" id="nominal_baris" class="form-control"> </div>
         <div class="form-group">
             <label for="alokasi">Alokasi</label>
             <select class="form-select" id="alokasidropdownSelect">
@@ -63,7 +64,7 @@
                    {% endfor %}
             </select>
         </div>`}
-        <div class="form-group"> <label for="tahun">Tahun</label> <input type="number" id="tahun_baris" class="form-control"> </div>
+        <div class="form-group"> <label for="tahun">Tahun</label> <input type="number" id="tahun_baris"min="1000" max="9999" class="form-control"> </div>
         `,
        function() {
           // Siapkan data untuk dikirim berdasarkan kategori
@@ -78,13 +79,13 @@
             // Jika kategori adalah 'Anggaran', tambahkan data terkait Anggaran
             if (category === 'anggaran') {
                 data.uraian = $('#uraian_baris').val();
-                data.anggaran = $('#anggaran_baris').val();
+                data.anggaran = normalizeValue($('#anggaran_baris').val());
                 data.type = $('#typedropdownSelect').val();
             } else {
                 // Jika kategori bukan 'Anggaran', tambahkan data terkait transaksi lainnya
                 data.tanggal = $('#tanggal_baris').val();
                 data.keterangan = $('#keterangan_baris').val();
-                data.nominal = $('#nominal_baris').val();
+                data.nominal = normalizeValue($('#nominal_baris').val());
                 data.alokasi = $('#alokasidropdownSelect').val();
             }
         handleAjax(
@@ -105,7 +106,7 @@
         <input type="hidden" id="kategori_baris" value="anggaran"> <div class="form-group"> 
         <label for="no">No</label> <input type="number" id="no_baris" class="form-control"> </div>
         <div class="form-group"> <label for="uraian">Uraian</label> <input type="text" id="uraian_baris" class="form-control"> </div>
-        <div class="form-group"> <label for="anggaran">Anggaran</label> <input type="number" id="anggaran_baris" class="form-control"> </div>
+        <div class="form-group"> <label for="anggaran">Anggaran</label> <input type="text" oninput="formatRupiah(this)" placeholder="0" id="anggaran_baris" class="form-control"> </div>
         <div class="form-group">
             <label for="type">Type</label>
             <select class="form-select" id="typedropdownSelect">
@@ -114,7 +115,7 @@
                 <option value="pendapatan">Pendapatan</option>
             </select>
         </div>
-        <div class="form-group"> <label for="tahun">Tahun</label> <input type="number" id="tahun_baris" class="form-control"> </div>
+        <div class="form-group"> <label for="tahun">Tahun</label> <input type="number" min="1000" max="9999" id="tahun_baris" class="form-control"> </div>
         `,
        function() {
           // Siapkan data untuk dikirim berdasarkan kategori
@@ -251,7 +252,7 @@
         <div class="form-group"> <label for="no">No</label> <input type="number" value="${no}" id="no_baris" class="form-control"> </div>
         ${category === 'anggaran' ? `
         <div class="form-group"> <label for="uraian">Uraian</label> <input type="text" id="uraian_baris" value="${uraian}" class="form-control"> </div>
-        <div class="form-group"> <label for="anggaran">Anggaran</label> <input type="number" id="anggaran_baris" value="${anggaran}" class="form-control"> </div>
+        <div class="form-group"> <label for="anggaran">Anggaran</label> <input type="text" oninput="formatRupiah(this)" placeholder="0" id="anggaran_baris" value="${anggaran}" class="form-control"> </div>
         <div class="form-group">
             <label for="type">Type</label>
             <select class="form-select" id="typedropdownSelect">
@@ -261,7 +262,7 @@
         </div>` : `
         <div class="form-group"> <label for="tanggal">Tanggal</label> <input type="date" id="tanggal_baris" value="${tanggal}" class="form-control"> </div>
         <div class="form-group"> <label for="keterangan">Keterangan</label> <input type="text" id="keterangan_baris" value="${keterangan}" class="form-control"> </div>
-        <div class="form-group"> <label for="nominal">Nominal</label> <input type="number" id="nominal_baris" value="${nominal}" class="form-control"> </div>
+        <div class="form-group"> <label for="nominal">Nominal</label> <input type="text" oninput="formatRupiah(this)" placeholder="0" id="nominal_baris" value="${nominal}" class="form-control"> </div>
         <div class="form-group">
             <label for="alokasi">Alokasi</label>
             <select class="form-select" id="alokasidropdownSelect">
@@ -270,7 +271,7 @@
                    {% endfor %}
             </select>
         </div>`}
-        <div class="form-group"> <label for="tahun">Tahun</label> <input type="number" id="tahun_baris" value="${tahun_lama}" class="form-control"> </div></form>`,
+        <div class="form-group"> <label for="tahun">Tahun</label> <input type="number"min="1000" max="9999" id="tahun_baris" value="${tahun_lama}" class="form-control"> </div></form>`,
         function() {
              // Siapkan data untuk dikirim berdasarkan kategori
             const data = {
@@ -285,13 +286,13 @@
             // Jika kategori adalah 'Anggaran', tambahkan data terkait Anggaran
             if (category === 'anggaran') {
                 data.uraian = $('#uraian_baris').val();
-                data.anggaran = $('#anggaran_baris').val();
+                data.anggaran = normalizeValue($('#anggaran_baris').val());
                 data.type = $('#typedropdownSelect').val();
             } else {
                 // Jika kategori bukan 'Anggaran', tambahkan data terkait transaksi lainnya
                 data.tanggal = $('#tanggal_baris').val();
                 data.keterangan = $('#keterangan_baris').val();
-                data.nominal = $('#nominal_baris').val();
+                data.nominal = normalizeValue($('#nominal_baris').val());
                 data.alokasi_lama = alokasi;
                 data.alokasi = $('#alokasidropdownSelect').val();
             }
@@ -319,6 +320,18 @@
       alert('Aksi penghapusan dibatalkan.');
     }
   }
+  function formatRupiah(input) {
+    let angka = input.value.replace(/[^,\d]/g, ''); // Menghapus semua karakter selain angka dan koma
+    if (angka) {
+        let hasil = Number(angka.replace(/,/g, '')).toLocaleString('id-ID'); // Format angka sesuai Indonesia
+        input.value = hasil;
+    } else {
+        input.value = ''; // Jika input tidak valid (semua dihapus), set ke string kosong
+    }
+}
+function normalizeValue(value) {
+    return value.replace(/\./g, ''); // Menghapus semua titik dari value yang diformat
+}
      function formatNumber(number) {
         // Mengubah angka menjadi string dan memisahkan bagian desimal
         var parts = number.toString().split(".");

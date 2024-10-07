@@ -867,11 +867,10 @@ def ubah_urutadana():
 def hapus_dana_new_id():
     tahun = request.json.get("year")
     category = request.json.get("category")
-
-
     id_ = request.json.get("id")
+    
     try:
-        g.con.execute(f"DELETE FROM {category} WHERE id = %s ", (id_,))
+        g.con.execute(f"DELETE FROM tabel_{category} WHERE id = %s ", (id_,))
         mysql.connection.commit()
         hapus_urutan_lama(id_, category, tahun)
         return jsonify({"msg":"SUKSES"})
