@@ -10,6 +10,10 @@
 .head-sub-rab { background-color: #bae7ff; /* Biru sedikit lebih gelap dari data utama */ color: #000; /* Warna teks hitam */ }
 .jumlah{ background-color: #e7e9f0; ; /* Biru sedikit lebih gelap dari data utama */ color: #000; /* Warna teks hitam */ }
 .dataTables_wrapper .dataTables_filter { float: left; text-align: left; margin-right: 10px; }
+.scroll-table {
+  max-height: 500px; /* This will show approximately 6 rows */
+  overflow-y: scroll;
+}
 </style>
 <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
 <script>
@@ -408,70 +412,73 @@ function normalizeValue(value) {
               
               {% for category, info in categories %}
                   <div class="d-flex justify-content-between align-items-center mb-2 mt-3">
-                    <h6 class="mb-0">Realisasi {{ category }}</h6>
-                    {% if category == "Report Dana" %}
-                    {% else %}
-                    <a href="javascript:void(0)" class="btn btn-info" onclick="tambahBaris('{{ category.lower() }}', {{ h.tahun }})">Tambah Baris</a>
-                    {% endif %}
+                      <h6 class="mb-0">Realisasi {{ category }}</h6>
+                      {% if category == "Report Dana" %}
+                      {% else %}
+                      <a href="javascript:void(0)" class="btn btn-info" onclick="tambahBaris('{{ category.lower() }}', {{ h.tahun }})">Tambah Baris</a>
+                      {% endif %}
                   </div>
-                  <div class="table-responsive">
-                    <table id="table_{{ h.tahun }}_{{ loop.index }}" class="table table-bordered display text-nowrap">
-                      <thead style="background-color:#f6f8fb;">
-                        <tr>
-                          <th>No</th>
-                            {% if category == "Anggaran" %}
-                          <th>Uraian</th>
-                          <th>Anggaran</th>
-                          <th>Type</th>
-                          <th>Tahun</th>
-                          <th>Aksi</th>
-                                {% elif category == "Transaksi" %}
-                          <th>Tanggal</th>
-                          <th>Keterangan</th>
-                          <th>Nominal</th>
-                          <th>Alokasi</th>
-                          <th>Aksi</th>
-                                {% elif category == "Report Dana" %}
-                          <th>Uraian</th>
-                          <th>Estimasi / Anggaran</th>
-                          <th>Realisasi</th>
-                          <th>Tahun</th>
-                                {% endif %}
-                        </tr>
-                      </thead>
-                      <tbody>
-                          {% for i in info %}
-                            {% if h.tahun == i.tahun %}
-                                <tr class="{{ i.class }} data-utama" id="{{ i.detail }}">
-                                <td>{{ i.no }}</td>
-                                {% if category == "Anggaran" %}
-                                <td>{{ i.uraian }} </td>
-                                <td class="anggaran_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.anggaran | clean_currency }}">{{ i.anggaran | clean_currency | format_currency }}</td> <!-- Contoh, sesuaikan dengan data Anda -->
-                                <td>{{ i.type }}</td>
-                                <td>{{ i.tahun }}</td>
-                                <td>
-                                  <button onclick="edit({{ i.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.no }}', '{{ i.uraian }}', '{{ i.anggaran }}', '{{ i.type }}', '','','','')" class="btn btn-warning">Edit</button>
-                                  <button onclick="hapus({{ i.tahun }}, '{{ category.lower() }}', {{ i.id }})" class="btn btn-danger">Hapus</button>
-                                </td>
-                                {% elif category == "Transaksi" %}
-                                <td>{{ i.tanggal }} </td>
-                                <td>{{ i.keterangan }}</td>
-                                <td>{{ i.nominal | clean_currency | format_currency }}</td>
-                                <td>{{ i.alokasi }}</td>
-                                <td>
-                                 <button onclick="upload_nota({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.nota }}')" class="btn btn-success">Nota</button>
-                                  <button onclick="edit({{ i.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.no }}', '','','','{{ i.tanggal }}', '{{ i.keterangan }}', {{i.nominal}}, '{{ i.alokasi }}' )" class="btn btn-warning">Edit</button>
-                                  <button onclick="hapus({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }})" class="btn btn-danger">Hapus</button>
-                                </td>
-                                {% elif category == "Report Dana" %}
-                                <td>{{ i.uraian }} </td>
-                                <td>{{ i.anggaran | clean_currency | format_currency }}</td>
-                                <td>{{ i.realisasi | format_currency }}</td>
-                                <td>{{ i.tahun }}</td>
-                                {% endif %}
+                  
+                  <!-- Apply max-height for Transaksi table -->
+                  <div class="table-responsive {% if category == 'Transaksi','Anggaran','Report Dana'  %}scroll-table{% endif %}">
+                      <table id="table_{{ h.tahun }}_{{ loop.index }}" class="table table-bordered display text-nowrap">
+                          <thead style="background-color:#f6f8fb;">
+                              <tr>
+                                  <th>No</th>
+                                  {% if category == "Anggaran" %}
+                                  <th>Uraian</th>
+                                  <th>Anggaran</th>
+                                  <th>Type</th>
+                                  <th>Tahun</th>
+                                  <th>Aksi</th>
+                                  {% elif category == "Transaksi" %}
+                                  <th>Tanggal</th>
+                                  <th>Keterangan</th>
+                                  <th>Nominal</th>
+                                  <th>Alokasi</th>
+                                  <th>Aksi</th>
+                                  {% elif category == "Report Dana" %}
+                                  <th>Uraian</th>
+                                  <th>Estimasi / Anggaran</th>
+                                  <th>Realisasi</th>
+                                  <th>Tahun</th>
+                                  {% endif %}
                               </tr>
-                            {% endif %}
-                          {% endfor %}
+                          </thead>
+                          <tbody>
+                              {% for i in info %}
+                                  {% if h.tahun == i.tahun %}
+                                  <tr class="{{ i.class }} data-utama" id="{{ i.detail }}">
+                                      <td>{{ i.no }}</td>
+                                      {% if category == "Anggaran" %}
+                                      <td>{{ i.uraian }} </td>
+                                      <td class="anggaran_{{ category.lower() }}_{{ h.tahun }}" data="{{ i.anggaran | clean_currency }}">{{ i.anggaran | clean_currency | format_currency }}</td>
+                                      <td>{{ i.type }}</td>
+                                      <td>{{ i.tahun }}</td>
+                                      <td>
+                                        <button onclick="edit({{ i.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.no }}', '{{ i.uraian }}', '{{ i.anggaran }}', '{{ i.type }}', '','','','')" class="btn btn-warning">Edit</button>
+                                        <button onclick="hapus({{ i.tahun }}, '{{ category.lower() }}', {{ i.id }})" class="btn btn-danger">Hapus</button>
+                                      </td>
+                                      {% elif category == "Transaksi" %}
+                                      <td>{{ i.tanggal }} </td>
+                                      <td>{{ i.keterangan }}</td>
+                                      <td>{{ i.nominal | clean_currency | format_currency }}</td>
+                                      <td>{{ i.alokasi }}</td>
+                                      <td>
+                                      <button onclick="upload_nota({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.nota }}')" class="btn btn-success">Nota</button>
+                                        <button onclick="edit({{ i.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.no }}', '','','','{{ i.tanggal }}', '{{ i.keterangan }}', {{i.nominal}}, '{{ i.alokasi }}' )" class="btn btn-warning">Edit</button>
+                                        <button onclick="hapus({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }})" class="btn btn-danger">Hapus</button>
+                                      </td>
+                                      {% elif category == "Report Dana" %}
+                                      <td>{{ i.uraian }} </td>
+                                      <td>{{ i.anggaran | clean_currency | format_currency }}</td>
+                                      <td>{{ i.realisasi | format_currency }}</td>
+                                      <td>{{ i.tahun }}</td>
+                                      {% endif %}
+                                  </tr>
+                                  {% endif %}
+                              {% endfor %}
+          
                     </tbody>
                 </table>
                 <script>$("#table_{{ h.tahun }}_{{ loop.index }}").DataTable({
