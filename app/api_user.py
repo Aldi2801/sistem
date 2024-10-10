@@ -120,15 +120,46 @@ def set_urutan(column, year):
             print("Error: Hasil bukan JSON yang valid:", result)
     return urutan if urutan else set_urutan_default(column)
 #halaman dana
-@app.route('/dana/<thn>')
-def dana_desa(thn):
-    info_list = fetch_data_and_format("SELECT * FROM realisasi_pendapatan where tahun = "+thn+" ORDER BY id")
-    info_list2 = fetch_data_and_format("SELECT * FROM realisasi_belanja where tahun = "+thn+" ORDER BY id")
-    info_list3 = fetch_data_and_format("SELECT * FROM realisasi_pembiayaan where tahun = "+thn+" ORDER BY id")
+@app.route('/dana_old/<thn>')
+def dana_desa_old(thn):
+    info_list = fetch_data_and_format(f"SELECT * FROM realisasi_pendapatan where tahun = {thn} ORDER BY id")
+    info_list2 = fetch_data_and_format(f"SELECT * FROM realisasi_belanja where tahun = {thn} ORDER BY id")
+    info_list3 = fetch_data_and_format(f"SELECT * FROM realisasi_pembiayaan where tahun = {thn} ORDER BY id")
     return render_template("dana.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn,  
                            urutan_pendapatan=set_urutan("pendapatan", thn), 
                            urutan_belanja=set_urutan("belanja", thn), 
                            urutan_pembiayaan=set_urutan("pembiayaan", thn))
+@app.route('/dana/<thn>')
+def dana_desa(thn):
+ # Mengambil data dari tabel
+    info_list = fetch_data_and_format(f"SELECT * FROM tabel_anggaran WHERE tahun = {thn} ORDER BY no")
+    info_list2 = fetch_data_and_format(f"SELECT * FROM tabel_transaksi WHERE tahun = {thn} ORDER BY no")
+    gabung = fetch_data_and_format("SELECT * FROM gabung_anggaran_transaksi")
+
+    info_list3 = []
+
+    # Proses penggabungan data
+    for j in info_list:  # j adalah dictionary, akses dengan key ['id']
+        item = {
+            'id': j['id'],  # Akses sebagai dictionary
+            'no': j['no'],
+            'uraian': j['uraian'],
+            'anggaran': j['anggaran'],
+            'tahun': j['tahun'],
+            'realisasi': 0  # Inisialisasi total nominal
+        }
+        
+        # Menjumlahkan nominal dari transaksi berdasarkan id_tabel_anggaran
+        for i in gabung:  # i adalah dictionary, akses dengan key ['id_tabel_anggaran']
+            if i['id_tabel_anggaran'] == j['id']:
+                for k in info_list2:  # k adalah dictionary, akses dengan key ['id']
+                    if i['id_transaksi'] == k['id']:
+                        # Menambahkan nominal dari transaksi ke dalam item
+                        item['realisasi'] += int(k['nominal'])
+
+        # Masukkan item yang sudah dijumlahkan ke dalam list
+        info_list3.append(item)
+    return render_template("dana_new.html",info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn)
 #halaman monografi
 @app.route('/monografi')
 def mono():
