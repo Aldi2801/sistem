@@ -13,7 +13,6 @@ def before_request():
 def teardown_request(exception):
     if hasattr(g, 'con'):
         g.con.close()
-        
 def fetch_data_and_format(query):
     g.con.execute(query)
     data = g.con.fetchall()
@@ -146,7 +145,8 @@ def dana_desa(thn):
             'uraian': j['uraian'],
             'anggaran': j['anggaran'],
             'tahun': j['tahun'],
-            'realisasi': 0  # Inisialisasi total nominal
+            'realisasi': 0 , # Inisialisasi total nominal
+            'lebih_kurang': 0  
         }
         
         # Menjumlahkan nominal dari transaksi berdasarkan id_tabel_anggaran
@@ -157,9 +157,11 @@ def dana_desa(thn):
                         # Menambahkan nominal dari transaksi ke dalam item
                         item['realisasi'] += int(k['nominal'])
 
+        item['lebih_kurang'] += int(item['anggaran']) - int(item['relisasi'])
         # Masukkan item yang sudah dijumlahkan ke dalam list
         info_list3.append(item)
-    return render_template("dana_new.html",info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn)
+
+    return render_template("dana_new.html",info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn, jml_anggaran = jml_anggaran, jml_realisasi = jml_realisasi, jml_lebih_kurang = jml_lebih_kurang)
 #halaman monografi
 @app.route('/monografi')
 def mono():

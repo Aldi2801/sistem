@@ -286,7 +286,7 @@ def hapus_berita():
     except Exception as e:
         print(str(e))
         return jsonify({"error": str(e)})
-#Dana
+#function di render_template
 @app.template_filter('format_currency')
 def format_currency(value):
     locale.setlocale(locale.LC_ALL, 'id_ID.UTF-8')
@@ -296,6 +296,12 @@ def clean_currency(value):
     """Remove 'Rp', dots, and spaces, then convert to float"""
     cleaned_value = value.replace('Rp', '').replace('RP', '').replace('.', '').replace(',', '.').strip()
     return float(cleaned_value)
+@app.template_filter('angka_ke_huruf')
+def angka_ke_huruf(n):
+    if 1 <= n <= 26:
+        return chr(n + 96)
+    else:
+        return "Angka harus antara 1 dan 26."
 
 
 def set_urutan_default(info_list):
@@ -320,39 +326,42 @@ def set_urutan(column, years):
             except json.JSONDecodeError:
                 print("Error: Hasil bukan JSON yang valid:", result)
     return urutan if urutan else set_urutan_default(column)
-
 @app.route('/admin/dana')
 def admindana():
-    # Mengambil data dari tabel
     info_list = fetch_data_and_format("SELECT * FROM tabel_anggaran ORDER BY no")
     info_list2 = fetch_data_and_format("SELECT * FROM tabel_transaksi ORDER BY no")
     gabung = fetch_data_and_format("SELECT * FROM gabung_anggaran_transaksi")
-
-    info_list3 = []
-
-    # Proses penggabungan data
-    for j in info_list:  # j adalah dictionary, akses dengan key ['id']
-        item = {
-            'id': j['id'],  # Akses sebagai dictionary
-            'no': j['no'],
-            'uraian': j['uraian'],
-            'anggaran': j['anggaran'],
-            'tahun': j['tahun'],
-            'realisasi': 0  # Inisialisasi total nominal
-        }
-        
-        # Menjumlahkan nominal dari transaksi berdasarkan id_tabel_anggaran
-        for i in gabung:  # i adalah dictionary, akses dengan key ['id_tabel_anggaran']
-            if i['id_tabel_anggaran'] == j['id']:
-                for k in info_list2:  # k adalah dictionary, akses dengan key ['id']
-                    if i['id_transaksi'] == k['id']:
-                        # Menambahkan nominal dari transaksi ke dalam item
-                        item['realisasi'] += int(k['nominal'])
-
-        # Masukkan item yang sudah dijumlahkan ke dalam list
-        info_list3.append(item)
+    info_list3 = [{**j, 
+                    'realisasi': (realisasi := sum( int(k['nominal']) for i in gabung if i['id_tabel_anggaran'] == j['id'] for k in info_list2 if i['id_transaksi'] == k['id'] )),
+                    'lebih_kurang': int(j['anggaran']) - realisasi} for j in info_list ]
     thn = fetch_years("SELECT tahun FROM tabel_anggaran GROUP BY tahun")
-    return render_template("admin/dana_transaksi.html",info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn)
+    summary = []
+    for h in thn:
+        pendapatan = [k for k in info_list3 if k['tahun'] == h['tahun'] and k['type'] == "pendapatan"]
+        pengeluaran = [k for k in info_list3 if k['tahun'] == h['tahun'] and k['type'] == "pengeluaran"]
+        item = {
+            'tahun': h['tahun'],
+            'jml_anggaran_pendapatan': sum(int(k['anggaran']) for k in pendapatan),
+            'jml_realisasi_pendapatan': sum(int(k['realisasi']) for k in pendapatan),
+            'jml_anggaran_pengeluaran': sum(int(k['anggaran']) for k in pengeluaran),
+            'jml_realisasi_pengeluaran': sum(int(k['realisasi']) for k in pengeluaran),
+        }
+        item.update({
+            'jml_lebih_kurang_pendapatan': format_currency(item['jml_anggaran_pendapatan'] - item['jml_realisasi_pendapatan']),
+            'jml_lebih_kurang_pengeluaran': format_currency(item['jml_anggaran_pengeluaran'] - item['jml_realisasi_pengeluaran']),
+            'summary_pendapatan': (
+                "Realisasi Pendapatan melebihi Estimasi yang diprediksi" if item['jml_anggaran_pendapatan'] < item['jml_realisasi_pendapatan'] else
+                "Realisasi Pendapatan kurang dari Estimasi yang diprediksi" if item['jml_anggaran_pendapatan'] > item['jml_realisasi_pendapatan'] else
+                "Realisasi Pendapatan sesuai Estimasi yang diprediksi"
+            ),
+            'summary_pengeluaran': (
+                "Realisasi Pengeluaran kurang dari Anggaran yang ditentukan" if item['jml_anggaran_pengeluaran'] < item['jml_realisasi_pengeluaran'] else
+                "Realisasi Pengeluaran melebihi Anggaran yang ditentukan" if item['jml_anggaran_pengeluaran'] > item['jml_realisasi_pengeluaran'] else
+                "Realisasi Pengeluaran sama dengan Anggaran yang ditentukan"
+            ),
+        })
+        summary.append(item)
+    return render_template("admin/dana_transaksi.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn, summary=summary)
 
 @app.route('/admin/dana/ubah_urutan', methods=['PUT'])
 @jwt_required()

@@ -1,0 +1,271 @@
+{% extends 'include/base.html' %} 
+{% block head %}
+<style>
+.hidden-row {
+  display: none;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.3s ease!important;
+}
+
+.clickable-row:hover {
+  text-decoration-thickness: 2px;
+  text-decoration: underline;
+  background-color: #b0b0b0!important; /* Warna sedikit lebih gelap saat di-hover */
+}
+</style>
+<script>
+    function upload_nota(year, category, id,nama_nota){
+        $("#tahun_nota").val(year);
+        $("#kategori_nota").val(category);
+        $("#id_nota").val(id);
+        console.log(nama_nota)
+        if(nama_nota == ""){
+            var pesan = "Tidak Ada Nota / Bukti"
+            $("#nama_nota").html(pesan);
+            $("#nama_nota").show();
+        }
+        else{
+          var pesan = "Nota / Bukti bisa dilihat disini <a target='_blank' href='/static/nota/"+nama_nota+"'>"+nama_nota+"</a>"
+          $("#nama_nota").html(pesan);
+          $("#nama_nota").show();
+        }
+        $("#bs-nota-modal-x2").modal('show'); 
+      }
+      function modal_rab(year,kategori,summary){
+        var judul= "RAB "+kategori+" "+year
+        $("#myLargeModalLabel").html(judul)
+        $("#nama_nota").html(summary);
+        $("#nama_nota").show();
+        $("#bs-nota-modal-x2").modal('show'); 
+      }
+      function modal_summary(year,kategori,summary){
+        var judul= "Summary "+kategori+" "+year
+        $("#myLargeModalLabel").html(judul)
+        $("#nama_nota").html(summary);
+        $("#nama_nota").show();
+        $("#bs-nota-modal-x2").modal('show'); 
+      }
+</script>
+{% endblock %}
+{% block content %}
+<div class="page-titles">
+    <div class="row">
+        <div class="col-lg-8 col-md-6 col-12 align-self-center">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 d-flex align-items-center">
+                    <li class="breadcrumb-item">
+                        <a href="/" class="link"><i class="ri-home-3-line fs-5"></i></a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Dana Desa</li>
+                </ol>
+            </nav>
+            <h1 class="mb-0 fw-bold">Realisasi Dana Desa {{tahun}}</h1>
+        </div>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-between ">
+                    <h1 class="mb-0 fw-bold mr-3">Realisasi Pendapatan</h1>
+                    </div>
+                </div>
+                    <div class="card-body">
+                        <small>Realisasi pendapatan adalah jumlah pendapatan yang benar-benar diperoleh atau diterima oleh suatu individu, perusahaan, atau organisasi dalam periode tertentu. Ini merupakan angka aktual yang menunjukkan seberapa besar pendapatan yang telah tercapai dibandingkan dengan target atau perkiraan yang telah ditetapkan sebelumnya.</small>
+                        <div class = "table-responsive">
+                        {% if info_list %}
+                        <table id="file_export" class="table table-striped table-bordered display text-nowrap"style="border:0px; border-bottom: 1px solid ;">
+                            <thead>
+                            <tr>
+                              <th >No</th>
+                              <th >Uraian</th>
+                              <th >Anggaran</th>
+                              <th >Realisasi</th>
+                              <th >Lebih/(Kurang)</th>
+                              <th >Tahun</th>
+                              <th >Nota/Bukti</th>
+                            </tr>
+                        </thead>
+                            {% for i in info_list %}
+                            <tr class="{{i.class}}" id="{{i.detail}}" onclick="{{i.onclick}}" {% if i.class|string == "clickable-row" %} title="klik untuk melihat detail" {% endif %} style="border:0px">
+                                <td>{{i.no}}</td>
+                                <td>{{i.uraian}}</td>
+                                <td>{{i.anggaran}}</td>
+                                <td>{{i.realisasi}}</td>
+                                <td>{{i['lebih/(kurang)']}}</td>
+                                <td>{{i.tahun}}</td>
+                                <td>
+                                    <button onclick="upload_nota({{i.tahun}},'pendapatan',{{i.id}},'{{i.nota}}')" class="btn btn-success">Lihat Nota / Bukti</button>
+                                </td>              
+                            </tr>
+                            {% endfor %}
+                          </table>
+                          {% else %}
+                            <p>No data available.</p>
+                        {% endif %}
+                        <!---->
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-between ">
+                <h1 class="mb-0 fw-bold mr-3">Realisasi Belanja</h1>
+                </div>
+            </div>
+                <div class="card-body">
+                    <small>Realisasi belanja merujuk pada penggunaan dana atau sumber pembiayaan yang telah disetujui atau dialokasikan untuk membiayai pengeluaran atau belanja yang dilakukan oleh pemerintah desa. Ini mencakup semua pengeluaran yang sebenarnya telah terjadi atau tercatat dalam laporan keuangan desa selama periode tertentu. Realisasi belanja ini mencakup berbagai jenis pengeluaran, seperti pembelian barang, pembayaran gaji pegawai, pembangunan infrastruktur, dan lain sebagainya. </small><br><br>
+          <div class = "table-responsive">
+                        {% if info_list2 %}
+                        
+                        <table id="file_export" class="table table-striped table-bordered display text-nowrap"style="border:0px; border-bottom: 1px solid ;">
+                            <thead>
+                            <tr>
+                              <th >No</th>
+                              <th >Uraian</th>
+                              <th >Anggaran</th>
+                              <th >Realisasi</th>
+                              <th >Lebih/(Kurang)</th>
+                              <th >Tahun</th>
+                              <th >Nota/Bukti</th>
+                            </tr>
+                            </thead>
+                            {% for i in info_list2 %}
+                            <tr class="{{i.class}}" id="{{i.detail}}" onclick="{{i.onclick}}" {% if i.class|string == "clickable-row" %} title="klik untuk melihat detail" {% endif %} style="border:0px">
+                                <td>{{i.no}}</td>
+                                <td>{{i.uraian}}</td>
+                                <td>{{i.anggaran}}</td>
+                                <td>{{i.realisasi}}</td>
+                                <td>{{i['lebih/(kurang)']}}</td>
+                                <td>{{i.tahun}}</td>
+                                <td>
+                                    <button onclick="upload_nota({{i.tahun}},'pendapatan',{{i.id}},'{{i.nota}}')" class="btn btn-success">Lihat Nota / Bukti</button>
+                                </td>     
+                            </tr>
+                            {% endfor %}
+                        </table>
+                        {% else %}
+                        <p>No data available.</p>
+                        {% endif %}
+                        <!-- -->
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-between ">
+                <h1 class="mb-0 fw-bold mr-3">Realisasi Pembiayaan</h1>
+                </div>
+            </div>
+                <div class="card-body">
+                    <small>Realisasi pembiayaan adalah saat dana atau sumber pembiayaan yang telah disetujui atau dijanjikan benar-benar tersedia atau digunakan oleh desa untuk mendukung kegiatan atau proyek tertentu. Ini bisa berupa dana hibah, pinjaman, atau sumber pembiayaan lainnya yang telah dicairkan atau digunakan secara efektif oleh pemerintah desa sesuai dengan peruntukannya</small><br><br>
+                        <div class = "table-responsive">
+                        {% if info_list3 %}
+                        <table id="file_export" class="table table-striped table-bordered display text-nowrap" style="border:0px; border-bottom: 1px solid ;">
+                            <thead>
+                            <tr >
+                              <th >No</th>
+                              <th >Uraian</th>
+                              <th >Anggaran</th>
+                              <th >Realisasi</th>
+                              <th >Lebih/(Kurang)</th>
+                              <th >Tahun</th>
+                              <th >Nota/Bukti</th>
+                            </tr>
+                        </thead>
+                            {% for i in info_list3 %}
+                            <tr class="{{i.class}}" id="{{i.detail}}" onclick="{{i.onclick}}" {% if i.class|string == "clickable-row" %} title="klik untuk melihat detail" {% endif %} style="border:0px">
+                                <td>{{i.no}}</td>
+                                <td>{{i.uraian}}</td>
+                                <td>{{i.anggaran}}</td>
+                                <td>{{i.realisasi}}</td>
+                                <td>{{i['lebih/(kurang)']}}</td>
+                                <td>{{i.tahun}}</td>
+                                <td>
+                                    <button onclick="upload_nota({{i.tahun}},'pendapatan',{{i.id}},'{{i.nota}}')" class="btn btn-success">Lihat Nota / Bukti</button>
+                                </td>     
+                            </tr>
+                            {% endfor %}
+                          </table>
+                          {% else %}
+                        <p>No data available.</p>
+                        {% endif %}
+                        <!---->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mt-4 mt-md-0">
+            <div class="card">
+                <div class="card-body">
+                    <center>
+                        <img src="../static/image/logo.png" style="width: 150px; height: 100px;"
+                            alt="logo admin"><br><br>
+                    </center>
+                    <h4>Sistem Informasi desa pangkah</h4>
+                    <p><strong>Desa pangkah</strong> berada di kecamatan Pangkah Kab. Tegal, dengan sebagian
+                        besar penduduknya sebagai Perindustrian/jasa menjadikan desa pangkah memiliki potensi
+                        wisata .</p><br>
+                    <p>Dengan luas wilayah 62.98 m<sup>2</sup> ini populasinya dianggap cukup karena dari total
+                        penduduk sebesar 2950, terbagi para laki-laki di pangkah sebanyak 1474 orang dan 1476
+                        sisanya wanita.</p><br>
+                    <br><br><br><br><br><br><br><br><br><br><br><br>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="text-uppercase">Kontak Bantuan</h4>
+                    <hr>
+                    <h4 class="d-flex align-item-center">
+                        <i class="ri-smartphone-line"></i> 081227589209
+                    </h4>
+                    <small>Please contact with us if you have any questions. We are
+                        avalible 24h.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal upload nota  -->
+<div class="modal fade" id="bs-nota-modal-x2" tabindex="-1" aria-labelledby="bs-nota-modal-lg" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header d-flex align-items-center">
+          <h4 class="modal-title" id="myLargeModalLabel">Upload Nota</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <span id="nama_nota" class="mt-2"></span>
+          <input type="hidden" id="tahun_nota">
+          <input type="hidden" id="kategori_nota">
+          <input type="hidden" id="id_nota">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+  function toggleDetails(ids) {
+    var idArray = ids.split(',');
+    idArray.forEach(function(id) {
+      var element = document.getElementById(id.trim());
+      if (element.style.display === "none" || element.style.display === "") {
+        element.style.display = "table-row";
+      } else {
+        element.style.display = "none";
+      }
+    });
+  }
+</script>
+{% endblock %}
