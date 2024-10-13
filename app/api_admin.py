@@ -299,7 +299,7 @@ def clean_currency(value):
 @app.template_filter('angka_ke_huruf')
 def angka_ke_huruf(n):
     if 1 <= n <= 26:
-        return chr(n + 96)
+        return chr(n + 64)
     else:
         return "Angka harus antara 1 dan 26."
 
@@ -341,23 +341,23 @@ def admindana():
         pengeluaran = [k for k in info_list3 if k['tahun'] == h['tahun'] and k['type'] == "pengeluaran"]
         item = {
             'tahun': h['tahun'],
-            'jml_anggaran_pendapatan': sum(int(k['anggaran']) for k in pendapatan),
-            'jml_realisasi_pendapatan': sum(int(k['realisasi']) for k in pendapatan),
-            'jml_anggaran_pengeluaran': sum(int(k['anggaran']) for k in pengeluaran),
-            'jml_realisasi_pengeluaran': sum(int(k['realisasi']) for k in pengeluaran),
+            'jml_anggaran_pendapatan': (jml_anggaran_pendapatan := sum(int(k['anggaran']) for k in pendapatan)),
+            'jml_realisasi_pendapatan':  (jml_realisasi_pendapatan  := sum(int(k['realisasi']) for k in pendapatan)),
+            'jml_anggaran_pengeluaran':  (jml_anggaran_pengeluaran  := sum(int(k['anggaran']) for k in pengeluaran)),
+            'jml_realisasi_pengeluaran': (jml_realisasi_pengeluaran := sum(int(k['realisasi']) for k in pengeluaran)),
         }
         item.update({
-            'jml_lebih_kurang_pendapatan': format_currency(item['jml_anggaran_pendapatan'] - item['jml_realisasi_pendapatan']),
-            'jml_lebih_kurang_pengeluaran': format_currency(item['jml_anggaran_pengeluaran'] - item['jml_realisasi_pengeluaran']),
+            'jml_lebih_kurang_pendapatan': (jml_lebih_kurang_pendapatan := format_currency(item['jml_anggaran_pendapatan'] - item['jml_realisasi_pendapatan'])),
+            'jml_lebih_kurang_pengeluaran': (jml_lebih_kurang_pengeluaran := format_currency(item['jml_anggaran_pengeluaran'] - item['jml_realisasi_pengeluaran'])),
             'summary_pendapatan': (
-                "Realisasi Pendapatan melebihi Estimasi yang diprediksi" if item['jml_anggaran_pendapatan'] < item['jml_realisasi_pendapatan'] else
-                "Realisasi Pendapatan kurang dari Estimasi yang diprediksi" if item['jml_anggaran_pendapatan'] > item['jml_realisasi_pendapatan'] else
-                "Realisasi Pendapatan sesuai Estimasi yang diprediksi"
+                f"Realisasi Pendapatan melebihi Estimasi yang diprediksi. Dari total anggaran sebesar {format_currency(int(jml_anggaran_pendapatan))}, realisasi pendapatan mecapai {format_currency(int(jml_realisasi_pendapatan))}, dengan selisih lebih besar {(jml_lebih_kurang_pendapatan)}" if item['jml_anggaran_pendapatan'] < item['jml_realisasi_pendapatan'] else
+                f"Realisasi Pendapatan kurang dari Estimasi yang diprediksi. Dari total anggaran sebesar {format_currency(int(jml_anggaran_pendapatan))}, realisasi pendapatan mecapai {format_currency(int(jml_realisasi_pendapatan))}, dengan selisih lebih besar {(jml_lebih_kurang_pendapatan)}" if item['jml_anggaran_pendapatan'] > item['jml_realisasi_pendapatan'] else
+                f"Realisasi Pendapatan sesuai Estimasi yang diprediksi. Dari total anggaran sebesar {format_currency(int(jml_anggaran_pendapatan))}, realisasi pendapatan mecapai {format_currency(int(jml_realisasi_pendapatan))}, dengan selisih lebih besar {(jml_lebih_kurang_pendapatan)}"
             ),
             'summary_pengeluaran': (
-                "Realisasi Pengeluaran kurang dari Anggaran yang ditentukan" if item['jml_anggaran_pengeluaran'] < item['jml_realisasi_pengeluaran'] else
-                "Realisasi Pengeluaran melebihi Anggaran yang ditentukan" if item['jml_anggaran_pengeluaran'] > item['jml_realisasi_pengeluaran'] else
-                "Realisasi Pengeluaran sama dengan Anggaran yang ditentukan"
+                f"Realisasi Pengeluaran untuk seluruh bidang kegiatan desa lebih tinggi dibandingkan dengan anggaran yang telah diterapkan. Dari total anggaran sebesar {format_currency(int(jml_anggaran_pengeluaran))}, realisasi pengeluaran mencapai {format_currency(int(jml_realisasi_pengeluaran))}. Terdapat selisih kurang sebesar {(jml_lebih_kurang_pengeluaran)}, yang menunjukan adanya pengeluaran yang melebihi anggaran di beberapa bidang" if item['jml_anggaran_pengeluaran'] < item['jml_realisasi_pengeluaran'] else
+                f"Realisasi Pengeluaran untuk seluruh bidang kegiatan desa lebih rendah dibandingkan dengan anggaran yang telah diterapkan. Dari total anggaran sebesar {format_currency(int(jml_anggaran_pengeluaran))}, realisasi pengeluaran mencapai {format_currency(int(jml_realisasi_pengeluaran))}. Terdapat selisih lebih besar {(jml_lebih_kurang_pengeluaran)}, yang menunjukan efisiensi dalam penggunaan dana di beberapa bidang" if item['jml_anggaran_pengeluaran'] > item['jml_realisasi_pengeluaran'] else
+                f"Realisasi Pengeluaran untuk seluruh bidang kegiatan desa sama dengan dibandingkan dengan anggaran yang telah diterapkan. Dari total anggaran sebesar {format_currency(int(jml_anggaran_pengeluaran))}, realisasi pengeluaran mencapai {format_currency(int(jml_realisasi_pengeluaran))}. Tidak Terdapat selisih yang menunujukan efisiensi dalam penggunaan dana di seluruh bidang"
             ),
         })
         summary.append(item)

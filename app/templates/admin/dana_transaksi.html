@@ -55,7 +55,6 @@
 
         ${category === 'anggaran' ? `
         <div class="form-group"> <label for="uraian">Uraian</label> <input type="text" id="uraian_baris" class="form-control"> </div>
-    <input  id="harga" >
         <div class="form-group"> <label for="anggaran">Anggaran</label> <input type="text" oninput="formatRupiah(this)" placeholder="0" id="anggaran_baris" class="form-control"> </div>
         <div class="form-group">
             <label for="type">Type</label>
@@ -325,10 +324,10 @@ function summary(
         {% endfor %}
                 <tr>
                 <td></td>
-                    <td>Jumlah</td>
-                    <td>${jml_anggaran_pengeluaran}</td>
-                    <td>${jml_realisasi_pengeluaran}</td>
-                    <td>${jml_lebih_kurang_pengeluaran}</td>
+                    <td><strong>Jumlah</strong></td>
+                    <td><strong>${jml_anggaran_pengeluaran}</strong></td>
+                    <td><strong>${jml_realisasi_pengeluaran}</strong></td>
+                    <td><strong>${jml_lebih_kurang_pengeluaran}</strong></td>
                 </tr>
             </tbody>
         </table>
@@ -337,14 +336,14 @@ function summary(
 
     // Gabungan konten modal dengan pesan pendapatan dan pengeluaran serta tabel
     const modalContent = `
-        <span class="mb-2 summary-text">Summary Pendapatan tahun ${tahun}</span><br>   
+        <span class="mb-4 summary-text">Summary Pendapatan tahun ${tahun}</span><br>
         
-        <span class="mb-2 summary-text">${pesan_pendapatan}</span><br>
         ${pendapatanTable}
+        <span class="mb-2 summary-text">${pesan_pendapatan}</span><br><hr>
 
-        <span class="mb-2 summary-text">Summary Pengeluaran tahun ${tahun}</span><br>   
-        <span class="mb-2 summary-text">${pesan_pengeluaran}</span><br>
+        <span class="mb-4 summary-text">Summary Pengeluaran tahun ${tahun}</span><br>   
         ${pengeluaranTable}
+        <span class="mb-2 summary-text">${pesan_pengeluaran}</span><br>
 
         <input type="hidden" id="tahun_nota" value="${tahun}">
         <input type="hidden" id="kategori_nota" value="summary">
