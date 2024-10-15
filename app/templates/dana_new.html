@@ -81,9 +81,7 @@
   function showModal(title, body, onSubmit) {
     document.getElementById('modal-title').innerText = title;
     document.getElementById('modal-body').innerHTML = body;
-    document.getElementById('modal-submit').onclick = onSubmit;
     $('#generic-modal').modal('show');
-    $("#modal-submit").hide()
   }
 
 
@@ -589,9 +587,6 @@ function normalizeValue(value) {
       </div>
       <div class="modal-body" id="modal-body">...</div>
       <div class="modal-footer">
-        <div class="col-lg-4 col-md-6 d-md-flex align-items-center justify-content-end">
-          <a id="modal-submit" class="btn btn-info d-flex align-items-center ms-2">Submit</a>
-        </div>
         <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
