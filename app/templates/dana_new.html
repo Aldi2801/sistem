@@ -1,21 +1,5 @@
 {% extends 'include/base.html' %} 
 {% block head %}
-<style>
-.hidden-row {
-  display: none;
-}
-
-.clickable-row {
-  cursor: pointer;
-  transition: background-color 0.3s ease!important;
-}
-
-.clickable-row:hover {
-  text-decoration-thickness: 2px;
-  text-decoration: underline;
-  background-color: #b0b0b0!important; /* Warna sedikit lebih gelap saat di-hover */
-}
-</style>
 <script>
     function upload_nota(year, category, id,nama_nota){
         $("#tahun_nota").val(year);
@@ -49,6 +33,214 @@
         $("#bs-nota-modal-x2").modal('show'); 
       }
 </script>
+<link rel="stylesheet" type="text/css" href="../../static/assets/libs/quill/dist/quill.snow.css" />
+<style>
+.hidden-row { display: none; }
+.clickable-row { cursor: pointer; transition: background-color 0.3s ease; }
+.clickable-row:hover { text-decoration: underline; background-color: #b0b0b0; }
+.data-utama { background-color: #e6f7ff; /* Biru muda lembut */ color: #000; /* Warna teks hitam */ }
+.sub-detail { background-color: #d9f7be; /* Hijau muda lembut */ color: #000; /* Warna teks hitam */ }
+.sub-rab { background-color: #fffbe6; /* Kuning pastel lembut */ color: #000; /* Warna teks hitam */ }
+.head-sub-rab { background-color: #bae7ff; /* Biru sedikit lebih gelap dari data utama */ color: #000; /* Warna teks hitam */ }
+.jumlah{ background-color: #e7e9f0; ; /* Biru sedikit lebih gelap dari data utama */ color: #000; /* Warna teks hitam */ }
+.dataTables_wrapper .dataTables_filter { float: left; text-align: left; margin-right: 10px; }
+.scroll-table {
+  max-height: 500px; /* This will show approximately 6 rows */
+  overflow-y: scroll;
+}
+.custom-table-pendapatan thead { background-color: #28a745; color: white; }
+.custom-table-pendapatan tbody tr { background-color: #e9f7ef; }
+.custom-table-pendapatan tbody tr:hover { background-color: #c3e6cb; }
+.custom-table-pengeluaran thead { background-color: #dc3545; color: white; }
+.custom-table-pengeluaran tbody tr { background-color: #f8d7da; }
+.custom-table-pengeluaran tbody tr:hover { background-color: #f5c6cb; }
+.custom-table tbody td { border: 1px solid #dee2e6; }
+.summary-text { font-weight: bold; margin-bottom: 18px; line-height: 1.5; font-size: 1.2em; letter-spacing: 0.5px; }
+  .ql-toolbar .ql-formats svg {
+    width: 20px; /* Lebar ikon */
+    height: 20px; /* Tinggi ikon */
+}
+  .ql-toolbar .ql-formats ql-align svg{
+    padding-bottom:5px;
+}
+</style>
+<script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
+<script>
+  function handleAjax(url, method, data, onSuccess, onError) {
+    $.ajax({
+      url: url,
+      method: method,
+      data: JSON.stringify(data),
+      contentType: 'application/json',
+      headers: { 'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}" },
+      success: onSuccess,
+      error: onError
+    });
+  }
+
+  function showModal(title, body, onSubmit) {
+    document.getElementById('modal-title').innerText = title;
+    document.getElementById('modal-body').innerHTML = body;
+    document.getElementById('modal-submit').onclick = onSubmit;
+    $('#generic-modal').modal('show');
+    $("#modal-submit").hide()
+  }
+
+
+ function ubahLabel() {
+    const isRab = document.querySelector('input[name="rab"]:checked').value;
+    const label1 = document.getElementById('label1');
+    const label2 = document.getElementById('label2');
+    const label3 = document.getElementById('label3');
+    const label4 = document.getElementById('label4');
+    const rab = document.getElementById('rab');
+    
+    if (isRab === '1') {
+        label1.textContent = "Volume";
+        label2.textContent = "Satuan";
+        label3.textContent = "Harga Satuan (Rp)";
+        label4.textContent = "Jumlah (Rp)";
+    } else {
+        label1.textContent = "Anggaran";
+        label2.textContent = "Realisasi";
+        label3.textContent = "Lebih/(Kurang)";
+        label4.textContent = "Tahun";
+    }
+}
+function summary(
+    tahun, 
+    pesan_pendapatan, jml_anggaran_pendapatan, jml_realisasi_pendapatan, jml_lebih_kurang_pendapatan,
+    pesan_pengeluaran, jml_anggaran_pengeluaran, jml_realisasi_pengeluaran, jml_lebih_kurang_pengeluaran
+) {
+    // Konten untuk tabel pendapatan
+    const pendapatanTable = `
+    <div class="table-responsive scroll-table">
+        <table class="table custom-table-pendapatan">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Uraian</th>
+                    <th>Anggaran</th>
+                    <th>Realisasi</th>
+                    <th>Lebih/Kurang</th>
+                </tr>
+            </thead>
+            <tbody>
+        {% for i in info_list3 %}
+        {% if i.type=='pendapatan' %}
+                <tr>
+                    <td>{{ i.no | angka_ke_huruf}}</td>
+                    <td>{{ i.uraian }} </td>
+                    <td>{{ i.anggaran | clean_currency | format_currency }}</td>
+                    <td>{{ i.realisasi | format_currency }}</td>
+                    <td>{{ i.lebih_kurang | format_currency }}</td>
+                </tr>
+        {% endif %}
+        {% endfor %}
+                <tr>
+                <td></td>
+                    <td>Jumlah</td>
+                    <td>${jml_anggaran_pendapatan}</td>
+                    <td>${jml_realisasi_pendapatan}</td>
+                    <td>${jml_lebih_kurang_pendapatan}</td>
+                </tr>
+            </tbody>
+        </table>
+      </div>
+    `;
+
+    // Konten untuk tabel pengeluaran
+    const pengeluaranTable = `
+    <div class="table-responsive scroll-table">
+        <table class="table custom-table-pengeluaran">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Uraian</th>
+                    <th>Anggaran</th>
+                    <th>Realisasi</th>
+                    <th>Lebih/Kurang</th>
+                </tr>
+            </thead>
+            <tbody>
+        {% for i in info_list3 %}
+        {% if i.type=='pengeluaran' %}
+                <tr>
+                    <td>{{ i.no | angka_ke_huruf}}</td>
+                    <td>{{ i.uraian }} </td>
+                    <td>{{ i.anggaran | clean_currency | format_currency }}</td>
+                    <td>{{ i.realisasi | format_currency }}</td>
+                    <td>{{ i.lebih_kurang | format_currency }}</td>
+                </tr>
+        {% endif %}
+        {% endfor %}
+                <tr>
+                <td></td>
+                    <td><strong>Jumlah</strong></td>
+                    <td><strong>${jml_anggaran_pengeluaran}</strong></td>
+                    <td><strong>${jml_realisasi_pengeluaran}</strong></td>
+                    <td><strong>${jml_lebih_kurang_pengeluaran}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    `;
+
+    // Gabungan konten modal dengan pesan pendapatan dan pengeluaran serta tabel
+    const modalContent = `
+        <span class="mb-4 summary-text">Pendapatan tahun ${tahun}</span><br>
+        
+        ${pendapatanTable}
+        <span class="mb-2 summary-text">Summary : ${pesan_pendapatan}</span><br><hr>
+
+        <span class="mb-4 summary-text">Pengeluaran tahun ${tahun}</span><br>   
+        ${pengeluaranTable}
+        <span class="mb-2 summary-text">Summary : 
+        ${pesan_pengeluaran}</span><br>
+
+        <input type="hidden" id="tahun_nota" value="${tahun}">
+        <input type="hidden" id="kategori_nota" value="summary">
+    `;
+
+    // Tampilkan modal
+    showModal(`Summary RAB tahun ${tahun}`, modalContent);
+}
+  function formatRupiah(input) {
+    let angka = input.value.replace(/[^,\d]/g, ''); // Menghapus semua karakter selain angka dan koma
+    if (angka) {
+        let hasil = Number(angka.replace(/,/g, '')).toLocaleString('id-ID'); // Format angka sesuai Indonesia
+        input.value = hasil;
+    } else {
+        input.value = ''; // Jika input tidak valid (semua dihapus), set ke string kosong
+    }
+}
+function normalizeValue(value) {
+    return value.replace(/\./g, ''); // Menghapus semua titik dari value yang diformat
+}
+     function formatNumber(number) {
+        // Mengubah angka menjadi string dan memisahkan bagian desimal
+        var parts = number.toString().split(".");
+        // Memformat bagian ribuan dengan titik
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        // Mengembalikan string yang diformat dengan koma sebagai desimal
+        return parts.join(","); 
+    }
+    function calculateTotal(className) {
+        var elements = document.querySelectorAll('.' + className);
+        console.log(elements)
+        var total = 0;
+        elements.forEach(function(element) {
+          console.log(element)
+            var value = parseFloat(element.getAttribute('data')) || 0; // Mengambil nilai dan konversi ke float
+            console.log(value)
+            total += value; // Menambahkan nilai ke total
+        });
+        total = formatNumber(total.toFixed(2))
+
+        return "Rp"+total; // Mengembalikan total dengan 2 desimal
+    }
+    function detail_nota(gambar,judul){ showModal("",`<img class='w-100' src='/static/image/${gambar}'> <h2>${judul}</h2>`); };
+    </script>
 {% endblock %}
 {% block content %}
 <div class="page-titles">
@@ -62,13 +254,111 @@
                     <li class="breadcrumb-item active" aria-current="page">Dana Desa</li>
                 </ol>
             </nav>
-            <h1 class="mb-0 fw-bold">Realisasi Dana Desa {{tahun}}</h1>
+            <div class="d-flex">
+                <h1 class="mb-0 fw-bold me-4">Realisasi Dana Desa {{tahun}}</h1>             
+                {% for x in summary %}
+                    {% if x.tahun == tahun %}
+                        <button type="button" class="btn btn-warning me-3" onclick="summary(
+                            '{{ tahun }}',
+                            '{{ x.summary_pendapatan }}',
+                            '{{ x.jml_anggaran_pendapatan  |format_currency }}', 
+                            '{{ x.jml_realisasi_pendapatan  |format_currency }}', 
+                            '{{ x.jml_lebih_kurang_pendapatan }}',
+                            '{{ x.summary_pengeluaran }}',
+                            '{{ x.jml_anggaran_pengeluaran  |format_currency}}', 
+                            '{{ x.jml_realisasi_pengeluaran  |format_currency}}', 
+                            '{{ x.jml_lebih_kurang_pengeluaran }}'
+                        )">Summary</button>
+                    {% endif %}
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-8">
+        {% set categories = [('Anggaran', info_list), ('Transaksi', info_list2), ('Report Dana', info_list3)] %}
+        {% for category, info in categories %}
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="mb-0 fw-bold me-3">Realisasi {{ category }}</h1>
+                        {% if category == "Report Dana" %}
+                        {% else %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive {% if category in ['Transaksi','Anggaran','Report Dana'] %}scroll-table{% endif %}">
+                        <table id="table_{{ tahun }}_{{ loop.index }}" class="table table-bordered display text-nowrap">
+                            <thead style="background-color:#f6f8fb;">
+                                <tr>
+                                    <th>No</th>
+                                    {% if category == "Anggaran" %}
+                                        <th>Uraian</th>
+                                        <th>Anggaran</th>
+                                        <th>Type</th>
+                                        <th>Tahun</th>
+                                    {% elif category == "Transaksi" %}
+                                        <th>Tanggal</th>
+                                        <th>Keterangan</th>
+                                        <th>Nominal</th>
+                                        <th>Alokasi</th>
+                                        <th>Nota</th>
+                                    {% elif category == "Report Dana" %}
+                                        <th>Uraian</th>
+                                        <th>Estimasi / Anggaran</th>
+                                        <th>Realisasi</th>
+                                        <th>Tahun</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in info %}
+                                    {% if tahun == i.tahun %}
+                                    <tr class="{{ i.class }} data-utama" id="{{ i.detail }}">
+                                        <td>{{ i.no }}</td>
+                                        {% if category == "Anggaran" %}
+                                            <td>{{ i.uraian }} </td>
+                                            <td class="anggaran_{{ category.lower() }}_{{ tahun }}" data="{{ i.anggaran | clean_currency }}">{{ i.anggaran | clean_currency | format_currency }}</td>
+                                            <td>{{ i.type }}</td>
+                                            <td>{{ i.tahun }}</td>
+                                        {% elif category == "Transaksi" %}
+                                            <td>{{ i.tanggal }} </td>
+                                            <td>{{ i.keterangan }}</td>
+                                            <td>{{ i.nominal | clean_currency | format_currency }}</td>
+                                            <td>{{ i.alokasi }}</td>
+                                            <td><button data-bs-toggle="modal" data-bs-target="#modal-{{ i.id }}" class="btn btn-success">Lihat Nota / Bukti</button></td>
+                                        {% elif category == "Report Dana" %}
+                                            <td>{{ i.uraian }} </td>
+                                            <td>{{ i.anggaran | clean_currency | format_currency }}</td>
+                                            <td>{{ i.realisasi | format_currency }}</td>
+                                            <td>{{ i.tahun }}</td>
+                                        {% endif %}
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <script>
+                            $("#table_{{ tahun }}_{{ loop.index }}").DataTable({
+                                "paging": false, 
+                                "info": false, 
+                                "searching": true, 
+                                "lengthChange": false, 
+                                "language": {
+                                    "search": "",  
+                                    "searchPlaceholder": "Cari..." 
+                                },
+                                "dom": '<"top"f>rt'
+                            });
+                        </script>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
             <div class="card">
                 <div class="card-header">
                     <div class="d-flex justify-between ">
@@ -187,6 +477,7 @@
                                 <td>{{i['lebih/(kurang)']}}</td>
                                 <td>{{i.tahun}}</td>
                                 <td>
+                                    <button data-bs-toggle="modal" data-bs-target="#modal-{{ i.id }}" class="btn btn-success">Nota</button>
                                     <button onclick="upload_nota({{i.tahun}},'pendapatan',{{i.id}},'{{i.nota}}')" class="btn btn-success">Lihat Nota / Bukti</button>
                                 </td>     
                             </tr>
@@ -233,6 +524,79 @@
     </div>
 </div>
 
+<!-- Modal Nota -->
+{% for transaksi in info_list2 %}
+<div class="modal fade" id="modal-{{ transaksi.id }}" tabindex="-1" aria-labelledby="modal-{{ transaksi.id }}" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content">
+      <div class="modal-header d-flex align-items-center">
+        <h4 class="modal-title" id="myLargeModalLabel">Nota {{transaksi.keterangan}}</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="background-color:#e6f4ff">
+      <div class="container-fluid" style="background-color:#e6f4ff">
+      <div class="row">
+      <div class="col-12">
+        <!-- Row -->
+        <div class="row">
+          <!-- Column -->
+          {% for i in list_nota %}
+          {% if i.id_transaksi == transaksi.id %}
+          <div class="col-lg-3">
+            <div class="card">
+              {% if i.gambar == "default.jpg" %}
+              {% else %}
+              <img class="card-img-top img-responsive" src="../../static/image/{{i.gambar}}" alt="Card image cap" />
+              {% endif %}
+              <div class="card-body">
+                <div class="d-flex no-block align-items-center mb-3">
+                  <span class="d-flex align-items-center"><i data-feather="calendar"
+                      class="feather-sm me-1"></i>{{i.tanggal}}</span>
+                </div>
+                <h3 class="font-weight-medium">{{i.judul}}</h3>
+                <p class="mb-0 mt-2 text-muted">{{i.deskripsi|safe}}</p>
+                <div class="text-end">
+                  <button onclick="detail_nota('{{ i.gambar }}','{{ i.judul }}')" class="btn btn-secondary btn-rounded waves-effect waves-light mt-3">detail</button> 
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Column -->                
+          {% endif %}
+          {% endfor %}
+        </div>
+        <!-- Row -->
+      </div>
+      </div>
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>     
+{% endfor %}
+<!-- Modal template -->
+<div class="modal fade" id="generic-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header d-flex align-items-center">
+        <h4 class="modal-title" id="modal-title">Title</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="modal-body">...</div>
+      <div class="modal-footer">
+        <div class="col-lg-4 col-md-6 d-md-flex align-items-center justify-content-end">
+          <a id="modal-submit" class="btn btn-info d-flex align-items-center ms-2">Submit</a>
+        </div>
+        <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- Modal upload nota  -->
 <div class="modal fade" id="bs-nota-modal-x2" tabindex="-1" aria-labelledby="bs-nota-modal-lg" aria-hidden="true">
     <div class="modal-dialog modal-xl">
@@ -256,6 +620,12 @@
 {% endblock %}
 {% block js %}
 <script>
+ $(document).ready(function() {
+    $("#modal-submit").hide();
+    $("#modal-submit").css("display", "none");
+ 
+});
+
   function toggleDetails(ids) {
     var idArray = ids.split(',');
     idArray.forEach(function(id) {

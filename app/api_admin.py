@@ -303,7 +303,6 @@ def angka_ke_huruf(n):
     else:
         return "Angka harus antara 1 dan 26."
 
-
 def set_urutan_default(info_list):
     urutan = {}
     for i in fetch_data_and_format(f"SELECT * FROM realisasi_{info_list} ORDER BY id"):
@@ -334,6 +333,7 @@ def admindana():
     info_list3 = [{**j, 
                     'realisasi': (realisasi := sum( int(k['nominal']) for i in gabung if i['id_tabel_anggaran'] == j['id'] for k in info_list2 if i['id_transaksi'] == k['id'] )),
                     'lebih_kurang': int(j['anggaran']) - realisasi} for j in info_list ]
+    gabung_nota = fetch_data_and_format("SELECT * FROM gabung_tabel_transaksi_nota")
     thn = fetch_years("SELECT tahun FROM tabel_anggaran GROUP BY tahun")
     summary = []
     for h in thn:
@@ -361,7 +361,9 @@ def admindana():
             ),
         })
         summary.append(item)
-    return render_template("admin/dana_transaksi.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn, summary=summary)
+        
+    list_nota=fetch_data_and_format("SELECT * FROM nota order by id DESC")
+    return render_template("admin/dana_transaksi.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn, summary=summary, list_nota = list_nota)
 
 @app.route('/admin/dana/ubah_urutan', methods=['PUT'])
 @jwt_required()
@@ -1299,6 +1301,48 @@ def bpd_edit():
         g.con.execute("UPDATE bpd SET nama = %s, jabatan = %s, status = %s WHERE id = %s",(nama,jabatan,status,id))
         mysql.connection.commit()
         return jsonify({"msg" : "SUKSES"})
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)})
+
+@app.route('/admin/tambah_Nota', methods=['POST'])
+@jwt_required()
+def tambah_Nota():
+    judul = request.form['judul']
+    link = '_'.join(filter(None, [judul.replace("#", "").replace("?", "").replace("/", "").replace(" ", "_")]))
+    id_transaksi = request.form['id_transaksi']
+    try: 
+        random_name = do_image("tambah","nota","")
+        g.con.execute("INSERT INTO nota (judul, gambar, link , id_transaksi ) VALUES (%s,%s,%s,%s)",(judul,random_name,link,id_transaksi))
+        mysql.connection.commit()
+        return jsonify({"msg":"SUKSES"})
+    except Exception as e:
+        str(e)
+        return jsonify({"error": str(e)})
+@app.route('/admin/edit_Nota', methods=['PUT'])
+@jwt_required()
+def Nota_edit():
+    id = request.form['id']
+    judul = request.form['judul']
+    link = '_'.join(filter(None, [judul.replace("#", "").replace("?", "").replace("/", "").replace(" ", "_")]))
+    try:
+        status = do_image("edit","nota",id)
+        g.con.execute("UPDATE nota SET judul = %s, link = %s  WHERE id = %s",(judul,link,id))
+        mysql.connection.commit()
+        return jsonify({"msg" : "SUKSES"})
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)})
+
+@app.route('/admin/hapus_Nota', methods=['DELETE'])
+@jwt_required()
+def hapus_Nota():
+    id = request.form['id']
+    try:
+        do_image("delete","nota",id)
+        g.con.execute("DELETE FROM nota WHERE id = %s", (id,))
+        mysql.connection.commit()
+        return jsonify({"msg": "SUKSES"})
     except Exception as e:
         print(str(e))
         return jsonify({"error": str(e)})

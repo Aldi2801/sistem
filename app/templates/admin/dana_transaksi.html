@@ -1,5 +1,6 @@
 {% extends 'include/include.html' %}
 {% block head %}
+<link rel="stylesheet" type="text/css" href="../../static/assets/libs/quill/dist/quill.snow.css" />
 <style>
 .hidden-row { display: none; }
 .clickable-row { cursor: pointer; transition: background-color 0.3s ease; }
@@ -22,7 +23,13 @@
 .custom-table-pengeluaran tbody tr:hover { background-color: #f5c6cb; }
 .custom-table tbody td { border: 1px solid #dee2e6; }
 .summary-text { font-weight: bold; margin-bottom: 18px; line-height: 1.5; font-size: 1.2em; letter-spacing: 0.5px; }
-
+  .ql-toolbar .ql-formats svg {
+    width: 20px; /* Lebar ikon */
+    height: 20px; /* Tinggi ikon */
+}
+  .ql-toolbar .ql-formats ql-align svg{
+    padding-bottom:5px;
+}
 </style>
 <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
 <script>
@@ -46,6 +53,7 @@
   }
 
   function tambahBaris(category,tahun_lama) {
+    $("#modal-submit").show()
        showModal(
         `Tambah Baris ${category}`,
         `
@@ -111,6 +119,7 @@
     );
   }
    function tambahBaris3() {
+    $("#modal-submit").show()
        showModal(
         'Tambah Baris Anggaran',
         `
@@ -182,84 +191,12 @@
         label4.textContent = "Tahun";
     }
 }
-
-    function tambahBaris2(category,tahun_lama,parent_id) {
-    showModal(
-      'Tambah Baris',
-      `
-       <input type="hidden" id="tahun_lama_baris" value="${tahun_lama}">
-       <input type="hidden" id="kategori_baris" value="${category}">
-       <input type="hidden" id="rab" >
-       <input type="hidden" id="parent_id" value="${parent_id}" >
-       <div class="form-group"><label id="tanya" for="tanya">Apakah ini Data RAB?</label>
-        <div class="form-check"> <input class="form-check-input" type="radio" name="rab" id="rab-ya" value="1" checked onchange="ubahLabel()"> <label class="form-check-label" for="rab-ya">Ya</label> </div>
-        <div class="form-check"> <input class="form-check-input" type="radio" name="rab" id="rab-tidak" value="0" onchange="ubahLabel()"> <label class="form-check-label" for="rab-tidak">Tidak</label> </div>
-       </div>
-       <div class="form-group"><label for="no">No</label><input type="text" id="no_baris" class="form-control"></div>
-       <div class="form-group"><label for="uraian">Uraian</label><input type="text" id="uraian_baris" class="form-control"></div>
-       <div class="form-group"><label id="label1" for="anggaran">Volume</label><input type="text" id="anggaran_baris" class="form-control"></div>
-       <div class="form-group"><label id="label2" for="realisasi">Satuan</label><input type="text" id="realisasi_baris" class="form-control"></div>
-       <div class="form-group"><label id="label3" for="lebih_kurang">Harga Satuan (Rp)</label><input type="text" id="lebih_kurang_baris" class="form-control"></div>
-       <div class="form-group"><label id="label4" for="tahun_baru">Jumlah (Rp)</label><input type="text" id="tahun_baru_baris" class="form-control"></div>`,
-       function() {
-        handleAjax(
-          '/admin/dana/tambah/sub',
-          'POST',
-          {
-            tahun_lama: $("#tahun_lama_baris").val(),
-            kategori: $("#kategori_baris").val(),
-            no: $("#no_baris").val(),
-            uraian: $('#uraian_baris').val(),
-            anggaran: $('#anggaran_baris').val(),
-            realisasi: $('#realisasi_baris').val(),
-            lebih_kurang: $('#lebih_kurang_baris').val(),
-            tahun_baru: $('#tahun_baru_baris').val(),
-            rab: document.querySelector('input[name="rab"]:checked').value,
-            parent_id: $('#parent_id').val()
-          },
-          function(response) {
-            window.location.reload();
-          },
-          function(xhr, status, error) {
-            console.error("Error:", error);
-          }
-        );
-
-      }
-    );
-  }
-  function upload_nota(tahun,category,id,nota) {
-    const pesan = nota ? `file sudah ada bisa dilihat disini <a target='_blank' href='/static/nota/${nota}'>${nota}</a>` : "";
-    showModal(
-      'Upload Nota / Bukti',
-      `<span class="mb-2">Upload Nota / Bukti untuk ${category} tahun ${tahun}</span><br>   
-        <span class="mb-2">${pesan}</span>
-       <input type="hidden" id="tahun_nota" value="${tahun}">
-       <input type="hidden" id="kategori_nota" value="${category}">
-       <input type="file" id="file_nota" class="form-control">`,
-      function() {
-        const formData = new FormData();
-        formData.append('file', document.getElementById('file_nota').files[0]);
-        formData.append('tahun', $("#tahun_nota").val());
-        formData.append('kategori', $("#kategori_nota").val());
-        $.ajax({
-          url: '/admin/dana_new/upload_file',
-          method: 'POST',
-          data: formData,
-          contentType: false,
-          processData: false,
-          headers: { 'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}" },
-          success: function() { window.location.reload(); },
-          error: function(xhr, status, error) { console.error("Error:", error); }
-        });
-      }
-    );
-  }
 function summary(
     tahun, 
     pesan_pendapatan, jml_anggaran_pendapatan, jml_realisasi_pendapatan, jml_lebih_kurang_pendapatan,
     pesan_pengeluaran, jml_anggaran_pengeluaran, jml_realisasi_pengeluaran, jml_lebih_kurang_pengeluaran
 ) {
+    $("#modal-submit").hide()
     // Konten untuk tabel pendapatan
     const pendapatanTable = `
     <div class="table-responsive scroll-table">
@@ -336,25 +273,48 @@ function summary(
 
     // Gabungan konten modal dengan pesan pendapatan dan pengeluaran serta tabel
     const modalContent = `
-        <span class="mb-4 summary-text">Summary Pendapatan tahun ${tahun}</span><br>
-        
+        <span class="mb-4 summary-text">Pendapatan tahun ${tahun}</span><br>
         ${pendapatanTable}
-        <span class="mb-2 summary-text">${pesan_pendapatan}</span><br><hr>
-
-        <span class="mb-4 summary-text">Summary Pengeluaran tahun ${tahun}</span><br>   
+        <span class="mb-2 summary-text">Summary : ${pesan_pendapatan}</span><br><hr>
+        <span class="mb-4 summary-text">Pengeluaran tahun ${tahun}</span><br>   
         ${pengeluaranTable}
-        <span class="mb-2 summary-text">${pesan_pengeluaran}</span><br>
-
+        <span class="mb-2 summary-text">Summary : 
+        ${pesan_pengeluaran}</span><br>
         <input type="hidden" id="tahun_nota" value="${tahun}">
         <input type="hidden" id="kategori_nota" value="summary">
     `;
-
     // Tampilkan modal
     showModal(`Summary RAB tahun ${tahun}`, modalContent);
 }
-
+function hapus_tahun(){
+    $("#modal-submit").show()
+  showModal("Hapus Tahun",
+            `<span class="mb-2">Keterangan: Pilih data tahun berapa yang mau dihapus</span>
+              <select class="form-select" id="tahun_hps" name="educationDate">
+                <option value="semua_tahun" selected>Semua Tahun</option>
+                {% for i in tahun %}
+                <option value="{{i.tahun}}">{{i.tahun}}</option>
+                {% endfor %}
+              </select>`,
+          function() {
+          var tahun = $("#tahun_hps").val();
+          $("#delete").html("Loading ...");
+          $.ajax({
+            url: "/admin/hapus_dana_new",
+            method: 'DELETE',
+            headers: {'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}"},
+            data: { tahun: tahun },
+            dataType: 'json',
+            success: function(data) {
+              handleResponse(data, "hapus", "/admin/dana");
+            }
+          });
+          event.preventDefault();
+    })
+}
 
   function edit(tahun_lama, category, id, no, uraian, anggaran,type, tanggal,keterangan,nominal,alokasi ) {
+    $("#modal-submit").show()
     showModal(
         `Edit Data ${category}`,
         `<form><input type="hidden" id="tahun_lama_baris" value="${tahun_lama}">
@@ -464,6 +424,67 @@ function normalizeValue(value) {
 
         return "Rp"+total; // Mengembalikan total dengan 2 desimal
     }
+    function tambah_nota(id_transaksi) {
+      console.log(id_transaksi)
+      var jdl = $('#judulNotabaru' + id_transaksi,).val() 
+      let formData = new FormData(); 
+      jQuery.each(jQuery('#formFilebaru' + id_transaksi)[0].files, function (i, file) { 
+        formData.append('gambar', file); }); 
+        formData.append('judul', jdl); 
+        formData.append('id_transaksi', id_transaksi); 
+       $.ajax({
+        url: '/admin/tambah_Nota',
+        method: 'POST', type: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}",
+        },
+        data: formData, cache: false, 
+        contentType: false, processData: false,
+      }).done(function (response) {
+        handleResponse(response,"tambah","/admin/dana")
+      }).fail(function (error) {
+        
+      });
+   
+    }
+    function edit_Nota(id){ 
+      var editjdl = $('#editjudulNota-' + id,).val() 
+      var reset = $('#reset-'+id).prop('checked'); 
+      let formData = new FormData(); 
+      formData.append('id', id); formData.append('judul', editjdl); 
+      jQuery.each(jQuery('#editformFilebaru-' + id)[0].files, function (i, file) { 
+        formData.append('gambar', file); }); 
+        formData.append('reset', reset); 
+        $.ajax({ url: '/admin/edit_Nota', 
+        data: formData, cache: false, 
+        contentType: false, processData: false,
+         method: 'PUT', type: 'PUT',
+          headers: { 'Authorization': 'Bearer ' + '{{ session['jwt_token'] }}', }, 
+          }).done(
+            function (data) { handleResponse(data,'edit','/admin/dana'); }
+            ); }
+    function detail_nota(gambar,judul){ 
+ showModal("",`<img class='w-100' src='/static/image/${gambar}'> <h2>${judul}</h2>`);
+     }
+      function hapusNota(id) {
+         if (confirm(`Are you sure you want to delete this ?`)) {
+       $.ajax({
+        url: '/admin/hapus_Nota',
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}",
+        },
+        data: { id: id },
+        dataType: 'json',
+      }).done(function (response) {
+        handleResponse(response,"hapus","/admin/dana")
+      }).fail(function (error) {
+        
+      });
+    } else {
+      alert('Aksi penghapusan dibatalkan.');
+    }
+    }
 </script>
 {% endblock %}
 {% block content %}
@@ -483,7 +504,7 @@ function normalizeValue(value) {
       <h1 class="mb-0 fw-bold">Dana Desa</h1>
     </div>
     <div class="col-lg-4 col-md-6 d-md-flex align-items-center justify-content-end">
-      <a href="javascript:void(0)" class="btn btn-danger d-flex align-items-center ms-2" data-bs-toggle="modal" data-bs-target="#bs-example-modal-x2">Hapus Tahun</a>
+      <a href="javascript:void(0)" class="btn btn-danger d-flex align-items-center ms-2" onclick="hapus_tahun()">Hapus Tahun</a>
       <a href="javascript:void(0)" class="btn btn-info d-flex align-items-center ms-2" onclick="tambahBaris3()">
         <i class="ri-add-line me-1"></i> Tambah Data
       </a>
@@ -499,7 +520,7 @@ function normalizeValue(value) {
           <h4>Dana Desa Tahun:</h4>
           <div class="col-sm-3">
             <div class="mb-3">
-              <select class="form-select" id="tahun" name="educationDate">
+              <select class="form-select" id="tahun_dana" name="educationDate">
                 <option value="tahun" selected>Semua Tahun</option>
                 {% for i in tahun %}
                   <option value="{{ i.tahun }}">{{ i.tahun }}</option>
@@ -513,20 +534,20 @@ function normalizeValue(value) {
           {% for h in tahun %}
             <div id="table_{{ h.tahun }}" class="mt-3">
               <h4>Dana Desa Tahun {{ h.tahun }}</h4>
-{% for x in summary %}
-  {% if x.tahun == h.tahun %}
-    <button type="button" class="btn btn-warning mr-3" onclick="summary(
-      '{{ h.tahun }}',
-      '{{ x.summary_pendapatan }}',
-      '{{ x.jml_anggaran_pendapatan  |format_currency }}', 
-      '{{ x.jml_realisasi_pendapatan  |format_currency }}', 
-      '{{ x.jml_lebih_kurang_pendapatan }}',
-      '{{ x.summary_pengeluaran }}',
-      '{{ x.jml_anggaran_pengeluaran  |format_currency}}', 
-      '{{ x.jml_realisasi_pengeluaran  |format_currency}}', 
-      '{{ x.jml_lebih_kurang_pengeluaran }}')">Summary</button>
-  {% endif %}
-{% endfor %}
+              {% for x in summary %}
+                {% if x.tahun == h.tahun %}
+                  <button type="button" class="btn btn-warning mr-3" onclick="summary(
+                    '{{ h.tahun }}',
+                    '{{ x.summary_pendapatan }}',
+                    '{{ x.jml_anggaran_pendapatan  |format_currency }}', 
+                    '{{ x.jml_realisasi_pendapatan  |format_currency }}', 
+                    '{{ x.jml_lebih_kurang_pendapatan }}',
+                    '{{ x.summary_pengeluaran }}',
+                    '{{ x.jml_anggaran_pengeluaran  |format_currency}}', 
+                    '{{ x.jml_realisasi_pengeluaran  |format_currency}}', 
+                    '{{ x.jml_lebih_kurang_pengeluaran }}')">Summary</button>
+                {% endif %}
+              {% endfor %}
 
               {% set categories = [('Anggaran', info_list), ('Transaksi', info_list2), ('Report Dana', info_list3)] %}
               
@@ -585,7 +606,7 @@ function normalizeValue(value) {
                                       <td>{{ i.nominal | clean_currency | format_currency }}</td>
                                       <td>{{ i.alokasi }}</td>
                                       <td>
-                                      <button onclick="upload_nota({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.nota }}')" class="btn btn-success">Nota</button>
+                                      <button data-bs-toggle="modal" data-bs-target="#modal-{{ i.id }}" class="btn btn-success">Nota</button>
                                         <button onclick="edit({{ i.tahun }}, '{{ category.lower() }}', {{ i.id }}, '{{ i.no }}', '','','','{{ i.tanggal }}', '{{ i.keterangan }}', {{i.nominal}}, '{{ i.alokasi }}' )" class="btn btn-warning">Edit</button>
                                         <button onclick="hapus({{ h.tahun }}, '{{ category.lower() }}', {{ i.id }})" class="btn btn-danger">Hapus</button>
                                       </td>
@@ -615,13 +636,166 @@ function normalizeValue(value) {
                 </div>
               {% endfor %}
             </div>
-            
           {% endfor %}
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Modal Nota -->
+{% for transaksi in info_list2 %}
+<div class="modal fade" id="modal-{{ transaksi.id }}" tabindex="-1" aria-labelledby="modal-{{ transaksi.id }}" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content">
+      <div class="modal-header d-flex align-items-center">
+        <h4 class="modal-title" id="myLargeModalLabel">Nota {{transaksi.keterangan}}</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="background-color:#e6f4ff">
+      <div class="page-titles" style="padding-top:0px;padding-bottom:0px"> <div class="row"> <div class="col-lg-8 col-md-6 col-12 align-self-center"> </div> <div class="col-lg-4 col-md-6 d-md-flex align-items-center justify-content-end"> <a class="btn btn-info d-flex align-items-center ms-2" data-bs-toggle="modal" data-bs-target="#tambah_nota_{{ transaksi.id }}"> <i class="ri-add-line me-1"></i> Tambah Nota </a> </div> </div> </div> <br>
+      <div class="container-fluid" style="background-color:#e6f4ff">
+      <div class="row">
+      <div class="col-12">
+        <!-- Row -->
+        <div class="row">
+          <!-- Column -->
+          {% for i in list_nota %}
+          {% if i.id_transaksi == transaksi.id %}
+          <div class="col-lg-3">
+            <div class="card">
+              {% if i.gambar == "default.jpg" %}
+              {% else %}
+              <img class="card-img-top img-responsive" src="../../static/image/{{i.gambar}}" alt="Card image cap" />
+              {% endif %}
+              <div class="card-body">
+                <div class="d-flex no-block align-items-center mb-3">
+                  <span class="d-flex align-items-center"><i data-feather="calendar"
+                      class="feather-sm me-1"></i>{{i.tanggal}}</span>
+                </div>
+                <h3 class="font-weight-medium">{{i.judul}}</h3>
+                <p class="mb-0 mt-2 text-muted">{{i.deskripsi|safe}}</p>
+                <div class="text-end">
+                  <button onclick="detail_nota('{{ i.gambar }}','{{ i.judul }}')" class="btn btn-secondary btn-rounded waves-effect waves-light mt-3">detail</button>
+                  <button class="btn btn-primary btn-rounded waves-effect waves-light mt-3" data-bs-toggle="modal"
+                    data-bs-target="#bs-example-modal-lg-{{i.id}}">
+                    Edit
+                  </button>
+                  <button class="btn btn-danger btn-rounded waves-effect waves-light mt-3"
+                    onclick="hapusNota('{{i.id}}')">
+                    Hapus
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Column -->                
+          {% endif %}
+          {% endfor %}
+        </div>
+        <!-- Row -->
+      </div>
+      </div>
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- Modal tambah nota -->
+    <div class="modal fade" id="tambah_nota_{{ transaksi.id }}" tabindex="-1" aria-labelledby="bs-example-modal-lg"
+      aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header d-flex align-items-center">
+            <h4 class="modal-title" id="myLargeModalLabel">
+              Tambah Nota
+            </h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <h4>Judul Nota</h4>
+            <form>
+              <div class="form-group">
+                <input type="text" id="judulNotabaru{{ transaksi.id }}" class="form-control" />
+              </div>
+            </form>
+            <h4>Input Gambar</h4>
+            <form>
+              <div class="input-group mb-3">
+                <div class="custom-file">
+                  <input class="form-control" type="file" id="formFilebaru{{ transaksi.id }}" />
+                </div>
+              </div>
+            </form>
+            </div>
+          <div class="modal-footer">
+            <a onclick="tambah_nota({{ transaksi.id }})" href="javascript:void(0)" class="btn btn-info d-fFlex align-items-center ms-2">
+              Submit
+            </a>
+            <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start"
+              data-bs-dismiss="modal">
+              Close
+            </button>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+      </div>
+      <!-- Modal tambah nota -->       
+{% endfor %}
+{% for i in list_nota %}
+ <div class="modal fade" id="bs-example-modal-lg-{{i.id}}" tabindex="-1"
+                  aria-labelledby="bs-example-modal-lg" aria-hidden="true">
+                  <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                      <div class="modal-header d-flex align-items-center">
+                        <h4 class="modal-title" id="myLargeModalLabel1">
+                          Edit Nota
+                        </h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Judul Nota</h4>
+                        <form>
+                          <div class="form-group">
+                            <input type="text" class="form-control" id="editjudulNota-{{i.id}}" value="{{i.judul}}" />
+                          </div>
+                        </form>
+                        <h4>Input Gambar Baru</h4>
+                        <form>
+                          <div class="input-group mb-3">
+                            <div class="custom-file">
+                              <input class="form-control" type="file" hint="{{i.gambar}}" id="editformFilebaru-{{i.id}}" />
+                            </div>
+                          </div>
+                        </form>                    
+                        <label class="form-check-label" for="inlineCheckbox1">Hapus Gambar?</label>
+                        <input class="form-check-input" type="checkbox" id="reset-{{i.id}}">
+                        
+                      </div>
+                      <div class="modal-footer">
+                        <button type="submit" onclick="edit_Nota({{ i.id }})"
+                          class="btn btn-info d-flex align-items-center ms-2">
+                          Submit
+                        </button>
+                        <button type="button"
+                          class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start"
+                          data-bs-dismiss="modal">
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                    <!-- /.modal-content -->
+                  </div>
+                  <!-- /.modal-dialog -->
+                </div>
+{% endfor %}
 <!-- Modal template -->
 <div class="modal fade" id="generic-modal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-xl">
@@ -640,142 +814,15 @@ function normalizeValue(value) {
     </div>
   </div>
 </div>
-
-<!-- Modal Hapus Tahun -->
-<div class="modal fade" id="bs-example-modal-x2" tabindex="-1" aria-labelledby="bs-example-modal-lg" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header d-flex align-items-center">
-        <h4 class="modal-title" id="myLargeModalLabel">Hapus Dana Desa berdasarkan tahun</h4>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <span class="mb-2">Keterangan: Pilih data tahun berapa yang mau dihapus</span>
-        <select class="form-select" id="tahun_hps" name="educationDate">
-          <option value="semua_tahun" selected>Semua Tahun</option>
-          {% for i in tahun %}
-          <option value="{{i.tahun}}">{{i.tahun}}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="modal-footer">
-        <div class="col-lg-4 col-md-6 d-md-flex align-items-center justify-content-end">
-          <a id="delete" class="btn btn-info d-flex align-items-center ms-2">Submit</a>
-        </div>
-        <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- Modal Tambah Data -->
-<div class="modal fade" id="bs-example-modal-xl" tabindex="-1" aria-labelledby="bs-example-modal-lg" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header d-flex align-items-center">
-        <h4 class="modal-title" id="myLargeModalLabel">Tambah Dana Desa</h4>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <!-- <span class="mb-2">Keterangan: Download dan edit 3 file Excel .xlsx <a href='https://drive.google.com/drive/folders/1PxN3Lb0oBcfA61zQUto5pxG2IAyuhwSO?usp=sharing'>di sini</a> dan upload ke form di bawah</span>
-        <h4>Input Excel Realisasi Pendapatan</h4> -->
-        <form>
-            <div class="custom-file">
-              <label> Masukan Tahun Baru </label>
-              <input class="form-control" type="number" min="1000" max="9999" id="formtahun" />
-            </div>      
-            {% if error_tahun %} <div style="color: red;"> {{ error_tahun }} </div> {% endif %}
-          
-        </form>
-      </div>
-      <div class="modal-footer">
-        <div class="col-lg-4 col-md-6 d-md-flex align-items-center justify-content-end">
-          <a id="tambah" href="javascript:void(0)" class="btn btn-info d-flex align-items-center ms-2">Submit</a>
-        </div>
-        <button type="button" class="btn btn-light-danger text-danger font-weight-medium waves-effect text-start" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-    <!-- /.modal-content -->
-  </div>
-  <!-- /.modal-dialog -->
-</div>
 {% endblock %}
 {% block js %}
 
-
-<script src="../../static/assets/libs/nestable/jquery.nestable.js"></script>
 <script>
   $("#nama_nota").hide();
-function toggleDetails(ids) {
-  var idArray = ids.split(',');
-  idArray.forEach(function(id) {
-    var element = document.getElementById(id.trim());
-
-    // Pengecekan apakah elemen dengan ID ditemukan
-    if (element) {
-      console.log(element);
-      if (element.style.display === "none" || element.style.display === "") {
-        element.style.display = "table-row";
-      } else {
-        element.style.display = "none";
-           if (element.classList.contains('clickable-row')) {
-            console.log("Elemen ini memiliki kelas 'clickable-row'.");
-            var list_id = element.getAttribute("onclick");
-            list_id = list_id.replace("toggleDetails('","")
-            list_id = list_id.replace("')","")
-            list_id = list_id.split(',')
-            console.log(list_id)
-            list_id.forEach(function(id){
-            var element_child = document.getElementById(id.trim());
-            if (element_child) { element_child.style.display = "none" } 
-            });
-        } 
-      }
-    } else {
-      // Jika elemen tidak ditemukan, log pesan atau biarkan saja
-      console.warn("Element with ID '" + id.trim() + "' not found.");
-    }
-  });
-}
   $(document).ready(function() {
-    $('#yearDropdown, #numberDropdown').change(function() {
-      var selectedYear = $('#yearDropdown').val();
-      var selectedNumber = $('#numberDropdown').val();
-    });
-
-    // Set default view
-    var selectedYear = $('#yearDropdown').val('2022');
-    var selectedNumber = $('#numberDropdown').val('1');
-
-    var updateOutput = function (e) {
-      var list = e.length ? e : $(e.target),
-          output = list.data("output");
-      if (window.JSON) {
-        var serializedData = window.JSON.stringify(list.nestable("serialize"));
-        output.val(serializedData);
-        console.log(serializedData)
-        // Kirim data ke server menggunakan AJAX
-        // Cari elemen modal-footer dengan class tonggle-show
-
-        var selectedYear = $('#yearDropdown').val();
-        var selectedNumber = $('#numberDropdown').val();
-        var submitButton = $('#submit_' + selectedYear + '_' + selectedNumber);
-
-        // Menghapus event handler klik sebelumnya agar tidak menumpuk
-        submitButton.off('click');
     
-    
-      } else {
-        output.val("JSON browser support required for this demo.");
-      }
-    };
-
-    var data = {{ tahun | tojson | safe }};      
-    // Ambil nilai 'tahun' dari setiap objek dalam data
-    var years = data.map(function(item) {
-      return item.tahun;
-    });
- $("#tahun").val("tahun");
-    $("#tahun").change(function() {
+ $("#tahun_dana").val("tahun");
+    $("#tahun_dana").change(function() {
       var data_thn = JSON.parse('{{ tahun | tojson | safe }}');
       var thn = $('#tahun').val();
       for (var key in data_thn) {
@@ -788,15 +835,9 @@ function toggleDetails(ids) {
       }
     });
     $("#tambah").on("click", function() {
-      //var excellpendapatan = $('#formpendapatan')[0].files[0];
-      //var excellbelanja = $('#formbelanja')[0].files[0];
-      //var excellpembiayaan = $('#formpembiayaan')[0].files[0];
       var tahun = $('#formtahun').val();
       var formData = new FormData();
       formData.append('tahun',tahun);
-      //formData.append('excellpendapatan', excellpendapatan);
-      //formData.append('excellbelanja', excellbelanja);
-      //formData.append('excellpembiayaan', excellpembiayaan);
       $("#tambah").html("Loading ...");
       $.ajax({
         //url: "/admin/tambah_dana",
@@ -807,7 +848,7 @@ function toggleDetails(ids) {
         processData: false,
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer ' + token
+          'Authorization': 'Bearer ' + "{{ session['jwt_token'] }}",
         },
         success: function(data) {
           handleResponse(data, "tambah tahun dana", "/admin/dana");

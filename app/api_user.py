@@ -27,7 +27,7 @@ def fetch_years(query):
 #halaman homepage
 @app.route('/')
 def homepahe():
-    thn_dana_list =fetch_data_and_format("SELECT tahun FROM realisasi_pendapatan group by tahun")
+    thn_dana_list =fetch_data_and_format("SELECT tahun FROM tabel_anggaran group by tahun")
     session['list_thn_dana']= thn_dana_list 
     return render_template('index.html')
 @app.route('/news')
@@ -40,6 +40,12 @@ def detail_berita(link):
     query = "SELECT * FROM berita where link = '"+ str(link) +"' order by id DESC "
     berita = fetch_data_and_format(query)
     return render_template('detail_berita.html',info_list = berita)
+#halaman nota
+@app.route('/nota/<link>')
+def detail_nota(link):
+    query = "SELECT * FROM berita where link = '"+ str(link) +"' order by id DESC "
+    berita = fetch_data_and_format(query)
+    return render_template('detail_nota.html',info_list = berita)
 #halaman sejarah
 @app.route('/sejarah')
 def sejarah():
@@ -128,40 +134,48 @@ def dana_desa_old(thn):
                            urutan_pendapatan=set_urutan("pendapatan", thn), 
                            urutan_belanja=set_urutan("belanja", thn), 
                            urutan_pembiayaan=set_urutan("pembiayaan", thn))
+def format_currency(value):
+    locale.setlocale(locale.LC_ALL, 'id_ID.UTF-8')
+    return locale.currency(value, grouping=True, symbol='Rp')
 @app.route('/dana/<thn>')
 def dana_desa(thn):
  # Mengambil data dari tabel
-    info_list = fetch_data_and_format(f"SELECT * FROM tabel_anggaran WHERE tahun = {thn} ORDER BY no")
-    info_list2 = fetch_data_and_format(f"SELECT * FROM tabel_transaksi WHERE tahun = {thn} ORDER BY no")
+    info_list = fetch_data_and_format("SELECT * FROM tabel_anggaran ORDER BY no")
+    info_list2 = fetch_data_and_format("SELECT * FROM tabel_transaksi ORDER BY no")
     gabung = fetch_data_and_format("SELECT * FROM gabung_anggaran_transaksi")
-
-    info_list3 = []
-
-    # Proses penggabungan data
-    for j in info_list:  # j adalah dictionary, akses dengan key ['id']
-        item = {
-            'id': j['id'],  # Akses sebagai dictionary
-            'no': j['no'],
-            'uraian': j['uraian'],
-            'anggaran': j['anggaran'],
-            'tahun': j['tahun'],
-            'realisasi': 0 , # Inisialisasi total nominal
-            'lebih_kurang': 0  
-        }
+    info_list3 = [{**j, 
+                    'realisasi': (realisasi := sum( int(k['nominal']) for i in gabung if i['id_tabel_anggaran'] == j['id'] for k in info_list2 if i['id_transaksi'] == k['id'] )),
+                    'lebih_kurang': int(j['anggaran']) - realisasi} for j in info_list ]
+    gabung_nota = fetch_data_and_format("SELECT * FROM gabung_tabel_transaksi_nota")
+    summary = []
+    pendapatan = [k for k in info_list3 if k['tahun'] == thn and k['type'] == "pendapatan"]
+    pengeluaran = [k for k in info_list3 if k['tahun'] == thn and k['type'] == "pengeluaran"]
+    item = {
+        'tahun': thn,
+        'jml_anggaran_pendapatan': (jml_anggaran_pendapatan := sum(int(k['anggaran']) for k in pendapatan)),
+        'jml_realisasi_pendapatan':  (jml_realisasi_pendapatan  := sum(int(k['realisasi']) for k in pendapatan)),
+        'jml_anggaran_pengeluaran':  (jml_anggaran_pengeluaran  := sum(int(k['anggaran']) for k in pengeluaran)),
+        'jml_realisasi_pengeluaran': (jml_realisasi_pengeluaran := sum(int(k['realisasi']) for k in pengeluaran)),
+    }
+    item.update({
+        'jml_lebih_kurang_pendapatan': (jml_lebih_kurang_pendapatan := format_currency(item['jml_anggaran_pendapatan'] - item['jml_realisasi_pendapatan'])),
+        'jml_lebih_kurang_pengeluaran': (jml_lebih_kurang_pengeluaran := format_currency(item['jml_anggaran_pengeluaran'] - item['jml_realisasi_pengeluaran'])),
+        'summary_pendapatan': (
+            f"Realisasi Pendapatan melebihi Estimasi yang diprediksi. Dari total anggaran sebesar {format_currency(int(jml_anggaran_pendapatan))}, realisasi pendapatan mecapai {format_currency(int(jml_realisasi_pendapatan))}, dengan selisih lebih besar {(jml_lebih_kurang_pendapatan)}" if item['jml_anggaran_pendapatan'] < item['jml_realisasi_pendapatan'] else
+            f"Realisasi Pendapatan kurang dari Estimasi yang diprediksi. Dari total anggaran sebesar {format_currency(int(jml_anggaran_pendapatan))}, realisasi pendapatan mecapai {format_currency(int(jml_realisasi_pendapatan))}, dengan selisih lebih besar {(jml_lebih_kurang_pendapatan)}" if item['jml_anggaran_pendapatan'] > item['jml_realisasi_pendapatan'] else
+            f"Realisasi Pendapatan sesuai Estimasi yang diprediksi. Dari total anggaran sebesar {format_currency(int(jml_anggaran_pendapatan))}, realisasi pendapatan mecapai {format_currency(int(jml_realisasi_pendapatan))}, dengan selisih lebih besar {(jml_lebih_kurang_pendapatan)}"
+        ),
+        'summary_pengeluaran': (
+            f"Realisasi Pengeluaran untuk seluruh bidang kegiatan desa lebih tinggi dibandingkan dengan anggaran yang telah diterapkan. Dari total anggaran sebesar {format_currency(int(jml_anggaran_pengeluaran))}, realisasi pengeluaran mencapai {format_currency(int(jml_realisasi_pengeluaran))}. Terdapat selisih kurang sebesar {(jml_lebih_kurang_pengeluaran)}, yang menunjukan adanya pengeluaran yang melebihi anggaran di beberapa bidang" if item['jml_anggaran_pengeluaran'] < item['jml_realisasi_pengeluaran'] else
+            f"Realisasi Pengeluaran untuk seluruh bidang kegiatan desa lebih rendah dibandingkan dengan anggaran yang telah diterapkan. Dari total anggaran sebesar {format_currency(int(jml_anggaran_pengeluaran))}, realisasi pengeluaran mencapai {format_currency(int(jml_realisasi_pengeluaran))}. Terdapat selisih lebih besar {(jml_lebih_kurang_pengeluaran)}, yang menunjukan efisiensi dalam penggunaan dana di beberapa bidang" if item['jml_anggaran_pengeluaran'] > item['jml_realisasi_pengeluaran'] else
+            f"Realisasi Pengeluaran untuk seluruh bidang kegiatan desa sama dengan dibandingkan dengan anggaran yang telah diterapkan. Dari total anggaran sebesar {format_currency(int(jml_anggaran_pengeluaran))}, realisasi pengeluaran mencapai {format_currency(int(jml_realisasi_pengeluaran))}. Tidak Terdapat selisih yang menunujukan efisiensi dalam penggunaan dana di seluruh bidang"
+        ),
+    })
+    summary.append(item)
         
-        # Menjumlahkan nominal dari transaksi berdasarkan id_tabel_anggaran
-        for i in gabung:  # i adalah dictionary, akses dengan key ['id_tabel_anggaran']
-            if i['id_tabel_anggaran'] == j['id']:
-                for k in info_list2:  # k adalah dictionary, akses dengan key ['id']
-                    if i['id_transaksi'] == k['id']:
-                        # Menambahkan nominal dari transaksi ke dalam item
-                        item['realisasi'] += int(k['nominal'])
+    list_nota=fetch_data_and_format("SELECT * FROM nota order by id DESC")
+    return render_template("dana_new.html", info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn, summary=summary, list_nota = list_nota)
 
-        item['lebih_kurang'] += int(item['anggaran']) - int(item['relisasi'])
-        # Masukkan item yang sudah dijumlahkan ke dalam list
-        info_list3.append(item)
-
-    return render_template("dana_new.html",info_list=info_list, info_list2=info_list2, info_list3=info_list3, tahun=thn, jml_anggaran = jml_anggaran, jml_realisasi = jml_realisasi, jml_lebih_kurang = jml_lebih_kurang)
 #halaman monografi
 @app.route('/monografi')
 def mono():
