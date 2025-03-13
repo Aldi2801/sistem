@@ -822,9 +822,12 @@ function normalizeValue(value) {
  $("#tahun_dana").val("tahun");
     $("#tahun_dana").change(function() {
       var data_thn = JSON.parse('{{ tahun | tojson | safe }}');
-      var thn = $('#tahun').val();
+      var thn = $('#tahun_dana').val();
+      console.log(data_thn)
       for (var key in data_thn) {
+        console.log(key)
         var table_thn = data_thn[key].tahun;
+        console.log(table_thn)
         if (table_thn == thn || thn == "tahun") {
           $('#table_' + table_thn).show();
         } else {

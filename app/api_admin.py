@@ -598,6 +598,7 @@ def tambah_id_dana_new():
         if kategori == 'anggaran':
             uraian   = request.json.get('uraian')  
             anggaran = request.json.get('anggaran')
+            anggaran = anggaran.replace(".", "")
             type     = request.json.get('type')
             # Menyisipkan data
             g.con.execute(f"INSERT INTO tabel_anggaran (no, uraian, anggaran, type, tahun) VALUES (%s, %s, %s, %s, %s)", (no, uraian, anggaran, type, tahun_baru))
